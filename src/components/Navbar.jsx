@@ -12,14 +12,7 @@ function Navbar() {
         <button>Home</button>
       </Link>
 
-      {isLoggedIn && (
-        <>
-          <Link to="cranes">
-            <button>Cranes</button>
-          </Link>
-          <button onClick={logOutUser}>Logout</button>
-        </>
-      )}
+      {isLoggedIn && <button onClick={logOutUser}>Logout</button>}
 
       {!isLoggedIn && (
         <>
