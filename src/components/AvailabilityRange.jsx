@@ -10,7 +10,7 @@ function AvailabilityRange({ availability, setAvailability }) {
         type="date"
         id="availabilityStart"
         name="availabilityStart"
-        value={availability.start}
+        value={availability.availabilityStart}
         onChange={handleChange}
       />
       <label htmlFor="availabilityEnd">Available To:</label>
@@ -18,9 +18,9 @@ function AvailabilityRange({ availability, setAvailability }) {
         type="date"
         id="availabilityEnd"
         name="availabilityEnd"
-        value={availability.end}
-        min={availability.start}
-        disabled={!availability.start}
+        value={availability.availabilityEnd}
+        min={availability.availabilityStart}
+        disabled={!availability.availabilityStart}
         onChange={handleChange}
       />
     </div>

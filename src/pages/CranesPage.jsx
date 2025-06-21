@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import AddCrane from "../components/AddCrane";
+import { AuthContext } from "../context/auth.context";
 
 const API_URL = "http://localhost:5005";
 
 function CranesPage() {
   const [cranes, setCranes] = useState([]);
+  const { isLoggedIn } = useContext(AuthContext);
 
   const getAllCranes = async () => {
     const storedToken = localStorage.getItem("authToken");
@@ -26,6 +29,7 @@ function CranesPage() {
 
   return (
     <div>
+      {isLoggedIn && <AddCrane refreshCranes={getAllCranes} />}
       <ul>
         {cranes.map((crane) => (
           <li key={crane._id}>{crane.title}</li>
