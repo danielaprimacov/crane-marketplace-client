@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AddCrane from "../components/AddCrane";
 import { AuthContext } from "../context/auth.context";
+import Crane from "../components/Crane";
 
 const API_URL = "http://localhost:5005";
 
@@ -30,11 +31,10 @@ function CranesPage() {
   return (
     <div>
       {isLoggedIn && <AddCrane refreshCranes={getAllCranes} />}
-      <ul>
-        {cranes.map((crane) => (
-          <li key={crane._id}>{crane.title}</li>
-        ))}
-      </ul>
+
+      {cranes.map((crane) => (
+        <Crane key={crane._id} {...crane} />
+      ))}
     </div>
   );
 }
