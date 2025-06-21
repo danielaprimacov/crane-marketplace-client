@@ -164,6 +164,7 @@ function AddCrane(props) {
         <AvailabilityRange
           availability={availability}
           setAvailability={setAvailability}
+          usedFor="Available"
         />
 
         <button type="submit">Add Crane</button>

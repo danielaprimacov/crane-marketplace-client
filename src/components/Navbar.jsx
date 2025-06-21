@@ -1,10 +1,11 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/auth.context";
 
 function Navbar() {
-  const { isLoggedIn, logOutUser } = useContext(AuthContext);
+  const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   return (
     <nav>
@@ -12,7 +13,17 @@ function Navbar() {
         <button>Home</button>
       </Link>
 
-      {isLoggedIn && <button onClick={logOutUser}>Logout</button>}
+      {isLoggedIn && (
+        <>
+          {user?.role !== "admin" ? (
+            <button>Profile</button>
+          ) : (
+            <button onClick={() => navigate("/admin")}>Dashboard</button>
+          )}
+
+          <button onClick={logOutUser}>Logout</button>
+        </>
+      )}
 
       {!isLoggedIn && (
         <>

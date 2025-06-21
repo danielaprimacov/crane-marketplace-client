@@ -78,6 +78,11 @@ function CraneDetailsPage() {
           ) : (
             <p>Availability not specified.</p>
           )}
+          {user?.role !== "admin" && (
+            <Link to={`/cranes/${craneId}/new-inquiry`}>
+              <button>Send inquiry</button>
+            </Link>
+          )}
         </>
       )}
       {isOwner && (

@@ -1,11 +1,11 @@
-function AvailabilityRange({ availability, setAvailability }) {
+function AvailabilityRange({ availability, setAvailability, usedFor }) {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setAvailability((prev) => ({ ...prev, [name]: value }));
   };
   return (
     <div>
-      <label htmlFor="availabilityStart">Available From:</label>
+      <label htmlFor="availabilityStart">{usedFor} From:</label>
       <input
         type="date"
         id="availabilityStart"
@@ -13,7 +13,7 @@ function AvailabilityRange({ availability, setAvailability }) {
         value={availability.availabilityStart}
         onChange={handleChange}
       />
-      <label htmlFor="availabilityEnd">Available To:</label>
+      <label htmlFor="availabilityEnd">{usedFor} To:</label>
       <input
         type="date"
         id="availabilityEnd"
