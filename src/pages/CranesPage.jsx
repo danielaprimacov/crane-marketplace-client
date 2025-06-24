@@ -3,11 +3,14 @@ import axios from "axios";
 import AddCrane from "../components/AddCrane";
 import { AuthContext } from "../context/auth.context";
 import Crane from "../components/Crane";
+import Modal from "../components/Modal";
 
 const API_URL = "http://localhost:5005";
 
 function CranesPage() {
   const [cranes, setCranes] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
+
   const { isLoggedIn } = useContext(AuthContext);
 
   const getAllCranes = async () => {
@@ -30,7 +33,21 @@ function CranesPage() {
 
   return (
     <div>
-      {isLoggedIn && <AddCrane refreshCranes={getAllCranes} />}
+      {isLoggedIn && (
+        <>
+          <button onClick={() => setShowAdd(true)}>Add Crane</button>
+          {showAdd && (
+            <Modal onClose={() => setShowAdd(false)}>
+              <AddCrane
+                refreshCranes={() => {
+                  getAllCranes();
+                  setShowAdd(false);
+                }}
+              />
+            </Modal>
+          )}
+        </>
+      )}
 
       {cranes.map((crane) => (
         <Crane key={crane._id} {...crane} />

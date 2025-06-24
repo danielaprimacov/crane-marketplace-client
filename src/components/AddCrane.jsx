@@ -69,7 +69,7 @@ function AddCrane(props) {
 
   return (
     <div>
-      <h2>Add Project</h2>
+      <h2>Add Crane</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="title">Title:</label>
@@ -162,9 +162,10 @@ function AddCrane(props) {
         </div>
 
         <AvailabilityRange
-          availability={availability}
-          setAvailability={setAvailability}
-          usedFor="Available"
+          field="availability"
+          values={availability}
+          setValues={setAvailability}
+          label="Available"
         />
 
         <button type="submit">Add Crane</button>

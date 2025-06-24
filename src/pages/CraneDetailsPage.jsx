@@ -85,7 +85,7 @@ function CraneDetailsPage() {
           )}
         </>
       )}
-      {isOwner && (
+      {(user?.role === "admin" || isOwner) && (
         <>
           <Link to={`/cranes/edit/${craneId}`}>Edit Crane Details</Link>
           <button onClick={handleDelete}>Delete Crane</button>

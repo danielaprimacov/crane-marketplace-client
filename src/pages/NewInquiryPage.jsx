@@ -102,9 +102,10 @@ function NewInquiryPage() {
         </div>
         <div>
           <AvailabilityRange
-            availability={period}
-            setAvailability={setPeriod}
-            usedFor="Period"
+            field="period"
+            values={period}
+            setValues={setPeriod}
+            label="Period"
           />
         </div>
         <div>

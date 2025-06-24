@@ -186,8 +186,10 @@ function EditCraneDetailsPage() {
           </select>
         </div>
         <AvailabilityRange
-          availability={availability}
-          setAvailability={setAvailability}
+          field="availability"
+          values={availability}
+          setValues={setAvailability}
+          label="Available"
         />
 
         <button type="submit">Save Changes</button>

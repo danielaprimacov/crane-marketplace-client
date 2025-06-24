@@ -10,6 +10,7 @@ import EditCraneDetailsPage from "./pages/EditCraneDetailsPage";
 import NewInquiryPage from "./pages/NewInquiryPage";
 import AdminRoute from "./components/AdminRoute";
 import AdminPage from "./pages/AdminPage";
+import InquiriesListPage from "./pages/InquiriesListPage";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/inquiries" element={<InquiriesListPage />} />
+          <Route path="/admin/cranes" element={<CranesPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
