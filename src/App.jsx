@@ -1,4 +1,4 @@
-import "./App.css";
+// import "./index.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CranesPage from "./pages/CranesPage";
@@ -16,7 +16,6 @@ function App() {
   return (
     <>
       <Navbar />
-
       <Routes>
         <Route exact path="/" element={<HomePage />} />
         <Route exact path="/cranes" element={<CranesPage />} />
