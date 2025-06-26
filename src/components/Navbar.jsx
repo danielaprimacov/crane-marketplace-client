@@ -12,8 +12,10 @@ function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <nav className="m-4 bg-transparent flex justify-between items-center pb-4 border-b border-b-[rgba(0,0,0,0.5)]">
-      <div className="flex items-center gap-2">
+    <nav
+      className="fixed inset-x-0 top-0 h-16 z-50 bg-transparent flex justify-between items-center px-4 border-b border-b-[rgba(0,0,0,0.5)]"
+    >
+      <div className="flex items-center gap-2 ">
         <img src={menuIcon} alt="Menu Icon" className="w-6" />
         <span className="text-sm uppercase">Menu</span>
       </div>
