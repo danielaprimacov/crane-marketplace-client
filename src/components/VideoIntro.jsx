@@ -24,7 +24,7 @@ function VideoIntro() {
     <section className="relative w-full h-170 overflow-hidden">
       <video
         ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover filter drop-shadow-md"
+        className="absolute inset-0 w-full h-full object-cover transform scale-105 filter blur-[2px]"
         autoPlay
         muted
         loop
@@ -37,14 +37,12 @@ function VideoIntro() {
         Your browser does not support HTML5 video.
       </video>
 
-      <div className="absolute bottom-5 right-5 z-[10000]">
-        <button
-          onClick={handleToggle}
-          className="absolute bottom-5 right-5 z-10 bg-black bg-opacity-50 text-white py-2 px-4 rounded hover:bg-opacity-75 transition"
-        >
-          {playing ? "Pause" : "Play"}
-        </button>
-      </div>
+      <button
+        onClick={handleToggle}
+        className="absolute bottom-5 right-5 z-20 bg-black/50 text-white py-2 px-4 rounded hover:bg-black/75 transition duration-200 ease-in-out cursor-pointer"
+      >
+        {playing ? "Pause" : "Play"}
+      </button>
     </section>
   );
 }

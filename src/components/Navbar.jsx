@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/auth.context";
@@ -8,12 +8,30 @@ import userIcon from "../assets/icons/circle-user.png";
 import logo from "../assets/icons/shipping.png"; // temporary
 
 function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <nav
-      className="fixed inset-x-0 top-0 h-16 z-50 bg-transparent flex justify-between items-center px-4 border-b border-b-[rgba(0,0,0,0.5)]"
+      className={`
+        fixed inset-x-0 top-0 h-16 z-50 bg-transparent flex justify-between items-center px-4
+        border-b border-black/30 transition-colors duration-500 ease-out
+        ${
+          isScrolled
+            ? "bg-white/90 border-b border-gray-200 shadow-sm"
+            : "bg-transparent"
+        }
+      `}
     >
       <div className="flex items-center gap-2 ">
         <img src={menuIcon} alt="Menu Icon" className="w-6" />
