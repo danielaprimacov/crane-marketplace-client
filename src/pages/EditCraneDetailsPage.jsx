@@ -10,6 +10,7 @@ function EditCraneDetailsPage() {
   const { craneId } = useParams();
 
   const [title, setTitle] = useState("");
+  const [producer, setProducer] = useState("");
   const [images, setImages] = useState([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [description, setDescription] = useState("");
@@ -40,6 +41,7 @@ function EditCraneDetailsPage() {
 
       const crane = response.data;
       setTitle(crane.title);
+      setProducer(crane.producer);
       setImages(crane.images || []);
       setDescription(crane.description);
       setPrice(crane.price);
@@ -74,6 +76,7 @@ function EditCraneDetailsPage() {
 
     const requestBody = {
       title,
+      producer,
       images,
       description,
       price,
@@ -109,6 +112,16 @@ function EditCraneDetailsPage() {
             id="title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="producer">Producer:</label>
+          <input
+            type="producer"
+            id="producer"
+            value={producer}
+            onChange={(event) => setProducer(event.target.value)}
             required
           />
         </div>

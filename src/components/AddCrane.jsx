@@ -7,6 +7,7 @@ const API_URL = "http://localhost:5005";
 
 function AddCrane(props) {
   const [title, setTitle] = useState("");
+  const [producer, setProducer] = useState("");
   const [images, setImages] = useState([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [description, setDescription] = useState("");
@@ -31,6 +32,7 @@ function AddCrane(props) {
 
     const requestBody = {
       title,
+      producer,
       images,
       description,
       price,
@@ -53,6 +55,7 @@ function AddCrane(props) {
 
       // On success, reset form and refresh list
       setTitle("");
+      setProducer("");
       setImages([]);
       setNewImageUrl("");
       setDescription("");
@@ -79,6 +82,17 @@ function AddCrane(props) {
             name="title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="producer">Producer:</label>
+          <input
+            type="text"
+            id="producer"
+            name="producer"
+            value={producer}
+            onChange={(event) => setProducer(event.target.value)}
             required
           />
         </div>

@@ -56,6 +56,7 @@ function CraneDetailsPage() {
       {crane && (
         <>
           <h1>{crane.title}</h1>
+          <h2>{crane.producer}</h2>
           <span> {crane.price} €</span>
           <p>{crane.description}</p>
           {crane.images?.length > 0 ? (
