@@ -3,7 +3,7 @@ import VideoIntro from "./VideoIntro";
 
 function HeroSection() {
   return (
-    <div className="relative w-full h-auto overflow-hidden ">
+    <div className="relative w-full h-screen overflow-hidden ">
       <VideoIntro />
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4">
         <p className="text-white uppercase text-2xl md:text-4xl lg:text-5xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">

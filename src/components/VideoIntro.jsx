@@ -21,7 +21,7 @@ function VideoIntro() {
   };
 
   return (
-    <section className="relative w-full h-165 overflow-hidden">
+    <section className="relative w-full h-screen overflow-hidden">
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover transform scale-105 filter blur-[2px]"
