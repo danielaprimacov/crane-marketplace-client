@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import banner from "../assets/images/banner-signup.avif";
+
 const API_URL = "http://localhost:5005";
 
 function SignupPage() {
@@ -32,41 +34,77 @@ function SignupPage() {
   };
 
   return (
-    <div>
-      <h1>Signup</h1>
-
-      <form onSubmit={handleSignupSubmit}>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          value={email}
-          onChange={handleEmail}
+    <div className="relative z-20 bg-white pb-10">
+      <div>
+        <img
+          className="w-full h-[18rem] object-cover"
+          src={banner}
+          alt="Banner Image - Team"
         />
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          value={password}
-          onChange={handlePassword}
-        />
-        <label htmlFor="name">Name:</label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={name}
-          onChange={handleName}
-        />
-        <button type="submit">Signup</button>
-      </form>
+      </div>
+      <div className="mt-5 w-[40rem] flex flex-col m-auto">
+        <h1 className="my-10 text-2xl uppercase">Create account</h1>
+        <form onSubmit={handleSignupSubmit} className="flex flex-col">
+          {[
+            {
+              id: "name",
+              type: "text",
+              label: "Your name*",
+              handler: handleName,
+            },
+            {
+              id: "email",
+              type: "email",
+              label: "Your email address*",
+              handler: handleEmail,
+            },
+            {
+              id: "password",
+              type: "password",
+              label: "Your password*",
+              handler: handlePassword,
+            },
+          ].map(({ id, type, label, handler }) => (
+            <div key={id} className="relative">
+              <input
+                type={type}
+                name={id}
+                id={id}
+                onChange={handler}
+                placeholder=" "
+                className="border-b border-b-black/20 mb-10 h-10 peer block w-full focus:outline-none focus:border-black bg-transparent"
+              />
+              <label
+                htmlFor={id}
+                className="absolute left-0 -top-8 h-10 flex items-center text-gray-500 text-sm text-black/50 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:-top-6"
+              >
+                {label}
+              </label>
+            </div>
+          ))}
+          <button
+            type="submit"
+            className="bg-black text-white py-2 mb-4 rounded cursor-pointer uppercase hover:bg-orange-400 transition duration-300 ease-in"
+          >
+            Signup
+          </button>
+          <p className="text-sm text-right -mt-3 tracking-wider">
+            Passwords must have a minimum length of 8 characters.{" "}
+          </p>
+        </form>
 
-      {errorMessage && <p>{errorMessage}</p>}
+        {errorMessage && <p>{errorMessage}</p>}
 
-      <p>Have an account?</p>
-      <Link to="/login">Login</Link>
+        <div className="flex justify-between items-center my-5">
+          <p>Do you have an account?</p>
+          <Link
+            to="/login"
+            className="bg-orange-300 text-black/70 px-4 py-1 rounded-sm cursor-pointer hover:bg-orange-400 transition duration-300 ease-in"
+          >
+            Login
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

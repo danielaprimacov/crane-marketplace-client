@@ -46,7 +46,7 @@ function Navbar() {
   return (
     <nav
       className={`
-        fixed inset-x-0 top-0 h-16 z-50 bg-white/50 flex justify-between items-center px-4 transition-transform duration-800 ease-out
+        fixed inset-x-0 top-0 h-16 z-50 bg-transparent flex justify-between items-center px-4 transition-transform duration-800 ease-out
         ${showNavbar ? "translate-y-0" : "-translate-y-full"}
       `}
     >
