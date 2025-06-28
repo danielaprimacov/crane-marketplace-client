@@ -7,6 +7,12 @@ import VideoIntro from "../components/VideoIntro";
 import installationPhoto from "../assets/images/installation.jpg";
 import transportPhoto from "../assets/images/transport.jpeg";
 import salePhoto from "../assets/images/sale.png";
+import teamPhoto from "../assets/images/team.jpg";
+
+import instagramIcon from "../assets/icons/instagram.png";
+import whatsappIcon from "../assets/icons/whatsapp.png";
+import facebookIcon from "../assets/icons/facebook.png";
+import xIcon from "../assets/icons/twitter-alt-circle.png";
 
 const API_URL = "http://localhost:5005";
 const MotionLink = motion(Link);
@@ -29,12 +35,12 @@ function HomePage() {
 
   const servicesItem = {
     hidden: { opacity: 0, x: 0 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.6 } },
+    show: { opacity: 1, x: 0, transition: { duration: 0.7 } },
   };
 
   const lastCranesItem = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+    show: { opacity: 1, y: 0, transition: { duration: 0.7 } },
   };
 
   const services = [
@@ -96,8 +102,8 @@ function HomePage() {
             The Art of Precision Lifting
           </p>
           <Link to="">
-            <button className="m-5 h-15 w-50 bg-white/50 cursor-pointer text-xl uppercase text-center rounded hover:bg-black/30 hover:text-white transition duration-400 ease-in-out">
-              Learn more
+            <button className="m-5 h-15 w-50 bg-white cursor-pointer text-xl uppercase text-center rounded hover:bg-red-700 hover:text-white transition duration-400 ease-in-out">
+              Discover more
             </button>
           </Link>
         </div>
@@ -167,27 +173,183 @@ function HomePage() {
             Last Added Cranes
           </motion.h1>
           <div className="flex flex-1 justify-between items-center p-6">
-            {recentCranes.map((crane) => (
-              <MotionLink
-                to={`/cranes/${crane._id}`}
-                variants={lastCranesItem}
-                className="w-70 h-80 flex justify-center border-gray-200 hover:shadow-md transition duration-300 transform"
-                style={{
-                  backgroundImage: `url(${crane.images?.[0] || ""})`,
-                }}
-              >
-                <div className="flex flex-col justify-center items-center gap-40">
-                  <div className="uppercase font-medium">{crane.status}</div>
-                  <button className="py-2 px-4 bg-green-300 text-gray rounded-lg hover:text-black/80 hover:scale-105 transition duration-300 transform">
-                    <Link to={`/cranes/${crane._id}/new-inquiry`}>
-                      Send an inquiry
-                    </Link>
-                  </button>
-                </div>
-              </MotionLink>
-            ))}
+            {recentCranes.map((crane) => {
+              const imageUrl = crane.images?.[0];
+              return (
+                <MotionLink
+                  key={crane._id}
+                  to={`/cranes/${crane._id}`}
+                  variants={lastCranesItem}
+                  style={{
+                    ...(imageUrl && {
+                      backgroundImage: `url("${imageUrl}")`,
+                    }),
+                  }}
+                  className="group w-[18rem] h-[20rem] relative overflow-hidden flex justify-center border-gray-200 rounded bg-no-repeat bg-cover bg-center hover:shadow-md transition duration-300"
+                >
+                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="relative z-10 flex flex-col justify-center items-center gap-40">
+                    <div className="uppercase font-medium text-2xl text-white tracking-wider transform transition-transform duration-300 ease-out group-hover:-translate-y-2">
+                      {crane.status}
+                    </div>
+                    <button className="py-2 px-4 bg-green-300 text-gray rounded-lg hover:text-black/80 hover:scale-105 transition duration-300 transform">
+                      <Link to={`/cranes/${crane._id}/new-inquiry`}>
+                        Send an inquiry
+                      </Link>
+                    </button>
+                  </div>
+                </MotionLink>
+              );
+            })}
           </div>
         </motion.div>
+        {/* Information Section */}
+        <div className="p-5 m-2">
+          <div className="px-6 mt-4 flex justify-between items-center gap-10">
+            <img
+              src={teamPhoto}
+              alt="Team Members"
+              className="h-[25rem] rounded-md shadow-sm"
+            />
+            <section className="px-5 flex flex-col justify-center items-center gap-4 text-center">
+              <p className="text-xl text-black/70">
+                KranHub is the premier B2B marketplace for crane
+                solutions—offering a curated fleet of tower, mobile, and crawler
+                cranes for sale or rent. Our full-service company manages every
+                step of the process—from precision assembly and secure transport
+                to safe disassembly your project stays on schedule and within
+                budget. Backed by certified technicians, transparent pricing,
+                and 24/7 support, KranHub delivers reliable heavy-lifting
+                expertise you can trust.{" "}
+                <p className="mt-2 text-red-700">
+                  Ready to discuss your next project?
+                </p>
+              </p>
+              <Link
+                to=""
+                className="px-8 py-4 mt-5 bg-black text-white rounded-lg hover:bg-red-700 transform transition duration-300 ease-out"
+              >
+                <button className="cursor-pointer">Contact Us</button>
+              </Link>
+            </section>
+          </div>
+        </div>
+        {/* Footer */}
+        <div className="p-12 mt-10 bg-black/20 flex justify-between">
+          {/* Company Information */}
+          <div>
+            <h3 className="text-black/40 uppercase mb-3">Address</h3>
+            <p>123456, Muster</p>
+            <p>Musterstrasse 12</p>
+            <p>+49 123 456789</p>
+          </div>
+          {/* Links */}
+          <div className="flex gap-2 justify-between">
+            <ul className="pr-6">
+              <h3 className="text-black/40 uppercase mb-3">Discover</h3>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Transporting Cranes
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Crane Sales
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Instaling <br />& disassembling Cranes
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Who we are
+                </Link>
+              </li>
+            </ul>
+            <ul className="pr-6">
+              <h3 className="text-black/40 uppercase mb-3">Get in Touch</h3>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Contact
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Revocation <br />& Claim
+                </Link>
+              </li>
+            </ul>
+            <ul className="pl-6">
+              <h3 className="text-black/40 uppercase mb-3">Information</h3>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Terms
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Imprint
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="" className="hover:text-red-700 hover:underline">
+                  Cookies Settings
+                </Link>
+              </li>
+            </ul>
+          </div>
+          {/* Newsletter and Social Media */}
+          <div>
+            <p className="text-black/40 mb-2">Newsletter</p>
+            <div className="flex flex-col items-center">
+              <p className="pb-6">
+                Be part of the KranHub community and subscribe to the newsletter
+                now!
+              </p>
+              <button className="px-10 py-2 rounded-md bg-black text-white cursor-pointer hover:bg-red-700 transform transition duration-300 ease-out">
+                Newsletter
+              </button>
+            </div>
+            <p className="text-black/40 mb-5">Social media</p>
+            <div className="flex justify-between px-6">
+              <Link
+                to="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={facebookIcon} alt="Facebook Icon" />
+              </Link>
+              <Link
+                to="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={instagramIcon} alt="Instagram Icon" />
+              </Link>
+              <Link
+                to="https://x.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={xIcon} alt="X (Twitter) Icon" />
+              </Link>
+              <Link
+                to="https://whatsapp.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={whatsappIcon} alt="WhatsApp Icon" />
+              </Link>
+            </div>
+          </div>
+        </div>
       </main>
     </>
   );
