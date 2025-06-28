@@ -6,7 +6,6 @@ import TopProducers from "../components/TopProducers";
 import Services from "../components/Services";
 import LastAddedCranes from "../components/LastAddedCranes";
 import InformationSection from "../components/InformationSection";
-import Footer from "../components/Footer";
 
 const API_URL = "http://localhost:5005";
 
@@ -55,7 +54,6 @@ function HomePage() {
         <Services />
         <LastAddedCranes recentCranes={recentCranes} />
         <InformationSection />
-        <Footer />
       </main>
     </>
   );
