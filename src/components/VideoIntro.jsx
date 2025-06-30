@@ -3,6 +3,9 @@ import { useState, useRef } from "react";
 import introWebm from "../assets/video/video-intro.webm";
 import introMp4 from "../assets/video/video-intro.mp4";
 
+import play from "../assets/icons/play.png";
+import stop from "../assets/icons/stop-circle.png";
+
 function VideoIntro() {
   const videoRef = useRef(null);
   const [playing, setPlaying] = useState(true);
@@ -39,9 +42,13 @@ function VideoIntro() {
 
       <button
         onClick={handleToggle}
-        className="absolute bottom-5 right-5 z-20 bg-black/50 text-white py-2 px-4 rounded hover:bg-black/75 transition duration-200 ease-in-out cursor-pointer"
+        className="absolute bottom-5 right-5 z-20 py-2 px-4 cursor-pointer"
       >
-        {playing ? "Pause" : "Play"}
+        {playing ? (
+          <img className="scale-150 fill-white" src={stop} alt="Stop Video" />
+        ) : (
+          <img className="scale-150" src={play} alt="Play Video" />
+        )}
       </button>
     </section>
   );

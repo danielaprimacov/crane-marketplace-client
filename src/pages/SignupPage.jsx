@@ -9,6 +9,7 @@ const API_URL = "http://localhost:5005";
 function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
   const [name, setName] = useState("");
   const [errorMessage, setErrorMessage] = useState(undefined);
 
@@ -16,11 +17,24 @@ function SignupPage() {
 
   const handleEmail = (event) => setEmail(event.target.value);
   const handlePassword = (event) => setPassword(event.target.value);
+  const handleRepeatPassword = (event) => setRepeatPassword(event.target.value);
   const handleName = (event) => setName(event.target.value);
 
   const handleSignupSubmit = async (event) => {
     event.preventDefault();
+    setErrorMessage(undefined);
     const requestBody = { email, password, name };
+
+    // Check if passwords match
+    if (password !== repeatPassword) {
+      setErrorMessage("Password do not match.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters.");
+      return;
+    }
 
     try {
       await axios.post(`${API_URL}/auth/signup`, requestBody);
@@ -64,6 +78,12 @@ function SignupPage() {
               label: "Your password*",
               handler: handlePassword,
             },
+            {
+              id: "repeat-password",
+              type: "repeat-password",
+              label: "Repeat your password*",
+              handler: handleRepeatPassword,
+            },
           ].map(({ id, type, label, handler }) => (
             <div key={id} className="relative">
               <input
@@ -93,7 +113,7 @@ function SignupPage() {
           </p>
         </form>
 
-        {errorMessage && <p>{errorMessage}</p>}
+        {errorMessage && <p className="text-red-600 mb-4">{errorMessage}</p>}
 
         <div className="flex justify-between items-center my-5">
           <p>Do you have an account?</p>
