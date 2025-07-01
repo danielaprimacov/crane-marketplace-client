@@ -2,7 +2,16 @@ import { useEffect } from "react";
 
 function Modal({ children, isOpen, onClose }) {
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+        // blur whichever element was focused (so you don’t end up with that little outline)
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }
+    };
+
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
@@ -20,7 +29,7 @@ function Modal({ children, isOpen, onClose }) {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-2xl hover:text-gray-500"
+          className="absolute top-4 right-4 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0"
         >
           &times;
         </button>

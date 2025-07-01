@@ -24,6 +24,7 @@ function Navbar({ openLogin }) {
 
   const isHome = location.pathname === "/";
   const isCranes = location.pathname === "/cranes";
+  const isProfile = location.pathname === "/profile";
 
   const getAllProducers = async () => {
     const storedToken = localStorage.getItem("authToken");
@@ -46,8 +47,8 @@ function Navbar({ openLogin }) {
   );
 
   useEffect(() => {
-    getAllProducers();
-  }, []);
+    if (isCranes) getAllProducers();
+  }, [isCranes]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,79 +78,73 @@ function Navbar({ openLogin }) {
 
   return (
     <nav
-      className={`
-        fixed inset-x-0 top-0 h-16 z-50 bg-transparent flex justify-between items-center px-4 transition-transform duration-800 ease-out
-        ${showNavbar ? "translate-y-0" : "-translate-y-full"}
-      `}
+      className={`fixed inset-x-0 top-0 h-16 z-50 bg-transparent transition-transform duration-800 ease-out 
+      ${showNavbar ? "translate-y-0" : "-translate-y-full"}
+    `}
     >
-      {isHome && (
-        <>
-          <div className="flex items-center gap-2 ">
-            <img src={menuIcon} alt="Menu Icon" className="w-6" />
-            <span className="text-sm uppercase">Menu</span>
-          </div>
-          <Link to="/">
-            <div>
-              <img src={logo} alt="Logo" className="w-[36px]" />
-            </div>
-          </Link>
-        </>
-      )}
-
-      {!isHome && (
-        <div className="flex items-center gap-6">
-          <Link to="/">
-            <div>
-              <img src={logo} alt="Logo" className="w-[36px]" />
-            </div>
-          </Link>
-          {uniqueProducers.length > 0 && (
-            <nav>
-              <ul className="flex items-center gap-4">
-                {uniqueProducers.map((producer) => (
-                  <li key={producer}>
+      <div className="flex items-center h-full px-4 w-full">
+        <div className="flex items-center flex-none">
+          {isHome && (
+            <button className="flex items-center gap-2">
+              <img src={menuIcon} alt="Menu" className="w-6" />
+              <span className="text-sm uppercase">Menu</span>
+            </button>
+          )}
+          {isCranes && (
+            <>
+              <Link to="/">
+                <img src={logo} alt="Logo" className="w-[36px]" />
+              </Link>
+              <ul className="flex items-center gap-4 overflow-x-auto ml-4">
+                {uniqueProducers.map((p) => (
+                  <li key={p}>
                     <Link
-                      to=""
+                      to="#"
                       className="text-sm uppercase font-medium text-gray-700 hover:text-red-600 whitespace-nowrap"
                     >
-                      {producer}
+                      {p}
                     </Link>
                   </li>
                 ))}
               </ul>
-            </nav>
+            </>
+          )}
+          {isProfile && (
+            <Link to="/">
+              <img src={logo} alt="Logo" className="w-[36px]" />
+            </Link>
           )}
         </div>
-      )}
 
-      {isLoggedIn && (
-        <div className="flex gap-5 items-center">
-          {user?.role !== "admin" ? (
-            <Link to="/profile" className="cursor-pointer">
-              <img className="w-5" src={userIcon} alt="User Icon" />
+        <div className="flex-1 flex justify-center">
+          {isHome && (
+            <Link to="/" className="inline-block">
+              <img src={logo} alt="Logo" className="w-[36px]" />
             </Link>
+          )}
+        </div>
+
+        <div className="flex items-center gap-5 flex-none">
+          {isLoggedIn ? (
+            <>
+              {user?.role === "admin" ? (
+                <button onClick={() => navigate("/admin")}>Dashboard</button>
+              ) : (
+                <Link to="/profile">
+                  <img src={userIcon} alt="Profile" className="w-5" />
+                </Link>
+              )}
+              <button onClick={logOutUser}>
+                <img src={logOutIcon} alt="Logout" className="w-5" />
+              </button>
+            </>
           ) : (
-            <button
-              className="cursor-pointer"
-              onClick={() => navigate("/admin")}
-            >
-              Dashboard
+            <button onClick={openLogin} className="p-2">
+              <img src={userIcon} alt="Login" className="w-6" />
             </button>
           )}
-
-          <button className="cursor-pointer" onClick={logOutUser}>
-            <img className="w-5" src={logOutIcon} alt="Logout Icon" />
-          </button>
         </div>
-      )}
-
-      {!isLoggedIn && (
-        <>
-          <button onClick={openLogin} className="p-2">
-            <img src={userIcon} alt="Login" className="w-6" />
-          </button>
-        </>
-      )}
+      </div>
     </nav>
   );
 }
