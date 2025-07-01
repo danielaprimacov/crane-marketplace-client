@@ -33,7 +33,7 @@ function LoginPage() {
       await authenticateUser();
 
       // redirect home
-      navigate("/");
+      navigate("/profile");
     } catch (error) {
       // grab API message or fallback
       const errorDescription =

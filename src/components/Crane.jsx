@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import arrow from "../assets/icons/arrow-right.png";
+
 function Crane({ title, images, description, price, location, status, _id }) {
   const noImage =
     "https://cdn.webshopapp.com/shops/166166/files/467071907/image.jpg";
@@ -16,16 +18,19 @@ function Crane({ title, images, description, price, location, status, _id }) {
         {title}
       </h3>
       <div
-        className={`top-2 right-2 uppercase text-center px-1 py-2 rounded 
+        className={`top-2 right-2 uppercase text-[10px] px-4 py-1 rounded-full font-semibold
         ${
           status === "for sale"
-            ? "bg-green-300 text-black"
+            ? "bg-green-100 text-green-800"
             : status === "for rent"
-            ? "bg-blue-300 text-white"
-            : "bg-gray-200 text-gray-800"
+            ? "bg-blue-100 text-blue-800"
+            : "bg-gray-100 text-gray-800"
         }`}
       >
-        {status}
+        <div className="flex items-center gap-2">
+          <img src={arrow} alt="Arrow Icon" className="h-4" />
+          {status}
+        </div>
       </div>
       <div
         className="w-full h-64 bg-cover bg-center transition-[background-image] duration-500"

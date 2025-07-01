@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import AddCrane from "../components/AddCrane";
 import { AuthContext } from "../context/auth.context";
@@ -10,7 +11,6 @@ const API_URL = "http://localhost:5005";
 function CranesPage() {
   const [cranes, setCranes] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
-
   const { isLoggedIn } = useContext(AuthContext);
 
   const getAllCranes = async () => {
@@ -20,7 +20,6 @@ function CranesPage() {
       const response = await axios.get(`${API_URL}/cranes`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-
       setCranes(response.data);
     } catch (error) {
       console.error("Failed to fetch cranes:", error);
@@ -33,7 +32,15 @@ function CranesPage() {
 
   return (
     <div className="mt-20 px-5 flex justify-center flex-col">
-      {isLoggedIn && (
+      
+      
+      <div className="pt-16"> 
+        <div className="pt-10"> 
+          
+        </div>
+      </div>
+
+      {/* {isLoggedIn && (
         <>
           <button
             onClick={() => setShowAdd(true)}
@@ -60,7 +67,7 @@ function CranesPage() {
         {cranes.map((crane) => (
           <Crane key={crane._id} {...crane} />
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

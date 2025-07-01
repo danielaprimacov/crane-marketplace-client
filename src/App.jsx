@@ -1,10 +1,11 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useState, useRef, useEffect, Fragment } from "react";
+import { Transition } from "@headlessui/react";
+
 import HomePage from "./pages/HomePage";
 import ScrollToTop from "./components/ScrollToTop";
 import CranesPage from "./pages/CranesPage";
-import SignupPage from "./pages/SignUpPage";
-import LoginPage from "./pages/LoginPage";
 import CraneDetailsPage from "./pages/CraneDetailsPage";
 import EditCraneDetailsPage from "./pages/EditCraneDetailsPage";
 import NewInquiryPage from "./pages/NewInquiryPage";
@@ -12,13 +13,39 @@ import AdminRoute from "./components/AdminRoute";
 import AdminPage from "./pages/AdminPage";
 import InquiriesListPage from "./pages/InquiriesListPage";
 import PublicLayout from "./components/PublicLayout";
+import ProfilePage from "./pages/ProfilePage";
+
+import Modal from "./components/Modal";
+import LoginForm from "./components/LoginForm";
+import SignupForm from "./components/SignupForm";
 
 function App() {
+  const [modalMode, setModalMode] = useState("none");
+  const openLogin = () => setModalMode("login");
+  const openSignup = () => setModalMode("signup");
+  const close = () => setModalMode("none");
+
+  const [height, setHeight] = useState(0);
+  const loginFormRef = useRef(null);
+  const signupFormRef = useRef(null);
+
+  useEffect(() => {
+    const ref = modalMode === "signup" ? signupFormRef : loginFormRef;
+    if (ref.current) {
+      // scrollHeight will give you the full “natural” height of the form
+      setHeight(ref.current.scrollHeight);
+    }
+  }, [modalMode]);
+
   return (
     <>
       <ScrollToTop />
       <Routes>
-        <Route element={<PublicLayout />}>
+        <Route
+          element={
+            <PublicLayout openLogin={openLogin} openSignup={openSignup} />
+          }
+        >
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/cranes" element={<CranesPage />} />
           <Route exact path="/cranes/:craneId" element={<CraneDetailsPage />} />
@@ -31,8 +58,7 @@ function App() {
             path="/cranes/:craneId/new-inquiry"
             element={<NewInquiryPage />}
           />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         <Route element={<AdminRoute />}>
@@ -43,6 +69,45 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <Modal isOpen={modalMode !== "none"} onClose={close}>
+        <div
+          className={
+            `relative overflow-hidden transition-[height] duration-300 ease-in-out ` +
+            (modalMode === "signup" ? "h-[35rem]" : "h-[25rem]")
+          }
+        >
+          {/* LOGIN PANEL */}
+          <div
+            className={
+              "absolute inset-0 transition-opacity duration-300 " +
+              (modalMode === "login"
+                ? "opacity-100 pointer-events-auto z-20"
+                : "opacity-0 pointer-events-none z-10")
+            }
+          >
+            <LoginForm
+              onSuccess={close}
+              onSwitchToSignup={() => setModalMode("signup")}
+            />
+          </div>
+
+          {/* SIGNUP PANEL */}
+          <div
+            className={
+              "absolute inset-0 transition-opacity duration-300 " +
+              (modalMode === "signup"
+                ? "opacity-100 pointer-events-auto z-20"
+                : "opacity-0 pointer-events-none z-10")
+            }
+          >
+            <SignupForm
+              onSuccess={close}
+              onSwitchToLogin={() => setModalMode("login")}
+            />
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }
