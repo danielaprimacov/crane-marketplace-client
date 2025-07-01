@@ -80,7 +80,7 @@ function SignupPage() {
             },
             {
               id: "repeat-password",
-              type: "repeat-password",
+              type: "password",
               label: "Repeat your password*",
               handler: handleRepeatPassword,
             },

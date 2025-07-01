@@ -12,7 +12,7 @@ function HeroSection() {
         <p className="mt-2 text-white uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
           The Art of Precision Lifting
         </p>
-        <Link to="">
+        <Link to="/cranes">
           <button className="m-5 h-15 w-50 bg-white cursor-pointer text-xl uppercase text-center rounded hover:bg-red-700 hover:text-white transition duration-400 ease-in-out">
             Discover more
           </button>

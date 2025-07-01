@@ -5,6 +5,7 @@ import { AuthContext } from "../context/auth.context";
 
 import menuIcon from "../assets/icons/menu-burger.png";
 import userIcon from "../assets/icons/circle-user.png";
+import logOutIcon from "../assets/icons/leave.png";
 import logo from "../assets/icons/shipping.png"; // temporary
 
 function Navbar() {
@@ -61,15 +62,24 @@ function Navbar() {
       </Link>
 
       {isLoggedIn && (
-        <>
+        <div className="flex gap-5 items-center">
           {user?.role !== "admin" ? (
-            <button>Profile</button>
+            <button className="cursor-pointer">
+              <img className="w-5" src={userIcon} alt="User Icon" />
+            </button>
           ) : (
-            <button onClick={() => navigate("/admin")}>Dashboard</button>
+            <button
+              className="cursor-pointer"
+              onClick={() => navigate("/admin")}
+            >
+              Dashboard
+            </button>
           )}
 
-          <button onClick={logOutUser}>Logout</button>
-        </>
+          <button className="cursor-pointer" onClick={logOutUser}>
+            <img className="w-5" src={logOutIcon} alt="Logout Icon" />
+          </button>
+        </div>
       )}
 
       {!isLoggedIn && (
