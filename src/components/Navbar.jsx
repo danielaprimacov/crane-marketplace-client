@@ -1,6 +1,5 @@
-import { useContext, useState, useEffect, useRef, useMemo } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
 
@@ -8,14 +7,11 @@ import menuIcon from "../assets/icons/menu-burger.png";
 import userIcon from "../assets/icons/circle-user.png";
 import logOutIcon from "../assets/icons/leave.png";
 import logo from "../assets/icons/shipping.png"; // temporary
-
-const API_URL = "http://localhost:5005";
+import ProducersNav from "./ProducersNav";
 
 function Navbar({ openLogin }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const [showNavbar, setShowNavbar] = useState(true);
-
-  const [producers, setProducers] = useState([]);
 
   const lastScrollY = useRef(0);
 
@@ -25,30 +21,6 @@ function Navbar({ openLogin }) {
   const isHome = location.pathname === "/";
   const isCranes = location.pathname === "/cranes";
   const isProfile = location.pathname === "/profile";
-
-  const getAllProducers = async () => {
-    const storedToken = localStorage.getItem("authToken");
-
-    try {
-      const response = await axios.get(`${API_URL}/cranes`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
-      // extract the producers
-      const allProducers = response.data.map(({ producer }) => producer);
-      setProducers(allProducers);
-    } catch (error) {
-      console.error("Failed to fetch cranes:", error);
-    }
-  };
-
-  const uniqueProducers = useMemo(
-    () => producers.filter((p, i, arr) => p && arr.indexOf(p) === i),
-    [producers]
-  );
-
-  useEffect(() => {
-    if (isCranes) getAllProducers();
-  }, [isCranes]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,8 +50,8 @@ function Navbar({ openLogin }) {
 
   return (
     <nav
-      className={`fixed inset-x-0 top-0 h-16 z-50 bg-transparent transition-transform duration-800 ease-out 
-      ${showNavbar ? "translate-y-0" : "-translate-y-full"}
+      className={`fixed inset-x-0 h-16 z-50 bg-transparent transition-all duration-800 ease-out overflow-visible 
+      ${showNavbar ? "top-0" : "-top-16"}
     `}
     >
       <div className="flex items-center h-full px-4 w-full">
@@ -92,21 +64,10 @@ function Navbar({ openLogin }) {
           )}
           {isCranes && (
             <>
-              <Link to="/">
+              <Link to="/" className="py-4">
                 <img src={logo} alt="Logo" className="w-[36px]" />
               </Link>
-              <ul className="flex items-center gap-4 overflow-x-auto ml-4">
-                {uniqueProducers.map((p) => (
-                  <li key={p}>
-                    <Link
-                      to="#"
-                      className="text-sm uppercase font-medium text-gray-700 hover:text-red-600 whitespace-nowrap"
-                    >
-                      {p}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <ProducersNav />
             </>
           )}
           {isProfile && (
