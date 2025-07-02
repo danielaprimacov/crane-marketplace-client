@@ -6,12 +6,16 @@ import AvailabilityRange from "./AvailabilityRange";
 const API_URL = "http://localhost:5005";
 
 function AddCrane(props) {
-  const [title, setTitle] = useState("");
   const [producer, setProducer] = useState("");
+  const [seriesCode, setSeriesCode] = useState("");
+  const [capacityClassNumber, setCapacityClassNumber] = useState("");
+  const [variantRevision, setVariantRevision] = useState("");
+  const [salePrice, setSalePrice] = useState("");
+  const [rentAmount, setRentAmount] = useState("");
+  const [rentInterval, setRentInterval] = useState("day");
   const [images, setImages] = useState([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState("");
   const [availability, setAvailability] = useState({
@@ -31,8 +35,10 @@ function AddCrane(props) {
     const storedToken = localStorage.getItem("authToken");
 
     const requestBody = {
-      title,
       producer,
+      seriesCode,
+      capacityClassNumber: Number(capacityClassNumber),
+      variantRevision,
       images,
       description,
       price,
@@ -47,6 +53,15 @@ function AddCrane(props) {
       };
     }
 
+    if (status === "for sale") {
+      requestBody.salePrice = Number(salePrice);
+    } else if (status === "for rent") {
+      requestBody.rentPrice = {
+        amount: Number(rentAmount),
+        interval: rentInterval,
+      };
+    }
+
     try {
       // Send POST and await response
       await axios.post(`${API_URL}/cranes`, requestBody, {
@@ -54,12 +69,16 @@ function AddCrane(props) {
       });
 
       // On success, reset form and refresh list
-      setTitle("");
       setProducer("");
+      setSeriesCode("");
+      setCapacityClassNumber("");
+      setVariantRevision("");
       setImages([]);
       setNewImageUrl("");
       setDescription("");
-      setPrice(0);
+      setSalePrice("");
+      setRentAmount("");
+      setRentInterval("day");
       setLocation("");
       setStatus("");
       setAvailability({ availabilityStart: "", availabilityEnd: "" });
@@ -75,17 +94,6 @@ function AddCrane(props) {
       <h2>Add Crane</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="title">Title:</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            required
-          />
-        </div>
-        <div>
           <label htmlFor="producer">Producer:</label>
           <input
             type="text"
@@ -94,6 +102,33 @@ function AddCrane(props) {
             value={producer}
             onChange={(event) => setProducer(event.target.value)}
             required
+          />
+        </div>
+        <div>
+          <label htmlFor="seriesCode">Series Code</label>
+          <input
+            id="seriesCode"
+            value={seriesCode}
+            onChange={(event) => setSeriesCode(event.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="capacityClassNumber">Capacity (t)</label>
+          <input
+            id="capacityClassNumber"
+            type="number"
+            value={capacityClassNumber}
+            onChange={(event) => setCapacityClassNumber(event.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="variantRevision">Variant/Revision</label>
+          <input
+            id="variantRevision"
+            value={variantRevision}
+            onChange={(event) => setVariantRevision(event.target.value)}
           />
         </div>
         <div>
@@ -136,17 +171,7 @@ function AddCrane(props) {
             onChange={(event) => setDescription(event.target.value)}
           />
         </div>
-        <div>
-          <label html="price">Price:</label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            value={price}
-            onChange={(event) => setPrice(event.target.value)}
-          />
-          <span>€</span>
-        </div>
+
         <div>
           <label html="location">Location:</label>
           <input
@@ -174,6 +199,48 @@ function AddCrane(props) {
             <option value="for rent">For Rent</option>
           </select>
         </div>
+
+        {status === "for sale" && (
+          <div>
+            <label htmlFor="salePrice">Sale Price (€)</label>
+            <input
+              id="salePrice"
+              type="number"
+              value={salePrice}
+              onChange={(e) => setSalePrice(e.target.value)}
+              required
+            />
+          </div>
+        )}
+
+        {status === "for rent" && (
+          <>
+            <div>
+              <label htmlFor="rentAmount">Rent Amount</label>
+              <input
+                id="rentAmount"
+                type="number"
+                value={rentAmount}
+                onChange={(e) => setRentAmount(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="rentInterval">Interval</label>
+              <select
+                id="rentInterval"
+                value={rentInterval}
+                onChange={(e) => setRentInterval(e.target.value)}
+                required
+              >
+                <option value="hour">Hour</option>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+              </select>
+            </div>
+          </>
+        )}
 
         <AvailabilityRange
           field="availability"

@@ -8,13 +8,16 @@ const API_URL = "http://localhost:5005";
 
 function EditCraneDetailsPage() {
   const { craneId } = useParams();
-
-  const [title, setTitle] = useState("");
+  const [seriesCode, setSeriesCode] = useState("");
+  const [capacityClassNumber, setCapacityClassNumber] = useState("");
+  const [variantRevision, setVariantRevision] = useState("");
   const [producer, setProducer] = useState("");
   const [images, setImages] = useState([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
+  const [salePrice, setSalePrice] = useState("");
+  const [rentAmount, setRentAmount] = useState("");
+  const [rentInterval, setRentInterval] = useState("day");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState("");
   const [availability, setAvailability] = useState({
@@ -40,11 +43,21 @@ function EditCraneDetailsPage() {
       });
 
       const crane = response.data;
-      setTitle(crane.title);
+      setProducer(crane.producer);
+      setSeriesCode(crane.seriesCode);
+      setCapacityClassNumber(crane.capacityClassNumber);
+      setVariantRevision(crane.variantRevision);
       setProducer(crane.producer);
       setImages(crane.images || []);
       setDescription(crane.description);
-      setPrice(crane.price);
+
+      if (crane.status === "for sale") {
+        setSalePrice(crane.salePrice);
+      } else if (crane.status === "for rent") {
+        setRentAmount(crane.rentPrice.amount);
+        setRentInterval(crane.rentPrice.interval);
+      }
+
       setLocation(crane.location);
       setStatus(crane.status);
       if (crane.availability?.from && crane.availability?.to) {
@@ -75,8 +88,10 @@ function EditCraneDetailsPage() {
     const storedToken = localStorage.getItem("authToken");
 
     const requestBody = {
-      title,
       producer,
+      seriesCode,
+      capacityClassNumber: Number(capacityClassNumber),
+      variantRevision,
       images,
       description,
       price,
@@ -88,6 +103,15 @@ function EditCraneDetailsPage() {
       requestBody.availability = {
         from: new Date(availability.availabilityStart),
         to: new Date(availability.availabilityEnd),
+      };
+    }
+
+    if (status === "for sale") {
+      requestBody.salePrice = Number(salePrice);
+    } else if (status === "for rent") {
+      requestBody.rentPrice = {
+        amount: Number(rentAmount),
+        interval: rentInterval,
       };
     }
 
@@ -106,16 +130,6 @@ function EditCraneDetailsPage() {
       <h2>Edit the Crane Details</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="title">Title:</label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            required
-          />
-        </div>
-        <div>
           <label htmlFor="producer">Producer:</label>
           <input
             type="producer"
@@ -123,6 +137,35 @@ function EditCraneDetailsPage() {
             value={producer}
             onChange={(event) => setProducer(event.target.value)}
             required
+          />
+        </div>
+        <div>
+          <label htmlFor="seriesCode">Series Code:</label>
+          <input
+            type="text"
+            id="seriesCode"
+            value={seriesCode}
+            onChange={(e) => setSeriesCode(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="capacityClassNumber">Capacity (t):</label>
+          <input
+            type="number"
+            id="capacityClassNumber"
+            value={capacityClassNumber}
+            onChange={(e) => setCapacityClassNumber(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="variantRevision">Variant / Revision:</label>
+          <input
+            type="text"
+            id="variantRevision"
+            value={variantRevision}
+            onChange={(e) => setVariantRevision(e.target.value)}
           />
         </div>
         <div>
@@ -164,16 +207,6 @@ function EditCraneDetailsPage() {
           />
         </div>
         <div>
-          <label htmlFor="price">Price (€):</label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(event) => setPrice(event.target.value)}
-            min="0"
-          />
-        </div>
-        <div>
           <label htmlFor="location">Location:</label>
           <input
             type="text"
@@ -198,6 +231,49 @@ function EditCraneDetailsPage() {
             <option value="for rent">For Rent</option>
           </select>
         </div>
+
+        {status === "for sale" && (
+          <div>
+            <label htmlFor="salePrice">Sale Price (€):</label>
+            <input
+              type="number"
+              id="salePrice"
+              value={salePrice}
+              onChange={(e) => setSalePrice(e.target.value)}
+              min="0"
+              required
+            />
+          </div>
+        )}
+        {status === "for rent" && (
+          <>
+            <div>
+              <label htmlFor="rentAmount">Rent Amount (€):</label>
+              <input
+                type="number"
+                id="rentAmount"
+                value={rentAmount}
+                onChange={(e) => setRentAmount(e.target.value)}
+                min="0"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="rentInterval">Interval:</label>
+              <select
+                id="rentInterval"
+                value={rentInterval}
+                onChange={(e) => setRentInterval(e.target.value)}
+                required
+              >
+                <option value="hour">Hour</option>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+              </select>
+            </div>
+          </>
+        )}
         <AvailabilityRange
           field="availability"
           values={availability}

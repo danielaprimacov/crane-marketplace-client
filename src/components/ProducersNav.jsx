@@ -63,7 +63,7 @@ function ProducersNav() {
         {uniqueProducers.map((producer) => (
           <li
             key={producer}
-            className="relative py-4 group transition-all duration-200 ease-out hover:border-b hover:border-b-red-600"
+            className="relative py-4 group transition-colors duration-200 ease-out border-b border-transparent hover:border-b-red-600"
             onMouseEnter={() => handleMouseEnter(producer)}
             onMouseLeave={handleMouseLeave}
           >

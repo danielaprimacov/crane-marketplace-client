@@ -3,7 +3,16 @@ import { Link } from "react-router-dom";
 
 import arrow from "../assets/icons/arrow-right.png";
 
-function Crane({ title, images, description, price, location, status, _id }) {
+function Crane({
+  title,
+  images,
+  description,
+  salePrice,
+  rentPrice,
+  location,
+  status,
+  _id,
+}) {
   const noImage =
     "https://cdn.webshopapp.com/shops/166166/files/467071907/image.jpg";
 
@@ -45,7 +54,11 @@ function Crane({ title, images, description, price, location, status, _id }) {
       </p>
       <div className="ml-auto flex items-center justify-between text-gray-700">
         <span className="font-medium mr-2">
-          {price ? `${price} €` : "Contact for price"}
+          {status === "for sale" && salePrice != null
+            ? `${salePrice} €`
+            : status === "for rent" && rentPrice?.amount != null
+            ? `${rentPrice.amount} €/${rentPrice.interval}`
+            : "Contact for price"}
         </span>
       </div>
       <div className="mb-2 pl-3 text-sm">{location}</div>

@@ -57,7 +57,13 @@ function CraneDetailsPage() {
         <>
           <h1>{crane.title}</h1>
           <h2>{crane.producer}</h2>
-          <span> {crane.price} €</span>
+          <span>
+            {crane.status === "for sale" && crane.salePrice != null
+              ? `${crane.salePrice} €`
+              : crane.status === "for rent" && crane.rentPrice?.amount != null
+              ? `${crane.rentPrice.amount} €/${crane.rentPrice.interval}`
+              : "Contact for price"}
+          </span>
           <p>{crane.description}</p>
           {crane.images?.length > 0 ? (
             <div>
