@@ -1,13 +1,13 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = "http://localhost:5005";
 
-function ProducersNav() {
+import ArrowIcon from "./ArrowIcon";
+
+function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
   const [cranes, setCranes] = useState([]);
-  const [openSubnav, setOpenSubnav] = useState(null);
-  const closeTimer = useRef(null);
 
   useEffect(() => {
     const getCranes = async () => {
@@ -29,25 +29,6 @@ function ProducersNav() {
     return Array.from(new Set(cranes.map((c) => c.producer).filter(Boolean)));
   }, [cranes]);
 
-  // Called when pointer enters the LI or the fly-out itself:
-  const handleMouseEnter = (producer) => {
-    // cancel any pending close
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-    setOpenSubnav(producer);
-  };
-
-  // Called when pointer leaves the LI or the fly-out itself:
-  const handleMouseLeave = () => {
-    // schedule a close in 300ms (adjust as you like)
-    closeTimer.current = window.setTimeout(() => {
-      setOpenSubnav(null);
-      closeTimer.current = null;
-    }, 300);
-  };
-
   const itemsByProducer = useMemo(() => {
     return cranes.reduce((acc, crane) => {
       if (!crane.producer) return acc;
@@ -63,42 +44,89 @@ function ProducersNav() {
         {uniqueProducers.map((producer) => (
           <li
             key={producer}
-            className="relative py-4 group transition-colors duration-200 ease-out border-b border-transparent hover:border-b-red-600"
+            className="
+              relative py-4 group border-b-2 border-transparent 
+              hover:border-red-600 transition-colors duration-200
+            "
             onMouseEnter={() => handleMouseEnter(producer)}
             onMouseLeave={handleMouseLeave}
           >
             <Link
               to="#"
-              className="text-sm uppercase font-medium text-black whitespace-nowrap transition-colors duration-200 ease-out group-hover:text-red-600"
+              className="
+                text-sm uppercase font-medium text-black 
+                transition-colors duration-200 
+                group-hover:text-red-600
+              "
             >
               {producer}
             </Link>
-
-            {openSubnav === producer && (
-              <div className="fixed inset-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30 pointer-events-none">
-                <div
-                  className="w-full p-5 shadow-lg transform scale-y-100 origin-top  transition-transform duration-200 ease-out pointer-events-auto overflow-auto"
-                  onMouseEnter={() => handleMouseEnter(producer)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <ul className="space-y-4">
-                    {itemsByProducer[producer].map((crane) => (
-                      <li key={crane._id} className="text-sm">
-                        <Link
-                          to={`/cranes/${crane._id}`}
-                          className="block hover:bg-gray-100 p-2 rounded"
-                        >
-                          {crane.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
           </li>
         ))}
       </ul>
+
+      {openSubnav && (
+        <div className="fixed inset-x-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30">
+          <div
+            className="w-full p-5 shadow-lg bg-white overflow-auto"
+            onMouseEnter={() => handleMouseEnter(openSubnav)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <ul className="space-y-4 mb-10 mt-2">
+              <li className="group flex items-center gap-3 font-medium pl-10 text-xl tracking-wider">
+                <Link
+                  to="#"
+                  className="pb-1 text-black transition-colors duration-200 group-hover:text-red-600"
+                >
+                  {openSubnav}
+                </Link>
+                <ArrowIcon className="h-4 w-4 stroke-current text-black transition-colors duration-200 group-hover:text-red-600" />
+              </li>
+
+              <li className="pl-10 py-3">
+                <Link
+                  to="#"
+                  className="text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
+                >
+                  All Cranes
+                </Link>
+              </li>
+              <div className="w-200 pl-10 grid grid-cols-2 gap-x-4 gap-y-8 justify-items-start">
+                {itemsByProducer[openSubnav].slice(0, 4).map((crane) => {
+                  const model = [
+                    crane.seriesCode,
+                    crane.capacityClassNumber,
+                    crane.variantRevision,
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+
+                  const firstImage = crane.images?.[0];
+
+                  return (
+                    <Link
+                      key={crane._id}
+                      className="group flex gap-3 items-start"
+                    >
+                      <div className="w-32 h-24 overflow-hidden mb-2">
+                        <img
+                          src={firstImage}
+                          alt={model}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                      <div className="text-sm">
+                        <p>{model}</p>
+                        <span className="text-gray-500">{crane.title}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,6 +13,9 @@ function Navbar({ openLogin }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const [showNavbar, setShowNavbar] = useState(true);
 
+  const [openSubnav, setOpenSubnav] = useState(null);
+  const closeTimer = useRef(null);
+
   const lastScrollY = useRef(0);
 
   const navigate = useNavigate();
@@ -21,6 +24,29 @@ function Navbar({ openLogin }) {
   const isHome = location.pathname === "/";
   const isCranes = location.pathname === "/cranes";
   const isProfile = location.pathname === "/profile";
+
+  const cancelClose = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+
+  // Called when pointer enters the LI or the fly-out itself:
+  const handleMouseEnter = (producer) => {
+    cancelClose();
+    if (producer) {
+      setOpenSubnav(producer);
+    }
+  };
+
+  // Called when pointer leaves the LI or the fly-out itself:
+  const handleMouseLeave = () => {
+    closeTimer.current = window.setTimeout(() => {
+      setOpenSubnav(null);
+      closeTimer.current = null;
+    }, 200);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,12 +89,20 @@ function Navbar({ openLogin }) {
             </button>
           )}
           {isCranes && (
-            <>
+            <div
+              className="flex items-center"
+              onMouseEnter={cancelClose}
+              onMouseLeave={handleMouseLeave}
+            >
               <Link to="/" className="py-4">
                 <img src={logo} alt="Logo" className="w-[36px]" />
               </Link>
-              <ProducersNav />
-            </>
+              <ProducersNav
+                openSubnav={openSubnav}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+              />
+            </div>
           )}
           {isProfile && (
             <Link to="/">

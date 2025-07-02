@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import arrow from "../assets/icons/arrow-right.png";
+//import arrow from "../assets/icons/arrow-right.png";
 
 function Crane({
   title,
@@ -37,7 +37,7 @@ function Crane({
         }`}
       >
         <div className="flex items-center gap-2">
-          <img src={arrow} alt="Arrow Icon" className="h-4" />
+          {/* <img src={arrow} alt="Arrow Icon" className="h-4" /> */}
           {status}
         </div>
       </div>
