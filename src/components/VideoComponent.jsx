@@ -4,17 +4,13 @@ import { useLocation } from "react-router-dom";
 import play from "../assets/icons/play.png";
 import stop from "../assets/icons/stop-circle.png";
 
-import soundOff from "../assets/icons/volume-slash.png";
-import soundOn from "../assets/icons/volume.png";
-
-function VideoComponent({ introWebm, introMp4, poster }) {
+function VideoComponent({ introWebm, introMp4, poster, muted, onMuteChange }) {
   const videoRef = useRef(null);
   const [playing, setPlaying] = useState(true);
-  const [muted, setMuted] = useState(true);
 
   const location = useLocation();
 
-  const isCranes = location.pathname === "/cranes";
+  const isCranes = location.pathname.startsWith("/cranes");
 
   useEffect(() => {
     if (videoRef.current) {
@@ -22,7 +18,8 @@ function VideoComponent({ introWebm, introMp4, poster }) {
     }
   }, [muted]);
 
-  const handleToggle = () => {
+  const handleToggle = (e) => {
+    e.stopPropagation();
     const video = videoRef.current;
     if (!video) return;
 
@@ -35,8 +32,10 @@ function VideoComponent({ introWebm, introMp4, poster }) {
     }
   };
 
-  const handleToggleMute = () => {
-    setMuted((m) => !m);
+  // Toggle mute/unmute (only on video click when isCranes)
+  const handleVideoClick = () => {
+    if (!isCranes) return;
+    onMuteChange((m) => !m);
   };
 
   return (
@@ -45,7 +44,7 @@ function VideoComponent({ introWebm, introMp4, poster }) {
         ref={videoRef}
         poster={poster}
         className={`absolute inset-0 w-full h-full object-cover transform filter transition-transform transition-filter duration-500 ${
-          isCranes ? "" : "blur-[2px] scale-105"
+          isCranes ? "cursor-pointer" : "blur-[2px] scale-105"
         }`}
         autoPlay
         muted={muted}
@@ -53,6 +52,7 @@ function VideoComponent({ introWebm, introMp4, poster }) {
         playsInline
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
+        onClick={handleVideoClick}
       >
         <source src={introWebm} type="video/webm" />
         <source src={introMp4} type="video/mp4" />
@@ -64,24 +64,11 @@ function VideoComponent({ introWebm, introMp4, poster }) {
         className="absolute bottom-5 right-5 z-20 py-2 px-4 cursor-pointer"
       >
         {playing ? (
-          <img className="scale-150 fill-white" src={stop} alt="Stop Video" />
+          <img className="scale-180 pb-3" src={stop} alt="Stop Video" />
         ) : (
-          <img className="scale-150" src={play} alt="Play Video" />
+          <img className="scale-180 pb-3" src={play} alt="Play Video" />
         )}
       </button>
-
-      {isCranes && (
-        <button
-          onClick={handleToggleMute}
-          className="absolute bottom-5 left-5 z-20 p-2 cursor-pointer"
-        >
-          {muted ? (
-            <img className="scale-105" src={soundOff} alt="Mute Video" />
-          ) : (
-            <img className="scale-105" src={soundOn} alt="Unmute Video" />
-          )}
-        </button>
-      )}
     </section>
   );
 }

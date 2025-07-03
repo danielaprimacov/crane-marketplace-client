@@ -105,6 +105,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
 
                   return (
                     <Link
+                      to={`/cranes/${crane._id}`}
                       key={crane._id}
                       className="group flex gap-3 items-start"
                     >

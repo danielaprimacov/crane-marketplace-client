@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 import { CheckCircleIcon } from "@heroicons/react/solid";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
@@ -18,6 +19,8 @@ import mobileCrane from "../assets/images/mobile-crane.jpg";
 import crawlerCrane from "../assets/images/crawler-crane.png";
 
 function CranesPage() {
+  const [videoMuted, setVideoMuted] = useState(true);
+
   return (
     <>
       <div className="relative w-full h-screen overflow-hidden">
@@ -25,14 +28,19 @@ function CranesPage() {
           introWebm={videoWebm}
           introMp4={videoMp4}
           poster={videoPoster}
+          muted={videoMuted}
+          onMuteChange={setVideoMuted}
         />
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4">
-          <div className="flex-1 flex flex-col justify-center items-center">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pointer-events-none">
+          <div className={`flex-1 flex flex-col justify-center items-center transition-opacity duration-700 ${videoMuted ? "opacity-100" : "opacity-0"}`}>
             <p className="text-white uppercase text-xl md:text-2xl lg:text-3xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
               Choose the Right Crane on KranHub
             </p>
             <p className="mt-2 text-red-600 uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
               Unmute video sound
+            </p>
+            <p className="my-5 text-red-600 text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+              click on the video
             </p>
             <p className="my-5 text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
               for an audio walkthrough on choosing the right crane
@@ -42,18 +50,13 @@ function CranesPage() {
               step-by-step guide in text.
             </p>
           </div>
-          <div className="pb-8">
-            <button
-              onClick={() => {
-                document
-                  .getElementById("guide")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
+          <div className="pb-15">
+            <div
               aria-label="Scroll down to guide"
-              className="p-2 bg-transparent"
+              className="absolute bottom-6 left-1/2 "
             >
-              <ArrowDownIcon className="h-8 w-8 text-red-600 animate-bounce" />
-            </button>
+              <ArrowDownIcon className="h-15 w-15 text-red-600 animate-bounce" />
+            </div>
           </div>
         </div>
       </div>
