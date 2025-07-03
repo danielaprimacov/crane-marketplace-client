@@ -22,7 +22,7 @@ function Navbar({ openLogin }) {
   const location = useLocation();
 
   const isHome = location.pathname === "/";
-  const isCranes = location.pathname === "/cranes";
+  const isCranes = location.pathname.startsWith("/cranes");
   const isProfile = location.pathname === "/profile";
 
   const cancelClose = () => {

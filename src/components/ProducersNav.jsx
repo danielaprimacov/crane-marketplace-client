@@ -5,6 +5,7 @@ import axios from "axios";
 const API_URL = "http://localhost:5005";
 
 import ArrowIcon from "./ArrowIcon";
+import { slugify } from "../utils/helpers";
 
 function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
   const [cranes, setCranes] = useState([]);
@@ -44,20 +45,13 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
         {uniqueProducers.map((producer) => (
           <li
             key={producer}
-            className="
-              relative py-4 group border-b-2 border-transparent 
-              hover:border-red-600 transition-colors duration-200
-            "
+            className="relative py-4 group border-b-2 border-transparent hover:border-red-600 transition-colors duration-200"
             onMouseEnter={() => handleMouseEnter(producer)}
             onMouseLeave={handleMouseLeave}
           >
             <Link
               to="#"
-              className="
-                text-sm uppercase font-medium text-black 
-                transition-colors duration-200 
-                group-hover:text-red-600
-              "
+              className="text-sm uppercase font-medium text-black transition-colors duration-200 group-hover:text-red-600"
             >
               {producer}
             </Link>
@@ -73,19 +67,11 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
             onMouseLeave={handleMouseLeave}
           >
             <ul className="space-y-4 mb-10 mt-2">
-              <li className="group flex items-center gap-3 font-medium pl-10 text-xl tracking-wider">
-                <Link
-                  to="#"
-                  className="pb-1 text-black transition-colors duration-200 group-hover:text-red-600"
-                >
-                  {openSubnav}
-                </Link>
-                <ArrowIcon className="h-4 w-4 stroke-current text-black transition-colors duration-200 group-hover:text-red-600" />
-              </li>
-
               <li className="pl-10 py-3">
                 <Link
-                  to="#"
+                  to={`/cranes/producers/${encodeURIComponent(
+                    slugify(openSubnav)
+                  )}`}
                   className="text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
                 >
                   All Cranes

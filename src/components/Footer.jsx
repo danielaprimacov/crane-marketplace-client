@@ -7,7 +7,7 @@ import xIcon from "../assets/icons/twitter-alt-circle.png";
 
 function Footer() {
   return (
-    <div className="p-12 mt-10 bg-black/20 flex justify-between">
+    <div id="footer" className="p-12 mt-10 bg-black/20 flex justify-between">
       {/* Company Information */}
       <div>
         <h3 className="text-black/40 uppercase mb-3">Address</h3>
