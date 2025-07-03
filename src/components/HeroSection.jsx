@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
-import VideoIntro from "./VideoIntro";
+import VideoComponent from "./VideoComponent";
+
+import introWebm from "../assets/video/video-intro.webm";
+import introMp4 from "../assets/video/video-intro.mp4";
 
 function HeroSection() {
   return (
     <div className="relative w-full h-screen overflow-hidden ">
-      <VideoIntro />
+      <VideoComponent introWebm={introWebm} introMp4={introMp4} />
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4">
         <p className="text-white uppercase text-2xl md:text-4xl lg:text-5xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
           KranHub presents

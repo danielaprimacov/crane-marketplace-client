@@ -6,6 +6,11 @@ import { AuthContext } from "../context/auth.context";
 import Crane from "../components/Crane";
 import Modal from "../components/Modal";
 
+import VideoComponent from "../components/VideoComponent";
+
+import videoWebm from "../assets/video/choose-a-crane.webm";
+import videoMp4 from "../assets/video/choose-a-crane.mp4";
+
 const API_URL = "http://localhost:5005";
 
 function CranesPage() {
@@ -31,12 +36,10 @@ function CranesPage() {
   }, []);
 
   return (
-    <div className="mt-20 px-5 flex justify-center flex-col">
-      
-      
-      <div className="pt-16"> 
-        <div className="pt-10"> 
-          
+    <div className="mt-16">
+      <div className="">
+        <div className="">
+          <VideoComponent introWebm={videoWebm} introMp4={videoMp4} />
         </div>
       </div>
 
