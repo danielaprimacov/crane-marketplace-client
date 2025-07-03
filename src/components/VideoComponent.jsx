@@ -7,7 +7,7 @@ import stop from "../assets/icons/stop-circle.png";
 import soundOff from "../assets/icons/volume-slash.png";
 import soundOn from "../assets/icons/volume.png";
 
-function VideoComponent({ introWebm, introMp4 }) {
+function VideoComponent({ introWebm, introMp4, poster }) {
   const videoRef = useRef(null);
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(true);
@@ -43,8 +43,9 @@ function VideoComponent({ introWebm, introMp4 }) {
     <section className="relative w-full h-screen overflow-hidden">
       <video
         ref={videoRef}
-        className={`absolute inset-0 w-full h-full object-cover filter ${
-          isCranes ? "" : "blur-[2px] transform scale-105"
+        poster={poster}
+        className={`absolute inset-0 w-full h-full object-cover transform filter transition-transform transition-filter duration-500 ${
+          isCranes ? "" : "blur-[2px] scale-105"
         }`}
         autoPlay
         muted={muted}

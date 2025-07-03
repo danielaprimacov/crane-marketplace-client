@@ -76,8 +76,10 @@ function Navbar({ openLogin }) {
 
   return (
     <nav
-      className={`fixed inset-x-0 h-16 z-50 bg-transparent transition-all duration-800 ease-out overflow-visible 
-      ${showNavbar ? "top-0" : "-top-16"}
+      className={`fixed inset-x-0 h-16 z-50 transition-all duration-800 ease-out overflow-visible 
+      ${showNavbar ? "top-0" : "-top-16"} ${
+        isCranes ? "bg-white" : "bg-transparent"
+      }
     `}
     >
       <div className="flex items-center h-full px-4 w-full">

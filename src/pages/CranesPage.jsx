@@ -1,77 +1,259 @@
-import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import AddCrane from "../components/AddCrane";
-import { AuthContext } from "../context/auth.context";
-import Crane from "../components/Crane";
-import Modal from "../components/Modal";
+
+import { CheckCircleIcon } from "@heroicons/react/solid";
+import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 
 import VideoComponent from "../components/VideoComponent";
+import ArrowDownIcon from "../components/ArrowDownIcon";
 
 import videoWebm from "../assets/video/choose-a-crane.webm";
 import videoMp4 from "../assets/video/choose-a-crane.mp4";
+import videoPoster from "../assets/images/poster-cranes-page.png";
 
-const API_URL = "http://localhost:5005";
+import cranePhoto from "../assets/images/feng-sun-5AmT_FPF5Jo-unsplash.jpg";
+import downArrow from "../assets/icons/down-arrow.gif";
+
+import towerCrane from "../assets/images/tower-crane.webp";
+import mobileCrane from "../assets/images/mobile-crane.jpg";
+import crawlerCrane from "../assets/images/crawler-crane.png";
 
 function CranesPage() {
-  const [cranes, setCranes] = useState([]);
-  const [showAdd, setShowAdd] = useState(false);
-  const { isLoggedIn } = useContext(AuthContext);
-
-  const getAllCranes = async () => {
-    const storedToken = localStorage.getItem("authToken");
-
-    try {
-      const response = await axios.get(`${API_URL}/cranes`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
-      setCranes(response.data);
-    } catch (error) {
-      console.error("Failed to fetch cranes:", error);
-    }
-  };
-
-  useEffect(() => {
-    getAllCranes();
-  }, []);
-
   return (
-    <div className="mt-16">
-      <div className="">
-        <div className="">
-          <VideoComponent introWebm={videoWebm} introMp4={videoMp4} />
+    <>
+      <div className="relative w-full h-screen overflow-hidden">
+        <VideoComponent
+          introWebm={videoWebm}
+          introMp4={videoMp4}
+          poster={videoPoster}
+        />
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4">
+          <div className="flex-1 flex flex-col justify-center items-center">
+            <p className="text-white uppercase text-xl md:text-2xl lg:text-3xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+              Choose the Right Crane on KranHub
+            </p>
+            <p className="mt-2 text-red-600 uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
+              Unmute video sound
+            </p>
+            <p className="my-5 text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+              for an audio walkthrough on choosing the right crane
+            </p>
+            <p className="text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+              or <span className="text-red-600">scroll down</span> for the full
+              step-by-step guide in text.
+            </p>
+          </div>
+          <div className="pb-8">
+            <button
+              onClick={() => {
+                document
+                  .getElementById("guide")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              aria-label="Scroll down to guide"
+              className="p-2 bg-transparent"
+            >
+              <ArrowDownIcon className="h-8 w-8 text-red-600 animate-bounce" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* {isLoggedIn && (
-        <>
-          <button
-            onClick={() => setShowAdd(true)}
-            className="group relative w-[30rem] h-10 py-2 m-auto bg-black text-white font-medium text-xl tracking-widest rounded-md cursor-pointer overflow-hidden transition duration-500 ease-in-out"
-          >
-            <span className="absolute inset-0 bg-orange-400 origin-left scale-x-0 transform transition-transform duration-500 ease-in-out group-hover:scale-x-100" />
-            <span className="relative z-10 block w-full h-full flex items-center justify-center group-hover:text-black/70">
-              Add Crane
-            </span>
-          </button>
-          {showAdd && (
-            <Modal onClose={() => setShowAdd(false)}>
-              <AddCrane
-                refreshCranes={() => {
-                  getAllCranes();
-                  setShowAdd(false);
-                }}
+      <div id="guide">
+        <div className="pt-13 pb-5 flex flex-col items-center justify-center">
+          <h1 className="py-5 mb-10 text-5xl font-semibold tracking-widest">
+            Define Your Job Needs
+          </h1>
+          <div className="flex p-5 gap-20">
+            <ul className="flex flex-col gap-10 text-lg pt-4">
+              <li className="flex flex-col justify-center items-center mb-4">
+                <p>What are you lifting?</p>
+                <img src={downArrow} alt="Down Arrow GIF" className="w-6" />
+                <span>
+                  Check the <strong>load capacity (in tonnes).</strong>
+                </span>
+              </li>
+              <li className="flex flex-col items-center mr-auto mb-4">
+                <p>How high or how far?</p>
+                <img src={downArrow} alt="Down Arrow GIF" className="w-6" />
+                <span>
+                  Look at the <strong>lift height</strong> and{" "}
+                  <strong>radius</strong> specs.
+                </span>
+              </li>
+              <li className="flex flex-col items-center">
+                <p>Where is the site?</p>
+                <img src={downArrow} alt="Down Arrow GIF" className="w-6" />
+                <span className="flex flex-col items-center">
+                  <span>
+                    Note your <strong>location</strong>
+                  </span>
+                  <span>
+                    — some cranes won't fit narrow streets or soft ground.
+                  </span>
+                </span>
+              </li>
+            </ul>
+            <div>
+              <img
+                src={cranePhoto}
+                alt="Construction Crane on sunset"
+                className="w-120 rounded-md"
               />
-            </Modal>
-          )}
-        </>
-      )}
-      <div className="mt-10 flex flex-wrap justify-evenly gap-5">
-        {cranes.map((crane) => (
-          <Crane key={crane._id} {...crane} />
-        ))}
-      </div> */}
-    </div>
+            </div>
+          </div>
+          <p className="pt-5 text-sm">
+            <span className="font-semibold pr-2">Tip:</span>
+            <span>
+              If you need to place materials on upper floors of a building, pick
+              a crane with a tall maximum height. For heavy loads near the
+              ground, capacity matters more than height.
+            </span>
+          </p>
+        </div>
+
+        <div className="pt-13 pb-5 flex flex-col items-center justify-center">
+          <h1 className="py-5 mb-10 text-5xl font-semibold tracking-widest">
+            Pick the Crane Type
+          </h1>
+          <h3 className="text-lg tracking-wider pb-8">
+            On KranHub you'll see three main categories — click each for photos
+            and specs:{" "}
+          </h3>
+          <div className="flex justify-evenly w-full py-8">
+            {[
+              {
+                title: "Tower",
+                text: "Tall-building projects, compact footprint on tight city sites",
+                image: towerCrane,
+              },
+              {
+                title: "Mobile",
+                text: "Quick setup, short-term jobs, moving between multiple locations",
+                image: mobileCrane,
+              },
+              {
+                title: "Crawler",
+                text: "Very heavy loads on uneven or soft ground, long-term installations",
+                image: crawlerCrane,
+              },
+            ].map(({ title, text, image }) => (
+              <div key={title} className="group [perspective:1000px] w-64 h-80">
+                {/* card inner */}
+                <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                  {/* front face */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center rounded-lg shadow-md p-4 flex items-center justify-center [backface-visibility:hidden]"
+                    style={{ backgroundImage: `url(${image})` }}
+                  >
+                    <p className="text-2xl py-2 px-4 font-semibold text-white bg-black/50 px-2 rounded">
+                      {title}
+                    </p>
+                  </div>
+                  {/* back face */}
+                  <div className="absolute inset-0 bg-white rounded-lg shadow-md p-4 flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                    <span className="text-center text-gray-700">{text}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="pt-5 text-sm">
+            <span className="font-semibold pr-2">Tip:</span>
+            <span>Hover over the “Type” filter to see a description.</span>
+          </p>
+        </div>
+
+        <div className="pt-13 pb-5 flex flex-col items-center justify-center">
+          <h1 className="py-5 mb-10 text-5xl font-semibold tracking-widest">
+            Filter & Compare Listings
+          </h1>
+          <p className="text-lg text-black/70 tracking-wider pb-8">
+            Once you’ve chosen a manufacturer, fine-tune your results with our
+            integrated filters:
+          </p>
+          <section className="max-w-7xl mx-auto p-8 bg-white rounded-xl shadow-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div>
+                <h3 className="text-xl font-medium mb-4">Filter by:</h3>
+                <ul className="space-y-4">
+                  <li>
+                    <span className="font-semibold">Capacity —</span>
+                    <span className="ml-2 text-gray-600">
+                      enter the minimum tonnage you require.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="font-semibold">Lift Height/Radius —</span>
+                    <span className="ml-2 text-gray-600">
+                      specify the height or boom reach you need.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="font-semibold">Rental Dates —</span>
+                    <span className="ml-2 text-gray-600">
+                      pick your start and end dates if renting.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="font-semibold">Location & Budget —</span>
+                    <span className="ml-2 text-gray-600">
+                      set your site location and maximum spend.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-medium mb-4">
+                  Each crane card includes:
+                </h3>
+                <ul className="space-y-4">
+                  {[
+                    "High-resolution photos",
+                    "Key specs (capacity, lift height, crane type)",
+                    "Transparent pricing (purchase price or daily rental rate)",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start">
+                      <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                      <span className="ml-3">{item}</span>
+                    </li>
+                  ))}
+
+                  <li className="flex items-start">
+                    <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                    <span className="ml-3">
+                      <span className="font-semibold">Send Inquiry</span> button
+                      — directs your request straight to our admin team for fast
+                      follow-up.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div className="max-w-full mx-auto bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl shadow-lg text-center mt-8">
+          <div className="flex justify-center items-center gap-5 mb-4">
+            <QuestionMarkCircleIcon className="h-12 w-12 text-blue-500" />
+            <h2 className="text-3xl font-semibold text-gray-800 mb-2">
+              Need Help?
+            </h2>
+          </div>
+          <p className="text-gray-600 mb-6">
+            Click{" "}
+            <Link
+              to=""
+              className="inline-block bg-blue-600 text-white px-4 py-1 rounded-full font-medium transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Get Expert Advice
+            </Link>{" "}
+            at the top of any page. Our team will review your requirements and
+            recommend the perfect crane—no technical jargon, guaranteed!
+          </p>
+        </div>
+      </div>
+    </>
   );
 }
 
