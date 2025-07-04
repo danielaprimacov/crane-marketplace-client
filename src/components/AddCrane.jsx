@@ -10,6 +10,9 @@ function AddCrane(props) {
   const [seriesCode, setSeriesCode] = useState("");
   const [capacityClassNumber, setCapacityClassNumber] = useState("");
   const [variantRevision, setVariantRevision] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [height, setHeight] = useState("");
+  const [radius, setRadius] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [rentAmount, setRentAmount] = useState("");
   const [rentInterval, setRentInterval] = useState("day");
@@ -38,6 +41,9 @@ function AddCrane(props) {
       producer,
       seriesCode,
       capacityClassNumber: Number(capacityClassNumber),
+      capacity: capacity ? Number(capacity) : undefined,
+      height: Number(height),
+      radius: Number(radius),
       variantRevision,
       images,
       description,
@@ -72,6 +78,9 @@ function AddCrane(props) {
       setProducer("");
       setSeriesCode("");
       setCapacityClassNumber("");
+      setCapacity("");
+      setHeight("");
+      setRadius("");
       setVariantRevision("");
       setImages([]);
       setNewImageUrl("");
@@ -120,6 +129,42 @@ function AddCrane(props) {
             type="number"
             value={capacityClassNumber}
             onChange={(event) => setCapacityClassNumber(event.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="capacity">Max Capacity (t):</label>
+          <input
+            type="number"
+            id="capacity"
+            value={capacity}
+            onChange={(event) => setCapacity(event.target.value)}
+            min="0"
+            step="0.1"
+            placeholder="e.g. 102.5"
+          />
+        </div>
+        <div>
+          <label htmlFor="height">Max Height (m):</label>
+          <input
+            type="number"
+            id="height"
+            value={height}
+            onChange={(event) => setHeight(event.target.value)}
+            min="0"
+            step="0.1"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="radius">Max Radius (m):</label>
+          <input
+            type="number"
+            id="radius"
+            value={radius}
+            onChange={(event) => setRadius(event.target.value)}
+            min="0"
+            step="0.1"
             required
           />
         </div>
