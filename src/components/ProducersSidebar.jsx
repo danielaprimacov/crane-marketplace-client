@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function ProducersSidebar({ producers, activeSlug }) {
   const [openSlug, setOpenSlug] = useState(
@@ -50,9 +50,9 @@ function ProducersSidebar({ producers, activeSlug }) {
 
             {openSlug === slug && (
               <ul className="mt-2 space-y-5">
-                {models.map((m) => (
-                  <li key={m} className="text-sm cursor-pointer text-black/70">
-                    {m}
+                {models.map(({ id, label }) => (
+                  <li key={id} className="text-sm cursor-pointer text-black/70">
+                    <Link to={`/cranes/${id}`}>{label}</Link>
                   </li>
                 ))}
               </ul>

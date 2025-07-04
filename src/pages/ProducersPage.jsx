@@ -60,7 +60,6 @@ function ProducersPage() {
       <div>
         <ProducersSidebar producers={groupCranes} />
 
-        {/* The cranes specifically of the producer */}
         <div></div>
       </div>
     </div>

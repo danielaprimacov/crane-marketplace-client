@@ -42,9 +42,10 @@ function ProducerPage() {
       const slug = slugify(name);
       const models = list.map((c) => {
         const rev = c.variantRevision?.trim();
-        return rev
+        const label = rev
           ? `${c.seriesCode} ${c.capacityClassNumber}t ${rev}`
           : `${c.seriesCode} ${c.capacityClassNumber}t`;
+        return { id: c._id, label };
       });
       return { name, slug, models };
     });
@@ -69,31 +70,73 @@ function ProducerPage() {
       <ProducersSidebar producers={groupCranes} activeSlug={producerSlug} />
 
       {/* Main content: list of this producer's cranes */}
-      <main className="flex-1 p-6 ml-4">
-        <h1 className="text-2xl font-bold mb-4">{activeGroup.name}</h1>
-
+      <main className="flex-1 p-6">
         {myCranes.length === 0 ? (
           <p>No cranes found for “{producerSlug}.”</p>
         ) : (
-          <ul className="space-y-4">
-            {myCranes.map((c) => {
-              const model = [
-                c.seriesCode,
-                c.capacityClassNumber,
-                c.variantRevision,
-              ]
-                .filter(Boolean)
-                .join(" ");
-              return (
-                <li key={c._id} className="border p-4 rounded">
-                  <Link to={`/cranes/${c._id}`} className="font-medium">
-                    {model}
-                  </Link>
-                  <p className="text-gray-500">{c.title}</p>
-                </li>
-              );
-            })}
-          </ul>
+            <div className="mt-10 ml-10">
+              
+              
+              <div className="mb-5">Filtering options</div>
+              
+              
+              
+              
+              
+              <div className="flex flex-wrap gap-5">
+              {myCranes.map((c) => {
+                const model = [
+                  c.seriesCode,
+                  c.capacityClassNumber,
+                  c.variantRevision,
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+
+                const bgUrl =
+                  Array.isArray(c.images) && c.images.length > 0
+                    ? c.images[0]
+                    : null;
+                return (
+                  <div className="w-72 h-72 mr-5 rounded-md shadow-md">
+                    <div>
+                      <div className="w-full h-44 overflow-hidden rounded-t">
+                        {bgUrl ? (
+                          <div
+                            className="w-full h-full bg-cover bg-center transform transition-transform duration-200 hover:scale-105"
+                            style={{ backgroundImage: `url(${bgUrl})` }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100" />
+                        )}
+                      </div>
+                      <div className="ml-2 mt-2">
+                        <Link
+                          key={c._id}
+                          to={`/cranes/${c._id}`}
+                          className="font-medium hover:underline"
+                        >
+                          {c.title}
+                        </Link>
+                        <p className="text-gray-500 pb-2">{model}</p>
+                      </div>
+                      <div className="py-2 text-right">
+                        {c.status === "for sale" ? (
+                          <span className="p-2 font-bold tracking-wider">
+                            For Sale
+                          </span>
+                        ) : (
+                          <span className="p-2 font-bold tracking-wider">
+                            For Rent
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </main>
     </div>
