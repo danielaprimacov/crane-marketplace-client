@@ -31,6 +31,7 @@ function AddCraneForm() {
 
   const [isSuccess, setIsSuccess] = useState(false);
   const [imageFeedback, setImageFeedback] = useState("");
+  const [isAvailable, setIsAvailable] = useState(false);
   const [newProducerSlug, setNewProducerSlug] = useState("");
 
   const handleAddImage = () => {
@@ -470,12 +471,36 @@ function AddCraneForm() {
         )}
 
         {/* AvailabilityRange  */}
-        <AvailabilityRange
-          field="availability"
-          values={availability}
-          setValues={setAvailability}
-          label="Available"
-        />
+        <div className="flex items-center mb-6">
+          <input
+            type="checkbox"
+            id="isAvailable"
+            checked={isAvailable}
+            onChange={(e) => {
+              setIsAvailable(e.target.checked);
+              if (!e.target.checked) {
+                // clear any previously set dates
+                setAvailability({ availabilityStart: "", availabilityEnd: "" });
+              }
+            }}
+            className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+          />
+          <label htmlFor="isAvailable" className="ml-2 text-sm text-gray-700">
+            Is Available?
+          </label>
+        </div>
+
+        {/* ── only show when checked ── */}
+        {isAvailable && (
+          <div className="mb-8">
+            <AvailabilityRange
+              field="availability"
+              values={availability}
+              setValues={setAvailability}
+              label="Available"
+            />
+          </div>
+        )}
 
         <button
           type="submit"
