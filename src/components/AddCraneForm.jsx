@@ -136,7 +136,7 @@ function AddCraneForm() {
   return (
     <>
       <h1 className="text-2xl uppercase mx-auto mb-5 border-b pb-3 border-b-red-600">
-        Add your own crane
+        Add your crane
       </h1>
       <form
         onSubmit={handleSubmit}

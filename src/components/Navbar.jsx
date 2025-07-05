@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
 
@@ -10,9 +11,13 @@ import cartIcon from "../assets/icons/cart-minus.png";
 import logo from "../assets/icons/shipping.png"; // temporary
 import ProducersNav from "./ProducersNav";
 
+const API_URL = "http://localhost:5005";
+
 function Navbar({ openLogin }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const [showNavbar, setShowNavbar] = useState(true);
+
+  const [myCranesCount, setMyCranesCount] = useState(0);
 
   const [openSubnav, setOpenSubnav] = useState(null);
   const closeTimer = useRef(null);
@@ -49,6 +54,27 @@ function Navbar({ openLogin }) {
       closeTimer.current = null;
     }, 200);
   };
+
+  useEffect(() => {
+    if (!isLoggedIn || !user?._id) return;
+
+    const fetchMyCranesCount = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const { data: allCranes } = await axios.get(`${API_URL}/cranes`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // replace `owner` with whatever field your backend sets:
+        const mine = allCranes.filter((c) => c.owner === user._id);
+        setMyCranesCount(mine.length);
+      } catch (err) {
+        console.error("Could not fetch cranes:", err);
+      }
+    };
+
+    fetchMyCranesCount();
+  }, [isLoggedIn, user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -138,10 +164,17 @@ function Navbar({ openLogin }) {
                       Add a new crane
                     </Link>
                   )}
-                  <div className="flex gap-5">
-                    <Link to="">
-                      <img src={cartIcon} alt="Cart Icon" className="w-5" />
-                    </Link>
+                  <div className="flex gap-5 items-center">
+                    <div className="relative">
+                      <Link to="/my-cranes">
+                        <img src={cartIcon} alt="Your Cranes" className="w-5" />
+                        {myCranesCount > 0 && (
+                          <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                            {myCranesCount}
+                          </span>
+                        )}
+                      </Link>
+                    </div>
                     <Link to="/profile">
                       <img src={userIcon} alt="Profile" className="w-5" />
                     </Link>
