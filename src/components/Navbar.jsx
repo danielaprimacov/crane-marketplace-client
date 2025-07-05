@@ -166,7 +166,7 @@ function Navbar({ openLogin }) {
                   )}
                   <div className="flex gap-5 items-center">
                     <div className="relative">
-                      <Link to="/my-cranes">
+                      <Link to="/cranes/my-cranes">
                         <img src={cartIcon} alt="Your Cranes" className="w-5" />
                         {myCranesCount > 0 && (
                           <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
