@@ -1,7 +1,9 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import axios from "axios";
+
+import { slugify } from "../utils/helpers";
 
 const API_URL = "http://localhost:5005";
 
@@ -32,8 +34,20 @@ function LoginForm({ onSuccess, onSwitchToSignup }, formRef) {
 
       onSuccess();
 
-      // redirect home
-      navigate("/profile");
+      // redirect all cranes
+      const { data: allCranes } = await axios.get(`${API_URL}/cranes`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const producers = Array.from(
+        new Set(allCranes.map((c) => c.producer).filter(Boolean))
+      );
+      if (producers.length > 0) {
+        const firstSlug = slugify(producers[0]);
+        navigate(`/cranes/producers/${encodeURIComponent(firstSlug)}`);
+      } else {
+        // fallback if no producers
+        navigate("/cranes");
+      }
     } catch (error) {
       // grab API message or fallback
       const errorDescription =
@@ -45,7 +59,11 @@ function LoginForm({ onSuccess, onSwitchToSignup }, formRef) {
   return (
     <div className="w-[40rem] flex flex-col m-auto pb-5">
       <h1 className="my-10 text-2xl uppercase">Login</h1>
-      <form ref={formRef} onSubmit={handleLoginSubmit} className="flex flex-col">
+      <form
+        ref={formRef}
+        onSubmit={handleLoginSubmit}
+        className="flex flex-col"
+      >
         {[
           {
             id: "email",

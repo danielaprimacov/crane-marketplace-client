@@ -20,6 +20,7 @@ import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
 import ProducersPage from "./pages/ProducersPage";
 import ProducerPage from "./pages/ProducerPage";
+import AddCranePage from "./pages/AddCranePage";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -50,9 +51,13 @@ function App() {
         >
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/cranes" element={<CranesPage />} />
+          <Route exact path="/cranes/new" element={<AddCranePage />} />
           <Route exact path="/cranes/:craneId" element={<CraneDetailsPage />} />
           <Route path="/cranes/producers" element={<ProducersPage />} />
-          <Route path="/cranes/producers/:producerSlug" element={<ProducerPage />} />
+          <Route
+            path="/cranes/producers/:producerSlug"
+            element={<ProducerPage />}
+          />
           <Route
             exact
             path="/cranes/edit/:craneId"

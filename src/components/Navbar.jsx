@@ -6,6 +6,7 @@ import { AuthContext } from "../context/auth.context";
 import menuIcon from "../assets/icons/menu-burger.png";
 import userIcon from "../assets/icons/circle-user.png";
 import logOutIcon from "../assets/icons/leave.png";
+import cartIcon from "../assets/icons/cart-minus.png";
 import logo from "../assets/icons/shipping.png"; // temporary
 import ProducersNav from "./ProducersNav";
 
@@ -23,6 +24,7 @@ function Navbar({ openLogin }) {
 
   const isHome = location.pathname === "/";
   const isCranes = location.pathname.startsWith("/cranes");
+  const isNewCrane = location.pathname === "/cranes/new";
   const isProfile = location.pathname === "/profile";
 
   const cancelClose = () => {
@@ -127,18 +129,35 @@ function Navbar({ openLogin }) {
               {user?.role === "admin" ? (
                 <button onClick={() => navigate("/admin")}>Dashboard</button>
               ) : (
-                <Link to="/profile">
-                  <img src={userIcon} alt="Profile" className="w-5" />
-                </Link>
+                <>
+                  {isCranes && !isNewCrane && (
+                    <Link
+                      to="/cranes/new"
+                      className="mr-10 bg-red-600 text-white px-4 py-1 rounded hover:shadow-lg hover:scale-101 transition-all duration-200"
+                    >
+                      Add a new crane
+                    </Link>
+                  )}
+                  <div className="flex gap-5">
+                    <Link to="">
+                      <img src={cartIcon} alt="Cart Icon" className="w-5" />
+                    </Link>
+                    <Link to="/profile">
+                      <img src={userIcon} alt="Profile" className="w-5" />
+                    </Link>
+                  </div>
+                </>
               )}
               <button onClick={logOutUser}>
                 <img src={logOutIcon} alt="Logout" className="w-5" />
               </button>
             </>
           ) : (
-            <button onClick={openLogin} className="p-2">
-              <img src={userIcon} alt="Login" className="w-6" />
-            </button>
+            <>
+              <button onClick={openLogin} className="p-2">
+                <img src={userIcon} alt="Login" className="w-6" />
+              </button>
+            </>
           )}
         </div>
       </div>
