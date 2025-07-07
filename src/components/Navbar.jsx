@@ -113,7 +113,7 @@ function Navbar({ openLogin }) {
       <div className="flex items-center h-full px-4 w-full">
         <div className="flex items-center flex-none">
           {isHome && (
-            <button className="flex items-center gap-2">
+            <button className="flex items-center gap-2 cursor-pointer">
               <img src={menuIcon} alt="Menu" className="w-6" />
               <span className="text-sm uppercase">Menu</span>
             </button>
@@ -187,7 +187,7 @@ function Navbar({ openLogin }) {
             </>
           ) : (
             <>
-              <button onClick={openLogin} className="p-2">
+              <button onClick={openLogin} className="p-2 cursor-pointer">
                 <img src={userIcon} alt="Login" className="w-6" />
               </button>
             </>
