@@ -20,15 +20,7 @@ function ProducersSidebar({ producers, activeSlug }) {
   };
 
   return (
-    <aside
-      className="
-        top-0 left-0
-        h-screen w-1/4 max-w-sm
-        bg-white border-r border-r-black/20
-        overflow-y-hidden hover:overflow-y-auto
-        transition-all
-      "
-    >
+    <aside className="top-0 left-0 h-screen w-1/4 max-w-sm bg-white border-r border-r-black/20 overflow-y-hidden hover:overflow-y-auto transition-all">
       <ul className="p-4 space-y-2 pt-10">
         {producers.map(({ name, slug, models }) => (
           <li key={slug} className="ml-8 pb-3 border-b border-b-black/10">

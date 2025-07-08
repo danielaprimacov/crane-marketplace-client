@@ -3,13 +3,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
+import ProducersNav from "./ProducersNav";
 
 import menuIcon from "../assets/icons/menu-burger.png";
 import userIcon from "../assets/icons/circle-user.png";
 import logOutIcon from "../assets/icons/leave.png";
 import craneIcon from "../assets/icons/crane.png";
+import inboxLogo from "../assets/icons/envelope.png";
 import logo from "../assets/icons/shipping.png"; // temporary
-import ProducersNav from "./ProducersNav";
 
 const API_URL = "http://localhost:5005";
 
@@ -18,6 +19,7 @@ function Navbar({ openLogin }) {
   const [showNavbar, setShowNavbar] = useState(true);
 
   const [myCranesCount, setMyCranesCount] = useState(0);
+  const [inquiriesCount, setInquiriesCount] = useState(0);
 
   const [openSubnav, setOpenSubnav] = useState(null);
   const closeTimer = useRef(null);
@@ -31,6 +33,7 @@ function Navbar({ openLogin }) {
   const isCranes = location.pathname.startsWith("/cranes");
   const isNewCrane = location.pathname === "/cranes/new";
   const isProfile = location.pathname.startsWith("/profile");
+
 
   const cancelClose = () => {
     if (closeTimer.current) {
@@ -78,6 +81,27 @@ function Navbar({ openLogin }) {
 
     fetchMyCranesCount();
   }, [isLoggedIn, user?._id, location.pathname]);
+
+  useEffect(() => {
+    if (!isLoggedIn || user?.role !== "admin") {
+      setInquiriesCount(0);
+      return;
+    }
+
+    const fetchInquiriesCount = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const { data: allInquiries } = await axios.get(`${API_URL}/inquiries`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setInquiriesCount(allInquiries.length);
+      } catch (err) {
+        console.error("Could not fetch inquiries:", err);
+      }
+    };
+
+    fetchInquiriesCount();
+  }, [isLoggedIn, user?.role, location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -159,11 +183,27 @@ function Navbar({ openLogin }) {
                 <>
                   <Link
                     to="/cranes/new"
-                    className="mr-10 bg-red-600 text-white px-4 py-1 rounded hover:shadow-lg hover:scale-101 transition-all duration-200"
+                    className="mr-5 bg-red-600 text-white px-4 py-1 rounded hover:shadow-lg hover:scale-101 transition-all duration-200"
                   >
                     Add a new crane
                   </Link>
-                  <button onClick={() => navigate("/admin")}>Dashboard</button>
+                  <div className="flex gap-5 items-center">
+                    <div className="relative">
+                      <button
+                        onClick={() =>
+                          navigate("/admin")
+                        }
+                        className="cursor-pointer p-1"
+                      >
+                        <img src={inboxLogo} alt="Inbox logo" className="w-5" />
+                        {inquiriesCount > 0 && (
+                          <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                            {inquiriesCount}
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>
@@ -178,7 +218,11 @@ function Navbar({ openLogin }) {
                   <div className="flex gap-5 items-center">
                     <div className="relative">
                       <Link to="/cranes/my-cranes">
-                        <img src={craneIcon} alt="Your Cranes" className="w-5" />
+                        <img
+                          src={craneIcon}
+                          alt="Your Cranes"
+                          className="w-5"
+                        />
                         {myCranesCount > 0 && (
                           <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                             {myCranesCount}
@@ -192,7 +236,7 @@ function Navbar({ openLogin }) {
                   </div>
                 </>
               )}
-              <button onClick={logOutUser}>
+              <button onClick={logOutUser} className="cursor-pointer">
                 <img src={logOutIcon} alt="Logout" className="w-5" />
               </button>
             </>

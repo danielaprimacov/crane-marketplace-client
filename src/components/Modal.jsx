@@ -42,7 +42,7 @@ function Modal({ children, isOpen, onClose }) {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0"
+          className="absolute cursor-pointer top-4 right-4 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0"
         >
           &times;
         </button>

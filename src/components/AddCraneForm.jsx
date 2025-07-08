@@ -504,7 +504,7 @@ function AddCraneForm() {
 
         <button
           type="submit"
-          className="bg-black text-white py-2 mt-6 rounded cursor-pointer uppercase hover:bg-gray-800 transition"
+          className="bg-black text-white py-2 mt-6 rounded cursor-pointer uppercase hover:bg-orange-600 transition"
         >
           Add Crane
         </button>
