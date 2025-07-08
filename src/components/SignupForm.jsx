@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = "http://localhost:5005";
@@ -10,8 +9,6 @@ function SignupForm({ onSuccess, onSwitchToLogin }, formRef) {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [name, setName] = useState("");
   const [errorMessage, setErrorMessage] = useState(undefined);
-
-  const navigate = useNavigate();
 
   const handleEmail = (event) => setEmail(event.target.value);
   const handlePassword = (event) => setPassword(event.target.value);
@@ -37,7 +34,7 @@ function SignupForm({ onSuccess, onSwitchToLogin }, formRef) {
     try {
       await axios.post(`${API_URL}/auth/signup`, requestBody);
       onSuccess();
-      navigate("/");
+      onSwitchToLogin();
     } catch (error) {
       // Safely grab the API’s error message, or fall back to a generic one
       const errorDescription =
@@ -49,7 +46,11 @@ function SignupForm({ onSuccess, onSwitchToLogin }, formRef) {
   return (
     <div className="w-[40rem] flex flex-col m-auto">
       <h1 className="my-10 text-2xl uppercase">Create account</h1>
-      <form ref={formRef} onSubmit={handleSignupSubmit} className="flex flex-col">
+      <form
+        ref={formRef}
+        onSubmit={handleSignupSubmit}
+        className="flex flex-col"
+      >
         {[
           {
             id: "name",

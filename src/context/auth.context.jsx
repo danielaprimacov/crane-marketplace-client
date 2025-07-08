@@ -28,7 +28,7 @@ function AuthProviderWrapper(props) {
 
     try {
       // Attempt verification
-      const response = await axios.get(`${API_URL}/auth/verify`, {
+      const response = await axios.get(`${API_URL}/users/profile`, {
         headers: { Authorization: `Bearer ${storeToken}` },
       });
 

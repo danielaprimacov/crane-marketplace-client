@@ -14,7 +14,7 @@ function CraneDetailsPage() {
   const [currentImage, setCurrentImage] = useState(0);
 
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, isLoggedIn } = useContext(AuthContext);
 
   const getCrane = async () => {
     const storedToken = localStorage.getItem("authToken");
@@ -56,7 +56,7 @@ function CraneDetailsPage() {
       await axios.delete(`${API_URL}/cranes/${craneId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate("/cranes");
+      navigate("/cranes/my-cranes");
     } catch (error) {
       console.error("Failed to delete crane:", error);
     }
@@ -167,7 +167,7 @@ function CraneDetailsPage() {
           </div>
 
           {/* Actions */}
-          {user && user.role !== "admin" && !isOwner && (
+          {user && user.role !== "admin" && !isOwner && !isLoggedIn && (
             <div className="mt-8">
               <Link to={`/cranes/${craneId}/new-inquiry`}>
                 <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500 transition">

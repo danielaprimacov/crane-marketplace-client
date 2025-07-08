@@ -30,7 +30,7 @@ function Navbar({ openLogin }) {
   const isHome = location.pathname === "/";
   const isCranes = location.pathname.startsWith("/cranes");
   const isNewCrane = location.pathname === "/cranes/new";
-  const isProfile = location.pathname === "/profile";
+  const isProfile = location.pathname.startsWith("/profile");
 
   const cancelClose = () => {
     if (closeTimer.current) {
@@ -153,7 +153,15 @@ function Navbar({ openLogin }) {
           {isLoggedIn ? (
             <>
               {user?.role === "admin" ? (
-                <button onClick={() => navigate("/admin")}>Dashboard</button>
+                <>
+                  <Link
+                    to="/cranes/new"
+                    className="mr-10 bg-red-600 text-white px-4 py-1 rounded hover:shadow-lg hover:scale-101 transition-all duration-200"
+                  >
+                    Add a new crane
+                  </Link>
+                  <button onClick={() => navigate("/admin")}>Dashboard</button>
+                </>
               ) : (
                 <>
                   {isCranes && !isNewCrane && (

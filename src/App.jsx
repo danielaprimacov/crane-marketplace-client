@@ -22,6 +22,7 @@ import ProducersPage from "./pages/ProducersPage";
 import ProducerPage from "./pages/ProducerPage";
 import AddCranePage from "./pages/AddCranePage";
 import UserCranesPage from "./pages/UserCranesPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -69,6 +70,7 @@ function App() {
             element={<NewInquiryPage />}
           />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
           <Route path="/cranes/my-cranes" element={<UserCranesPage />} />
         </Route>
 
