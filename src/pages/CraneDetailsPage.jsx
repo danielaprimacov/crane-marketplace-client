@@ -14,7 +14,7 @@ function CraneDetailsPage() {
   const [currentImage, setCurrentImage] = useState(0);
 
   const navigate = useNavigate();
-  const { user, isLoggedIn } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const getCrane = async () => {
     const storedToken = localStorage.getItem("authToken");

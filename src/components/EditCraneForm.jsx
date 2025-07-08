@@ -128,7 +128,7 @@ function EditCraneForm() {
       await axios.put(`${API_URL}/cranes/${craneId}`, requestBody, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      navigate(`/cranes/${craneId}`);
+      navigate(`/cranes/${craneId}`, { replace: true });
     } catch (error) {
       console.error("Failed to create crane:", error);
     }
