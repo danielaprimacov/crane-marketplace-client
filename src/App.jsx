@@ -23,6 +23,7 @@ import ProducerPage from "./pages/ProducerPage";
 import AddCranePage from "./pages/AddCranePage";
 import UserCranesPage from "./pages/UserCranesPage";
 import EditProfilePage from "./pages/EditProfilePage";
+import AdminLayout from "./components/AdminLayout";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -108,9 +109,10 @@ function App() {
         </Route>
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/inquiries" element={<InquiriesListPage />} />
-          <Route path="/admin/cranes" element={<CranesPage />} />
+          <Route path="admin" element={<AdminLayout />}>
+            <Route index element={<AdminPage />} />
+            <Route path="inquiries" element={<InquiriesListPage />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

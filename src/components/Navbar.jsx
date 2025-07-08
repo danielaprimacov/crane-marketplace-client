@@ -34,7 +34,6 @@ function Navbar({ openLogin }) {
   const isNewCrane = location.pathname === "/cranes/new";
   const isProfile = location.pathname.startsWith("/profile");
 
-
   const cancelClose = () => {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
@@ -181,18 +180,18 @@ function Navbar({ openLogin }) {
             <>
               {user?.role === "admin" ? (
                 <>
-                  <Link
-                    to="/cranes/new"
-                    className="mr-5 bg-red-600 text-white px-4 py-1 rounded hover:shadow-lg hover:scale-101 transition-all duration-200"
-                  >
-                    Add a new crane
-                  </Link>
+                  {isCranes && !isNewCrane && (
+                    <Link
+                      to="/cranes/new"
+                      className="mr-5 bg-red-600 text-white px-4 py-1 rounded hover:shadow-lg hover:scale-101 transition-all duration-200"
+                    >
+                      Add a new crane
+                    </Link>
+                  )}
                   <div className="flex gap-5 items-center">
                     <div className="relative">
                       <button
-                        onClick={() =>
-                          navigate("/admin")
-                        }
+                        onClick={() => navigate("/admin")}
                         className="cursor-pointer p-1"
                       >
                         <img src={inboxLogo} alt="Inbox logo" className="w-5" />

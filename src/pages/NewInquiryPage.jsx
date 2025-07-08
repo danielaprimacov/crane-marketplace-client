@@ -63,7 +63,7 @@ function NewInquiryPage() {
   };
 
   return (
-    <div>
+    <div className="mt-20">
       New Inquiry for {craneId}
       <form onSubmit={handleSubmit}>
         <div>
@@ -123,7 +123,7 @@ function NewInquiryPage() {
       </form>
       {successMessage && <p>{successMessage}</p>}
       {errorMessage && <p>{errorMessage}</p>}
-      <Link to={`/cranes/${craneId}`}>Back</Link>
+      <Link to={`/cranes/${craneId}`}>Back to the crane</Link>
     </div>
   );
 }

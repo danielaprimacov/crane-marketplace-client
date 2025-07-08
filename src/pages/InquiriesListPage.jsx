@@ -84,7 +84,7 @@ function InquiriesListPage() {
   };
 
   return (
-    <div>
+    <div className="mt-10 flex flex-wrap gap-5">
       {inquiries.map((inquiry) => (
         <InquiryCard
           key={inquiry._id}
