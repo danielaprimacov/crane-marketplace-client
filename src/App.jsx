@@ -16,6 +16,7 @@ import PublicLayout from "./components/PublicLayout";
 import ProfilePage from "./pages/ProfilePage";
 
 import Modal from "./components/Modal";
+import IsPrivate from "./components/IsPrivate";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
 import ProducersPage from "./pages/ProducersPage";
@@ -53,7 +54,15 @@ function App() {
         >
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/cranes" element={<CranesPage />} />
-          <Route exact path="/cranes/new" element={<AddCranePage />} />
+          <Route
+            exact
+            path="/cranes/new"
+            element={
+              <IsPrivate>
+                <AddCranePage />
+              </IsPrivate>
+            }
+          />
           <Route exact path="/cranes/:craneId" element={<CraneDetailsPage />} />
           <Route path="/cranes/producers" element={<ProducersPage />} />
           <Route
@@ -63,15 +72,40 @@ function App() {
           <Route
             exact
             path="/cranes/edit/:craneId"
-            element={<EditCraneDetailsPage />}
+            element={
+              <IsPrivate>
+                <EditCraneDetailsPage />
+              </IsPrivate>
+            }
           />
           <Route
             path="/cranes/:craneId/new-inquiry"
             element={<NewInquiryPage />}
           />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/profile/edit" element={<EditProfilePage />} />
-          <Route path="/cranes/my-cranes" element={<UserCranesPage />} />
+          <Route
+            path="/profile"
+            element={
+              <IsPrivate>
+                <ProfilePage />
+              </IsPrivate>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <IsPrivate>
+                <EditProfilePage />
+              </IsPrivate>
+            }
+          />
+          <Route
+            path="/cranes/my-cranes"
+            element={
+              <IsPrivate>
+                <UserCranesPage />
+              </IsPrivate>
+            }
+          />
         </Route>
 
         <Route element={<AdminRoute />}>
