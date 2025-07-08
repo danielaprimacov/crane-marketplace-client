@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
+import Modal from "../components/Modal";
 
 const API_URL = "http://localhost:5005";
 
@@ -12,6 +13,7 @@ function CraneDetailsPage() {
   const [crane, setCrane] = useState(null);
   const { craneId } = useParams();
   const [currentImage, setCurrentImage] = useState(0);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -50,7 +52,7 @@ function CraneDetailsPage() {
   const isOwner = user && user._id === ownerId;
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this crane?")) return;
+    setConfirmOpen(false);
     const token = localStorage.getItem("authToken");
     try {
       await axios.delete(`${API_URL}/cranes/${craneId}`, {
@@ -61,6 +63,8 @@ function CraneDetailsPage() {
       console.error("Failed to delete crane:", error);
     }
   };
+
+  const handleDeleteClick = () => setConfirmOpen(true);
 
   return (
     <div className="mt-20 max-w-6xl mx-auto px-4">
@@ -185,7 +189,7 @@ function CraneDetailsPage() {
                 Edit
               </Link>
               <button
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-500 transition"
               >
                 Delete
@@ -194,6 +198,26 @@ function CraneDetailsPage() {
           )}
         </div>
       </div>
+      <Modal isOpen={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <h2 className="text-xl font-semibold mb-4">Delete Crane?</h2>
+        <p className="mb-6">
+          Are you sure you want to delete this crane? This cannot be undone.
+        </p>
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={() => setConfirmOpen(false)}
+            className="px-4 py-2 border rounded cursor-pointer hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded cursor-pointer hover:bg-red-500 transition"
+          >
+            Yes, delete
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
