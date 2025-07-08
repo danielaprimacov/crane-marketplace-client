@@ -1,7 +1,6 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useState, useRef, useEffect, Fragment } from "react";
-import { Transition } from "@headlessui/react";
+import { useState, useRef, useEffect } from "react";
 
 import HomePage from "./pages/HomePage";
 import ScrollToTop from "./components/ScrollToTop";

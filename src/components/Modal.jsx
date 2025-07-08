@@ -1,6 +1,19 @@
 import { useEffect } from "react";
 
 function Modal({ children, isOpen, onClose }) {
+  // lock scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    // cleanup on unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") {
