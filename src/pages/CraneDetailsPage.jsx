@@ -167,10 +167,10 @@ function CraneDetailsPage() {
           </div>
 
           {/* Actions */}
-          {user && user.role !== "admin" && !isOwner && !isLoggedIn && (
+          {(!user || user.role !== "admin") && !isOwner && (
             <div className="mt-8">
               <Link to={`/cranes/${craneId}/new-inquiry`}>
-                <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500 transition">
+                <button className="bg-orange-500 text-white py-2 px-4 cursor-pointer rounded hover:bg-orange-400 transition">
                   Send Inquiry
                 </button>
               </Link>
