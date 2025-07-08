@@ -7,7 +7,7 @@ import { AuthContext } from "../context/auth.context";
 import menuIcon from "../assets/icons/menu-burger.png";
 import userIcon from "../assets/icons/circle-user.png";
 import logOutIcon from "../assets/icons/leave.png";
-import cartIcon from "../assets/icons/cart-minus.png";
+import craneIcon from "../assets/icons/crane.png";
 import logo from "../assets/icons/shipping.png"; // temporary
 import ProducersNav from "./ProducersNav";
 
@@ -56,7 +56,10 @@ function Navbar({ openLogin }) {
   };
 
   useEffect(() => {
-    if (!isLoggedIn || !user?._id) return;
+    if (!isLoggedIn || !user?._id) {
+      setMyCranesCount(0);
+      return;
+    }
 
     const fetchMyCranesCount = async () => {
       try {
@@ -74,7 +77,7 @@ function Navbar({ openLogin }) {
     };
 
     fetchMyCranesCount();
-  }, [isLoggedIn, user]);
+  }, [isLoggedIn, user?._id, location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,7 +178,7 @@ function Navbar({ openLogin }) {
                   <div className="flex gap-5 items-center">
                     <div className="relative">
                       <Link to="/cranes/my-cranes">
-                        <img src={cartIcon} alt="Your Cranes" className="w-5" />
+                        <img src={craneIcon} alt="Your Cranes" className="w-5" />
                         {myCranesCount > 0 && (
                           <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                             {myCranesCount}
