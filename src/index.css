@@ -1,2 +1,22 @@
 @import "tailwindcss";
 
+.gradient-low {
+  background: linear-gradient(90deg, #66bb6a, #1b5e20);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-medium {
+  background: linear-gradient(90deg, #ff8a65, #bf360c);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-high {
+  background: linear-gradient(90deg, #f44336, #b71c1c);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

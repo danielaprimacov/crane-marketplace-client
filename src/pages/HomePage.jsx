@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 import HeroSection from "../components/HeroSection";
-import TopProducers from "../components/TopProducers";
+import TopProducers from "../components/AllProducers";
 import Services from "../components/Services";
 import LastAddedCranes from "../components/LastAddedCranes";
 import InformationSection from "../components/InformationSection";
@@ -33,24 +33,25 @@ function HomePage() {
     fetchCranes();
   }, []);
 
-  const topProducers = useMemo(() => {
+  const allProducers = useMemo(() => {
+    // count how many cranes per producer
     const counts = cranes.reduce((acc, { producer }) => {
       if (!producer) return acc;
       acc[producer] = (acc[producer] || 0) + 1;
       return acc;
     }, {});
 
+    // turn into [producer, count] pairs, sort by count, then extract just the producer names
     return Object.entries(counts)
-      .sort(([, aCount], [, bCount]) => bCount - aCount)
-      .slice(0, 4)
-      .map(([prod]) => prod);
+      .sort(([, aCount], [, bCount]) => bCount - aCount) // highest-count first
+      .map(([producer]) => producer);
   }, [cranes]);
 
   return (
     <>
       <HeroSection />
       <main className="relative z-20 bg-white">
-        <TopProducers topProducers={topProducers} />
+        <TopProducers allProducers={allProducers} />
         <Services />
         <LastAddedCranes recentCranes={recentCranes} />
         <InformationSection />

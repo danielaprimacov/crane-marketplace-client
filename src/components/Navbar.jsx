@@ -191,7 +191,7 @@ function Navbar({ openLogin }) {
                   <div className="flex gap-5 items-center">
                     <div className="relative">
                       <button
-                        onClick={() => navigate("/admin")}
+                        onClick={() => navigate("/admin/inquiries")}
                         className="cursor-pointer p-1"
                       >
                         <img src={inboxLogo} alt="Inbox logo" className="w-5" />

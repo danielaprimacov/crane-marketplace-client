@@ -1,14 +1,20 @@
-import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = "http://localhost:5005";
+const SCROLL_STEP = 1;
+const FRAME_INTERVAL = 16;
 
 import ArrowIcon from "./ArrowIcon";
 import { slugify } from "../utils/helpers";
 
 function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
   const [cranes, setCranes] = useState([]);
+  const scrollRef = useRef(null);
+  const timerRef = useRef(null);
+
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const getCranes = async () => {
@@ -23,7 +29,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
       }
     };
     getCranes();
-  }, []);
+  }, [pathname]);
 
   // derive a sorted, unique list of producer names
   const uniqueProducers = useMemo(() => {
@@ -39,25 +45,61 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
     }, {});
   }, [cranes]);
 
+  const startScroll = () => {
+    if (timerRef.current) return;
+    timerRef.current = setInterval(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth) return;
+      el.scrollLeft += SCROLL_STEP;
+    }, FRAME_INTERVAL);
+  };
+  const stopScroll = () => {
+    clearInterval(timerRef.current);
+    timerRef.current = null;
+    if (scrollRef.current) scrollRef.current.scrollLeft = 0;
+  };
+
+  const needsScroll = uniqueProducers.length > 7;
+
   return (
-    <div className="relative w-full ml-4 overflow-visible">
-      <ul className="flex items-center gap-4 overflow-x-auto">
-        {uniqueProducers.map((producer) => (
-          <li
-            key={producer}
-            className="relative py-4 group border-b-2 border-transparent hover:border-red-600 transition-colors duration-200"
-            onMouseEnter={() => handleMouseEnter(producer)}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link
-              to="#"
-              className="text-sm uppercase font-medium text-black transition-colors duration-200 group-hover:text-red-600"
+    <div
+      className="relative flex items-center w-full ml-4"
+      onMouseLeave={stopScroll}
+    >
+      <div className="overflow-hidden w-[calc(7*4rem+6*1.5rem)] pr-10">
+        <ul
+          ref={scrollRef}
+          className="flex gap-6 whitespace-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+          style={{
+            // hide scrollbar
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+          }}
+        >
+          {uniqueProducers.map((producer, index) => (
+            <li
+              key={index}
+              className="group inline-block py-4 border-b-2 border-transparent hover:border-red-600 transition-colors duration-200"
+              onMouseEnter={() => handleMouseEnter(producer)}
+              onMouseLeave={handleMouseLeave}
             >
-              {producer}
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <span className="text-sm uppercase cursor-pointer font-medium text-black transition-colors duration-200 group-hover:text-red-600">
+                {producer}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {needsScroll && (
+        <button
+          onMouseEnter={startScroll}
+          className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full shadow hover:bg-gray-100 transition"
+        >
+          <ArrowIcon className="w-5 h-5 text-gray-600" />
+        </button>
+      )}
 
       {openSubnav && (
         <div className="fixed inset-x-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30">
@@ -74,7 +116,10 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
                   )}`}
                   className="text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
                 >
-                  All Cranes
+                  <div className="flex items-center gap-2">
+                    {" "}
+                    All Cranes <ArrowIcon className="w-2 pt-1" />
+                  </div>
                 </Link>
               </li>
               <div className="w-200 pl-10 grid grid-cols-2 gap-x-4 gap-y-8 justify-items-start">

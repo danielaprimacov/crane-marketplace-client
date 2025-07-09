@@ -4,6 +4,12 @@ import InquiryCard from "../components/InquiryCard";
 
 const API_URL = "http://localhost:5005";
 
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import KanbanProvider from "../components/kanban/KanbanProvider";
+import Columns from "../components/kanban/Columns";
+import DragLayer from "../components/kanban/DragLayer";
+
 function InquiriesListPage() {
   const [inquiries, setInquiries] = useState([]);
 
@@ -84,17 +90,20 @@ function InquiriesListPage() {
   };
 
   return (
-    <div className="mt-10 flex flex-wrap gap-5">
-      {inquiries.map((inquiry) => (
-        <InquiryCard
-          key={inquiry._id}
-          {...inquiry}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-          onRead={handleRead}
-        />
-      ))}
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <KanbanProvider
+        initialTasks={inquiries}
+        onMoveTask={handleUpdate}
+        onDeleteTask={handleDelete}
+        onUpdateTask={handleUpdate}
+        onRead={handleRead}
+      >
+        <div>
+          <Columns />
+          <DragLayer />
+        </div>
+      </KanbanProvider>
+    </DndProvider>
   );
 }
 
