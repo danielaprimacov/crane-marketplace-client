@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
@@ -10,6 +10,7 @@ const API_URL = "http://localhost:5005";
 
 function AddInquiryForm({ craneId }) {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [customerName, setCustomerName] = useState("");
   const [email, setEmail] = useState("");
@@ -80,7 +81,9 @@ function AddInquiryForm({ craneId }) {
       });
 
       setSuccessMessage("✅ Your inquiry has been sent!");
-      setTimeout(() => setSuccessMessage(""), 3000);
+      setTimeout(() => {
+        navigate(`/cranes/${craneId}`, { replace: true });
+      }, 3000);
 
       setCustomerName("");
       setEmail("");

@@ -11,6 +11,8 @@ import { slugify } from "../utils/helpers";
 
 function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
   const [cranes, setCranes] = useState([]);
+  const [needsScroll, setNeedsScroll] = useState(false);
+
   const scrollRef = useRef(null);
   const timerRef = useRef(null);
 
@@ -45,6 +47,19 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
     }, {});
   }, [cranes]);
 
+  useEffect(() => {
+    const checkOverflow = () => {
+      const el = scrollRef.current;
+      if (!el) return;
+      setNeedsScroll(el.scrollWidth > el.clientWidth);
+    };
+
+    checkOverflow();
+
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [uniqueProducers]);
+
   const startScroll = () => {
     if (timerRef.current) return;
     timerRef.current = setInterval(() => {
@@ -60,14 +75,12 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
     if (scrollRef.current) scrollRef.current.scrollLeft = 0;
   };
 
-  const needsScroll = uniqueProducers.length > 7;
-
   return (
     <div
       className="relative flex items-center w-full ml-4"
       onMouseLeave={stopScroll}
     >
-      <div className="overflow-hidden w-[calc(7*4rem+6*1.5rem)] pr-10">
+      <div className="overflow-hidden flex-1 pr-14">
         <ul
           ref={scrollRef}
           className="flex gap-6 whitespace-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar"

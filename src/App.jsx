@@ -24,6 +24,7 @@ import AddCranePage from "./pages/AddCranePage";
 import UserCranesPage from "./pages/UserCranesPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import AdminLayout from "./components/AdminLayout";
+import OurServicesPage from "./pages/OurServicesPage";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -54,6 +55,7 @@ function App() {
         >
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/cranes" element={<CranesPage />} />
+          <Route exact path="/services" element={<OurServicesPage />} />
           <Route
             exact
             path="/cranes/new"

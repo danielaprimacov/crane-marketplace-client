@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ArrowIcon from "./ArrowIcon";
 import { slugify } from "../utils/helpers";
@@ -13,7 +13,20 @@ function AllProducers({ allProducers }) {
   const scrollRef = useRef(null);
   const timerRef = useRef(null);
 
-  const needsScroll = allProducers.length > VISIBLE;
+  const [needsScroll, setNeedsScroll] = useState(false);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      const el = scrollRef.current;
+      if (!el) return;
+      setNeedsScroll(el.scrollWidth > el.clientWidth);
+    };
+
+    checkOverflow();
+
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [allProducers]);
 
   // start auto-scroll
   const startScroll = () => {
@@ -35,35 +48,33 @@ function AllProducers({ allProducers }) {
   };
 
   // container width: 5 cards + 4 gaps
-  const containerWidth = VISIBLE * CARD_WIDTH + (VISIBLE - 1) * GAP;
+  const maxWidth = VISIBLE * CARD_WIDTH + (VISIBLE - 1) * GAP;
 
   return (
-    <div className="relative z-30 px-5 py-10" onMouseLeave={stopScroll}>
-      {/* viewport */}
-      <div className="overflow-hidden" style={{ width: containerWidth }}>
-        {/* scrollable list */}
-        <div
-          ref={scrollRef}
-          className="flex gap-4"
-          style={{ scrollBehavior: "smooth" }}
-        >
-          {allProducers.map((prod) => {
-            const slug = encodeURIComponent(slugify(prod));
-            return (
-              <Link
-                key={prod}
-                to={`/cranes/producers/${slug}`}
-                className="
-                  flex-none w-[20rem] p-4 border border-gray-200 rounded 
-                  bg-white uppercase text-center font-medium tracking-wide 
-                  hover:shadow-lg transition
-                "
-              >
-                {prod}
-              </Link>
-            );
-          })}
-        </div>
+    <div className="z-30 py-10" onMouseLeave={stopScroll}>
+      {/* scrollable list */}
+      <div
+        ref={scrollRef}
+        className="relative flex gap-4 overflow-x-auto w-full max-w-[1664px]"
+        style={{
+          scrollBehavior: "smooth",
+          // hide scrollbar
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
+        {allProducers.map((prod) => {
+          const slug = encodeURIComponent(slugify(prod));
+          return (
+            <Link
+              key={prod}
+              to={`/cranes/producers/${slug}`}
+              className="flex-none w-[20rem] p-4 text-lg rounded bg-white uppercase text-center font-bold tracking-widest hover:shadow-lg transition"
+            >
+              {prod}
+            </Link>
+          );
+        })}
       </div>
 
       {/* hover-scroll arrow */}
@@ -71,7 +82,7 @@ function AllProducers({ allProducers }) {
         <button
           onMouseEnter={startScroll}
           className="
-            absolute right-2 top-1/2 -translate-y-1/2  z-40
+            absolute right-2 top-17 -translate-y-1/2 z-40
             bg-white p-2 rounded-full shadow hover:bg-gray-100 transition
           "
         >

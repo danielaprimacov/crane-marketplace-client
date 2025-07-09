@@ -67,7 +67,7 @@ function CraneDetailsPage() {
   const handleDeleteClick = () => setConfirmOpen(true);
 
   return (
-    <div className="mt-20 max-w-6xl mx-auto px-4">
+    <div className="mt-20 max-w-7xl mx-auto px-4">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}

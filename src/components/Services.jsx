@@ -5,6 +5,8 @@ import installationPhoto from "../assets/images/installation.jpg";
 import transportPhoto from "../assets/images/transport.jpeg";
 import salePhoto from "../assets/images/sale.png";
 
+import { slugify } from "../utils/helpers";
+
 const MotionLink = motion.create(Link);
 
 function Services() {
@@ -48,7 +50,7 @@ function Services() {
       >
         {services.map(({ src, alt, label }) => (
           <MotionLink
-            to=""
+            to={`/services#${encodeURIComponent(slugify(label))}`}
             key={label}
             variants={servicesItem}
             className="flex-1 flex flex-col border border-gray-200 hover:shadow-md transition duration-300 transform"

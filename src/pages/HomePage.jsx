@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 import HeroSection from "../components/HeroSection";
-import TopProducers from "../components/AllProducers";
+import AllProducers from "../components/AllProducers";
 import Services from "../components/Services";
 import LastAddedCranes from "../components/LastAddedCranes";
 import InformationSection from "../components/InformationSection";
@@ -23,7 +23,7 @@ function HomePage() {
         // sort newest first
         const recent = data
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 4);
+          .slice(0, 8);
         setCranes(data);
         setRecentCranes(recent);
       } catch (err) {
@@ -51,7 +51,7 @@ function HomePage() {
     <>
       <HeroSection />
       <main className="relative z-20 bg-white">
-        <TopProducers allProducers={allProducers} />
+        <AllProducers allProducers={allProducers} />
         <Services />
         <LastAddedCranes recentCranes={recentCranes} />
         <InformationSection />

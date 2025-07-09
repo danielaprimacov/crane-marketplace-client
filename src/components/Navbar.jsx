@@ -31,6 +31,7 @@ function Navbar({ openLogin }) {
 
   const isHome = location.pathname === "/";
   const isCranes = location.pathname.startsWith("/cranes");
+  const isServices = location.pathname.startsWith("/services");
   const isNewCrane = location.pathname === "/cranes/new";
   const isProfile = location.pathname.startsWith("/profile");
 
@@ -160,7 +161,7 @@ function Navbar({ openLogin }) {
               />
             </div>
           )}
-          {isProfile && (
+          {isProfile || isServices &&  (
             <Link to="/">
               <img src={logo} alt="Logo" className="w-[36px]" />
             </Link>

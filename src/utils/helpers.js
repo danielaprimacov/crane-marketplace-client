@@ -1,7 +1,13 @@
 export function slugify(str) {
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")     // spaces → hyphens
-    .replace(/[^\w-]/g, "");  // strip non-word chars
+  return (
+    str
+      .toString()
+      .toLowerCase()
+      // turn spaces, slashes, etc into hyphens
+      .replace(/[^a-z0-9]+/g, "-")
+      // collapse multiple hyphens
+      .replace(/-+/g, "-")
+      // remove leading/trailing hyphens
+      .replace(/^-|-$/g, "")
+  );
 }
