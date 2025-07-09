@@ -1,5 +1,6 @@
 import { useDrag } from "react-dnd";
 import { useContext, useState } from "react";
+import axios from "axios";
 
 import ArrowsOutIcon from "./Icons/ArrowsOutIcon";
 import DeleteIcon from "./Icons/DeleteIcon";
@@ -7,6 +8,8 @@ import DeleteIcon from "./Icons/DeleteIcon";
 import InquiryCard from "../InquiryCard";
 import Modal from "../Modal";
 import KanbanContext from "./KanbanContext";
+
+const API_URL = "http://localhost:5005";
 
 function TaskItem({ task }) {
   const { deleteTask, updateTask, moveTask, markRead } =
@@ -44,10 +47,20 @@ function TaskItem({ task }) {
   const borderColor = statusBorderMap[task.status] || "#f8f9fa";
   const titleColor = statusTextMap[task.status] || "#343a40";
 
-  const deleteHandler = (e) => {
-    e.stopPropagation();
-    deleteTask(task.id);
-    setShowDetails(false);
+  const deleteHandler = async () => {
+    try {
+      await axios.delete(`${API_URL}/inquiries/${task.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      deleteTask(task.id);
+      setShowDetails(false);
+    } catch (err) {
+      console.error("Failed to delete inquiry:", err);
+      alert("Could not delete. Please try again.");
+    }
   };
 
   const openHandler = (e) => {
@@ -112,11 +125,14 @@ function TaskItem({ task }) {
           crane={task.crane}
           period={task.period}
           address={task.address}
+          needsTransport={task.needsTransport}
+          needsInstallation={task.needsInstallation}
           status={task.status}
           isRead={task.isRead}
           onUpdate={saveHandler}
           onDelete={deleteHandler}
           onRead={markRead}
+          onCloseModal={closeHandler}
           showDetailsOnly
         />
       </Modal>

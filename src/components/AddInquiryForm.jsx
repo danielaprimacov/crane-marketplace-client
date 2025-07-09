@@ -20,6 +20,9 @@ function AddInquiryForm({ craneId }) {
   });
   const [address, setAddress] = useState("");
 
+  const [needsTransport, setNeedsTransport] = useState(false);
+  const [needsInstallation, setNeedsInstallation] = useState(false);
+
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -43,8 +46,6 @@ function AddInquiryForm({ craneId }) {
     }
     fetchCrane();
   }, [craneId]);
-  
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,6 +59,8 @@ function AddInquiryForm({ craneId }) {
       message,
       address,
       crane: craneId,
+      needsTransport,
+      needsInstallation,
     };
 
     if (period.periodStart && period.periodEnd) {
@@ -65,6 +68,10 @@ function AddInquiryForm({ craneId }) {
         from: new Date(period.periodStart),
         to: new Date(period.periodEnd),
       };
+    }
+
+    if (needsTransport || needsInstallation) {
+      requestBody.address = address;
     }
 
     try {
@@ -80,6 +87,8 @@ function AddInquiryForm({ craneId }) {
       setMessage("");
       setAddress("");
       setPeriod({ periodStart: "", periodEnd: "" });
+      setNeedsTransport(false);
+      setNeedsInstallation(false);
     } catch (error) {
       console.error("Failed to create inquiry:", error);
       setErrorMessage("❌ Something went wrong. Please try again.");
@@ -159,23 +168,54 @@ function AddInquiryForm({ craneId }) {
             label="Period"
           />
         </div>
-        <div>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="address"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Address (optional)
+        <div className="flex justify-between mb-8">
+          {/* Transportation checkbox */}
+          <label className="inline-flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={needsTransport}
+              onChange={(e) => setNeedsTransport(e.target.checked)}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="text-gray-700">I need transportation</span>
+          </label>
+
+          {/* Installation / Disassembly checkbox */}
+          <label className="inline-flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={needsInstallation}
+              onChange={(e) => setNeedsInstallation(e.target.checked)}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="text-gray-700">
+              I need installation / disassembly
+            </span>
           </label>
         </div>
+
+        {(needsTransport || needsInstallation) && (
+          <>
+            <div className="relative mb-8">
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={address}
+                onChange={(event) => setAddress(event.target.value)}
+                required
+                placeholder=" "
+                className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
+              />
+              <label
+                htmlFor="address"
+                className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              >
+                Address
+              </label>
+            </div>
+          </>
+        )}
 
         <button
           type="submit"

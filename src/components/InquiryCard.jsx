@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AvailabilityRange from "./AvailabilityRange";
 
-import Modal from "./Modal";
-
 function InquiryCard({
   _id: inquiryId,
   customerName,
@@ -12,14 +10,16 @@ function InquiryCard({
   crane,
   period: initialPeriod,
   address,
+  needsTransport,
+  needsInstallation,
   status: initialStatus,
   isRead,
   onUpdate,
   onDelete,
   onRead,
+  onCloseModal,
   showDetailsOnly = false,
 }) {
-  const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState(initialStatus);
   const [editPeriod, setEditPeriod] = useState({
@@ -27,19 +27,12 @@ function InquiryCard({
     periodEnd: initialPeriod?.to?.slice(0, 10) || "",
   });
 
-  const model = [crane.producer, crane.seriesCode, crane.variantRevision]
-    .filter(Boolean)
-    .join(" ");
-
   useEffect(() => {
     setEditPeriod({
       periodStart: initialPeriod?.from?.slice(0, 10) || "",
       periodEnd: initialPeriod?.to?.slice(0, 10) || "",
     });
   }, [initialPeriod]);
-
-  // mark read by admin when opening
-  const closeHandler = () => setOpen(false);
 
   const saveHandler = () => {
     const requestBody = {
@@ -125,6 +118,14 @@ function InquiryCard({
                 <strong>Address:</strong> {address}
               </p>
             )}
+            <p>
+              <strong>Transportation needed:</strong>{" "}
+              {needsTransport ? "Yes" : "No"}
+            </p>
+            <p>
+              <strong>Installation/disassembly needed:</strong>{" "}
+              {needsInstallation ? "Yes" : "No"}
+            </p>
           </div>
 
           <div className="mt-10 flex justify-evenly space-x-3">
@@ -136,8 +137,8 @@ function InquiryCard({
             </button>
             <button
               onClick={() => {
-                onDelete(inquiryId);
-                closeHandler();
+                onDelete();
+                onCloseModal();
               }}
               className="w-40 py-2 bg-red-600 cursor-pointer text-white rounded hover:bg-red-700"
             >
