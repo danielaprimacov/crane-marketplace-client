@@ -82,7 +82,7 @@ function AllProducers({ allProducers }) {
         <button
           onMouseEnter={startScroll}
           className="
-            absolute right-2 top-17 -translate-y-1/2 z-40
+            absolute right-2 top-17 -translate-y-1/2 z-40 cursor-pointer
             bg-white p-2 rounded-full shadow hover:bg-gray-100 transition
           "
         >

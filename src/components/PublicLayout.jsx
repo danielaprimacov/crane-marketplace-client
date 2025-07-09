@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ExpertAdviceWidget from "./ExpertAdviceWidget";
 
 function PublicLayout({ openLogin, openSignup }) {
   return (
@@ -11,6 +12,7 @@ function PublicLayout({ openLogin, openSignup }) {
         <Outlet />
       </main>
       <Footer />
+      <ExpertAdviceWidget />
     </div>
   );
 }
