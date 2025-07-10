@@ -6,6 +6,7 @@ import AllProducers from "../components/AllProducers";
 import Services from "../components/Services";
 import LastAddedCranes from "../components/LastAddedCranes";
 import InformationSection from "../components/InformationSection";
+import OurClients from "../components/OurClients";
 
 const API_URL = "http://localhost:5005";
 
@@ -54,6 +55,7 @@ function HomePage() {
         <AllProducers allProducers={allProducers} />
         <Services />
         <LastAddedCranes recentCranes={recentCranes} />
+        <OurClients />
         <InformationSection />
       </main>
     </>
