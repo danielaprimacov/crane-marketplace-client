@@ -1,7 +1,10 @@
 import { useState } from "react";
+import axios from "axios";
+
+const API_URL = "http://localhost:5005";
 
 function ContactForm({ onClose }) {
-  const [form, setForm] = useState({
+  const initialState = {
     salutation: "",
     firstName: "",
     lastName: "",
@@ -9,16 +12,43 @@ function ContactForm({ onClose }) {
     country: "",
     phone: "",
     message: "",
-  });
+  };
+
+  const [form, setForm] = useState(initialState);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: send to your API
-    console.log("submit", form);
-    onClose();
+    setSubmitting(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // send to backend
+      await axios.post(`${API_URL}/messages`, {
+        formType: "contact",
+        ...form,
+      });
+
+      // on success, close the modal
+      setSuccess("✅ Your message was sent successfully!");
+      setForm(initialState);
+      setTimeout(() => onClose(), 2000);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setError(
+        err.response?.data?.message ||
+          "There was an error submitting the form. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -27,7 +57,10 @@ function ContactForm({ onClose }) {
       className="flex flex-col w-full max-w-2xl mx-auto"
     >
       <h2 className="text-2xl font-bold mb-6 text-center">Contact Us</h2>
-
+      {/* show success */}
+      {success && <p className="text-green-600 mb-4 text-center">{success}</p>}
+      {/* show error if any */}
+      {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
       {/* Salutation */}
       <div className="relative">
         <select
@@ -218,6 +251,7 @@ function ContactForm({ onClose }) {
         <button
           type="button"
           onClick={onClose}
+          disabled={submitting}
           className="
             px-4 py-2 rounded border cursor-pointer
             hover:bg-gray-100 transition
@@ -227,12 +261,13 @@ function ContactForm({ onClose }) {
         </button>
         <button
           type="submit"
+          disabled={submitting}
           className="
             bg-black text-white py-2 px-4 rounded cursor-pointer
             uppercase hover:bg-orange-600 transition
           "
         >
-          Send
+          {submitting ? "Sending…" : "Send"}
         </button>
       </div>
     </form>

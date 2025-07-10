@@ -60,31 +60,34 @@ function OurServicesPage() {
           </div>
         </div>
 
-        <div id="sale" className="h-screen mt-10 flex flex-col">
+        <div id="sale-rent" className="h-screen mt-10 flex flex-col">
           <h2 className="text-4xl font-bold mb-13 text-center tracking-widest">
-            Sale
+            Sale / Rent
           </h2>
           <div className="flex justfiy-evenly px-20 w-full">
             <div className="mt-10 text-center px-5">
               <p className="text-xl">
-                Browse a curated marketplace of top‐quality cranes at
-                competitive prices—whether you need to buy outright or explore
-                flexible financing options.
+                Browse our curated marketplace of top-quality cranes—available
+                to purchase outright or rent on flexible terms (hourly, daily,
+                weekly or monthly). Whether you’re looking to own your equipment
+                long-term or need a crane on-site just for a specific project,
+                KranHub has you covered.
               </p>
-              <p className="my-10 text-red-600 text-lg">
+              <p className="my-5 text-red-600 text-lg">
                 Discover the perfect crane for your project
               </p>
               <p className="text-xl">
-                Every listing includes detailed specs, high-resolution photos,
-                and verified seller ratings. Our team vets each machine for
-                performance and safety, so you can buy with confidence.
+                Every listing includes full specs, high-resolution photos,
+                verified seller ratings, and transparent pricing. Rentals come
+                with comprehensive insurance and on-site support; purchases
+                include our quality guarantee.
               </p>
               <p className="mt-10 text-red-400">
-                Ready to find your next crane?
+                Ready to find the perfect crane solution?
               </p>
               <p className="mb-10 text-green-600">
-                Start shopping now and secure your ideal equipment in just a few
-                clicks.
+                Explore our Sale &amp; Rent catalog or get personalized advice
+                to match you with the ideal machine—fast and hassle-free.
               </p>
               <button
                 className="bg-blue-400 text-white rounded-lg w-64 h-10 cursor-pointer hover:bg-blue-500 transition duration-300"

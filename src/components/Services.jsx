@@ -28,7 +28,7 @@ function Services() {
       alt: "Crane Transportation",
       label: "Transportation",
     },
-    { src: salePhoto, alt: "Crane Sales", label: "Sale" },
+    { src: salePhoto, alt: "Crane Sales", label: "Sale / Rent" },
     {
       src: installationPhoto,
       alt: "Crane Installation",
