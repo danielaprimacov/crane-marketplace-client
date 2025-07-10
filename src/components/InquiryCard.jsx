@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+
 import AvailabilityRange from "./AvailabilityRange";
+import Modal from "./Modal";
 
 function InquiryCard({
   _id: inquiryId,
@@ -26,6 +28,9 @@ function InquiryCard({
     periodStart: initialPeriod?.from?.slice(0, 10) || "",
     periodEnd: initialPeriod?.to?.slice(0, 10) || "",
   });
+
+  // confirmation delete state
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     setEditPeriod({
@@ -61,6 +66,18 @@ function InquiryCard({
       month: "short",
       day: "numeric",
     });
+
+  // instead of immediate delete, open confirm
+  const onDeleteClick = () => {
+    setConfirmOpen(true);
+  };
+
+  // actual delete + close both modals
+  const confirmDelete = () => {
+    onDelete(inquiryId);
+    setConfirmOpen(false);
+    onCloseModal();
+  };
 
   return (
     <>
@@ -136,10 +153,7 @@ function InquiryCard({
               Edit
             </button>
             <button
-              onClick={() => {
-                onDelete();
-                onCloseModal();
-              }}
+              onClick={onDeleteClick}
               className="w-40 py-2 bg-red-600 cursor-pointer text-white rounded hover:bg-red-700"
             >
               Delete
@@ -187,6 +201,28 @@ function InquiryCard({
           </div>
         </>
       )}
+
+      {/* Confirmation Delete Modal */}
+      <Modal isOpen={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <h3 className="text-xl font-semibold mb-4">Delete Inquiry?</h3>
+        <p className="mb-6">
+          Are you sure you want to permanently delete this inquiry?
+        </p>
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={() => setConfirmOpen(false)}
+            className="px-4 py-2 rounded cursor-pointer border hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={confirmDelete}
+            className="bg-red-600 text-white cursor-pointer px-4 py-2 rounded hover:bg-red-700 transition"
+          >
+            Yes, delete
+          </button>
+        </div>
+      </Modal>
     </>
   );
 }

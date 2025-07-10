@@ -1,8 +1,37 @@
+import { useState, useEffect, useContext } from "react";
 import { Outlet, Link } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../context/auth.context";
+
+const API_URL = "http://localhost:5005";
 
 import goBackIcon from "../assets/icons/angle-double-small-left.png";
 
 function AdminLayout() {
+  const { isLoggedIn, user } = useContext(AuthContext);
+  const [messagesCount, setMessagesCount] = useState(0);
+
+  useEffect(() => {
+    // only for admins
+    if (!isLoggedIn || user?.role !== "admin") {
+      setMessagesCount(0);
+      return;
+    }
+    const fetchMessagesCount = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const { data } = await axios.get(`${API_URL}/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMessagesCount(data.length);
+      } catch (err) {
+        console.error("Failed to fetch message count", err);
+      }
+    };
+
+    fetchMessagesCount();
+  }, [isLoggedIn, user?.role]);
+
   return (
     <div className="bg-orange-50 h-screen w-screen min-h-screen">
       {/* Admin Navigation */}
@@ -24,9 +53,14 @@ function AdminLayout() {
           </Link>
           <Link
             to="/admin/messages"
-            className="hover:text-orange-600 border-b border-b-transparent hover:border-b-orange-600 transition duration-300"
+            className="relative block hover:text-orange-600 border-b border-b-transparent hover:border-b-orange-600 transition duration-300"
           >
-            <div>All Messages</div>
+            <span>All Messages</span>
+            {messagesCount > 0 && (
+              <span className="absolute -top-2 -right-4 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                {messagesCount}
+              </span>
+            )}
           </Link>
         </div>
       </header>

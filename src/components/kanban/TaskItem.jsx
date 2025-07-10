@@ -12,9 +12,11 @@ import KanbanContext from "./KanbanContext";
 const API_URL = "http://localhost:5005";
 
 function TaskItem({ task }) {
-  const { deleteTask, updateTask, moveTask, markRead } =
-    useContext(KanbanContext);
+  const { deleteTask, updateTask, markRead } = useContext(KanbanContext);
   const [showDetails, setShowDetails] = useState(false);
+
+  // for confirm the delete action
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -63,6 +65,16 @@ function TaskItem({ task }) {
     }
   };
 
+  const openDeleteConfirm = (e) => {
+    e.stopPropagation(); // don’t also open details
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    await deleteHandler();
+    setConfirmOpen(false);
+  };
+
   const openHandler = (e) => {
     e.stopPropagation();
     if (!task.isRead) markRead(task.id);
@@ -106,7 +118,7 @@ function TaskItem({ task }) {
             <ArrowsOutIcon className="transition duration-300 ease-out hover:stroke-[#f9572a]" />
           </div>
           {task.message}
-          <div className="cursor-pointer" onClick={deleteHandler}>
+          <div className="cursor-pointer" onClick={openDeleteConfirm}>
             <DeleteIcon className="transition duration-300 ease-out hover:stroke-[#F72929]" />
           </div>
         </h3>
@@ -116,6 +128,7 @@ function TaskItem({ task }) {
         </div>
       </div>
       <Modal isOpen={showDetails} onClose={closeHandler}>
+        {/* Inquiry details modal */}
         <InquiryCard
           key={task.id}
           _id={task.id}
@@ -135,6 +148,27 @@ function TaskItem({ task }) {
           onCloseModal={closeHandler}
           showDetailsOnly
         />
+      </Modal>
+      {/* Delete‐confirmation modal */}
+      <Modal isOpen={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <h3 className="text-xl font-semibold mb-4">Delete Inquiry?</h3>
+        <p className="mb-6">
+          Are you sure you want to permanently delete this inquiry?
+        </p>
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={() => setConfirmOpen(false)}
+            className="px-4 py-2 rounded cursor-pointer border hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={confirmDelete}
+            className="bg-red-600 text-white cursor-pointer px-4 py-2 rounded hover:bg-red-700 transition"
+          >
+            Yes, delete
+          </button>
+        </div>
       </Modal>
     </>
   );

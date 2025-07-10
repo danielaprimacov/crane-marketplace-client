@@ -25,6 +25,7 @@ import UserCranesPage from "./pages/UserCranesPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import AdminLayout from "./components/AdminLayout";
 import OurServicesPage from "./pages/OurServicesPage";
+import MessagesPage from "./pages/MessagesPage";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -114,6 +115,7 @@ function App() {
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminPage />} />
             <Route path="inquiries" element={<InquiriesListPage />} />
+            <Route path="messages" element={<MessagesPage />} />
           </Route>
         </Route>
 
