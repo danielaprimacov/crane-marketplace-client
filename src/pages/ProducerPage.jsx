@@ -35,7 +35,13 @@ function ProducerPage() {
     (async () => {
       try {
         const { data } = await axios.get(`${API_URL}/cranes`);
-        setCranes(data);
+        // annotate each crane with a .price field:
+        const withPrice = data.map((c) => ({
+          ...c,
+          price:
+            c.status === "for sale" ? c.salePrice : c.rentPrice?.amount ?? 0,
+        }));
+        setCranes(withPrice);
       } catch (err) {
         console.error(err);
         setError("Unable to load cranes.");
@@ -218,15 +224,22 @@ function ProducerPage() {
               />
 
               {/* Price */}
-              <RangeDropDown
-                label="Price"
-                min={minP}
-                max={maxP}
-                step={1}
-                value={pRange}
-                onChange={setPRange}
-                onApply={applyPrice}
-              />
+              {minP < maxP ? (
+                <RangeDropDown
+                  label="Price"
+                  min={minP}
+                  max={maxP}
+                  step={1}
+                  value={pRange}
+                  onChange={setPRange}
+                  onApply={applyPrice}
+                />
+              ) : (
+                // either hide it or show a static label
+                <div className="px-4 py-2 bg-gray-100 rounded">
+                  Price: €{minP}
+                </div>
+              )}
               <FilterDropDown
                 label="Status"
                 options={statusOptions}
@@ -257,7 +270,7 @@ function ProducerPage() {
 
             {displayList.length === 0 ? (
               <p className="mt-6 text-center">
-                {hasAnyFilter
+                {hasAny
                   ? "No cranes match those filters."
                   : "No cranes available."}
               </p>

@@ -20,6 +20,7 @@ function Navbar({ openLogin }) {
 
   const [myCranesCount, setMyCranesCount] = useState(0);
   const [inquiriesCount, setInquiriesCount] = useState(0);
+  const [messagesCount, setMessagesCount] = useState(0);
 
   const [openSubnav, setOpenSubnav] = useState(null);
   const closeTimer = useRef(null);
@@ -30,6 +31,11 @@ function Navbar({ openLogin }) {
   const location = useLocation();
 
   const isHome = location.pathname === "/";
+  const isAbout = location.pathname === "/about";
+  const isRevocation = location.pathname === "/revocation-claim";
+  const isTerms = location.pathname === "/terms";
+  const isImprint = location.pathname === "/imprint";
+  const isPrivacy = location.pathname === "/privacy-policy";
   const isCranes = location.pathname.startsWith("/cranes");
   const isServices = location.pathname.startsWith("/services");
   const isNewCrane = location.pathname === "/cranes/new";
@@ -104,6 +110,27 @@ function Navbar({ openLogin }) {
   }, [isLoggedIn, user?.role, location.pathname]);
 
   useEffect(() => {
+    // only for admins
+    if (!isLoggedIn || user?.role !== "admin") {
+      setMessagesCount(0);
+      return;
+    }
+    const fetchMessagesCount = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const { data } = await axios.get(`${API_URL}/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMessagesCount(data.length);
+      } catch (err) {
+        console.error("Failed to fetch message count", err);
+      }
+    };
+
+    fetchMessagesCount();
+  }, [isLoggedIn, user?.role, location.pathname]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
       const heroBottom = window.innerHeight; // height of the hero on home
@@ -139,7 +166,12 @@ function Navbar({ openLogin }) {
     >
       <div className="flex items-center h-full px-4 w-full">
         <div className="flex items-center flex-none">
-          {isHome && (
+          {(isHome ||
+            isAbout ||
+            isRevocation ||
+            isTerms ||
+            isImprint ||
+            isPrivacy) && (
             <button className="flex items-center gap-2 cursor-pointer">
               <img src={menuIcon} alt="Menu" className="w-6" />
               <span className="text-sm uppercase">Menu</span>
@@ -161,11 +193,12 @@ function Navbar({ openLogin }) {
               />
             </div>
           )}
-          {isProfile || isServices &&  (
-            <Link to="/">
-              <img src={logo} alt="Logo" className="w-[36px]" />
-            </Link>
-          )}
+          {isProfile ||
+            (isServices && (
+              <Link to="/">
+                <img src={logo} alt="Logo" className="w-[36px]" />
+              </Link>
+            ))}
         </div>
 
         <div className="flex-1 flex justify-center">
@@ -196,9 +229,9 @@ function Navbar({ openLogin }) {
                         className="cursor-pointer p-1"
                       >
                         <img src={inboxLogo} alt="Inbox logo" className="w-5" />
-                        {inquiriesCount > 0 && (
+                        {(inquiriesCount > 0 || messagesCount > 0) && (
                           <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                            {inquiriesCount}
+                            {inquiriesCount + messagesCount}
                           </span>
                         )}
                       </button>

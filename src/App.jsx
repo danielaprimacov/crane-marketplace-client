@@ -26,6 +26,11 @@ import EditProfilePage from "./pages/EditProfilePage";
 import AdminLayout from "./components/AdminLayout";
 import OurServicesPage from "./pages/OurServicesPage";
 import MessagesPage from "./pages/MessagesPage";
+import AboutPage from "./pages/AboutPage";
+import RevocationPage from "./pages/RevocationPage";
+import TermsPage from "./pages/TermsPage";
+import ImprintPage from "./pages/ImprintPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -57,6 +62,14 @@ function App() {
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/cranes" element={<CranesPage />} />
           <Route exact path="/services" element={<OurServicesPage />} />
+          <Route
+            path="/about"
+            element={<AboutPage openSignup={openSignup} />}
+          />
+          <Route path="/revocation-claim" element={<RevocationPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/imprint" element={<ImprintPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route
             exact
             path="/cranes/new"

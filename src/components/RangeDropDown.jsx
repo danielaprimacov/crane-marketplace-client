@@ -59,7 +59,7 @@ function RangeDropDown({
                   ...props.style,
                   background: getTrackBackground({
                     values: local,
-                    colors: ["#E5E7EB", "#e53935", "#e53935"],
+                    colors: ["#E5E7EB", "#e53935", "#E5E7EB"],
                     min,
                     max,
                   }),
@@ -105,7 +105,11 @@ function RangeDropDown({
 
           {/* Apply */}
           <button
-            onClick={() => onApply(local)}
+            onClick={() => {
+              if (local[0] > min || local[1] < max) {
+                onApply(local);
+              }
+            }}
             className="mt-4 w-full bg-red-500 text-white py-2 rounded"
           >
             Apply

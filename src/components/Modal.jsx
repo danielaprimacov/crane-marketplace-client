@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 
-function Modal({ children, isOpen, onClose }) {
+function Modal({
+  children,
+  isOpen,
+  onClose,
+  widthClass = "w-[45rem] max-w-full",
+  extraClass = "",
+}) {
   // lock scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +43,7 @@ function Modal({ children, isOpen, onClose }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl p-10 w-[45rem] relative"
+        className={`bg-white rounded-2xl p-10 relative ${widthClass} ${extraClass}` }
         onClick={(e) => e.stopPropagation()}
       >
         <button

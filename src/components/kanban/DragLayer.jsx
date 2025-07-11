@@ -44,7 +44,7 @@ function DragLayer() {
   return (
     <div style={getItemStyles(currentOffset)}>
       <div
-        className="w-88 h-24 cursor-pointer rounded-md p-2.5 mb-2.5 flex flex-col justify-center"
+        className="w-88 h-28 cursor-pointer rounded-md p-2.5 mb-2.5 flex flex-col justify-center"
         style={{ opacity: 0.7, border: `2px solid ${borderColor}` }}
       >
         <h3

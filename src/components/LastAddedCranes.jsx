@@ -32,7 +32,7 @@ function LastAddedCranes({ recentCranes }) {
         Last Added Cranes
       </motion.h1>
       <div className="flex flex-1 justify-between items-center p-6">
-        {saleCranes.map((crane) => {
+        {saleCranes.slice(0, 4).map((crane) => {
           const imageUrl = crane.images?.[0];
           return (
             <MotionLink

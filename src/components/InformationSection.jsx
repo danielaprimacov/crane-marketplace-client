@@ -7,6 +7,7 @@ import teamPhoto from "../assets/images/team.jpg";
 
 function InformationSection() {
   const [isModalOpen, setModalOpen] = useState(false);
+  
   return (
     <>
       <div className="p-5 m-2">

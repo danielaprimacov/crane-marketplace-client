@@ -2,6 +2,7 @@ export function slugify(str) {
   return (
     str
       .toString()
+      .trim()
       .toLowerCase()
       // turn spaces, slashes, etc into hyphens
       .replace(/[^a-z0-9]+/g, "-")

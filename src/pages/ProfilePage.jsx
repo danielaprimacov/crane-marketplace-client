@@ -14,9 +14,10 @@ function ProfilePage() {
   useEffect(() => {
     if (!user) return;
     const fetchMyCranes = async () => {
+      const storedToken = localStorage.getItem("authToken");
       try {
         const { data: allCranes } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${storedToken}` },
         });
         const owned = allCranes.filter((c) => {
           const ownerId = typeof c.owner === "string" ? c.owner : c.owner._id;

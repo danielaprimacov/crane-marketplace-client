@@ -1,48 +1,19 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
-import axios from "axios";
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { useProducers } from "../hooks/useProducers";
+
 const SCROLL_STEP = 1;
 const FRAME_INTERVAL = 16;
 
 import ArrowIcon from "./ArrowIcon";
-import { slugify } from "../utils/helpers";
 
 function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
-  const [cranes, setCranes] = useState([]);
+  const { producers } = useProducers();
   const [needsScroll, setNeedsScroll] = useState(false);
 
   const scrollRef = useRef(null);
   const timerRef = useRef(null);
-
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    const getCranes = async () => {
-      try {
-        const { data } = await axios.get(`${API_URL}/cranes`);
-        setCranes(data); // data is an array of { producer, /* other fields */ }
-      } catch (err) {
-        console.error("Failed to fetch cranes:", err);
-      }
-    };
-    getCranes();
-  }, [pathname]);
-
-  // derive a sorted, unique list of producer names
-  const uniqueProducers = useMemo(() => {
-    return Array.from(new Set(cranes.map((c) => c.producer).filter(Boolean)));
-  }, [cranes]);
-
-  const itemsByProducer = useMemo(() => {
-    return cranes.reduce((acc, crane) => {
-      if (!crane.producer) return acc;
-      acc[crane.producer] = acc[crane.producer] || [];
-      acc[crane.producer].push(crane);
-      return acc;
-    }, {});
-  }, [cranes]);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -55,7 +26,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
 
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
-  }, [uniqueProducers]);
+  }, [producers]);
 
   const startScroll = () => {
     if (timerRef.current) return;
@@ -87,15 +58,15 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
             scrollbarWidth: "none",
           }}
         >
-          {uniqueProducers.map((producer, index) => (
+          {producers.map(({ name, slug }) => (
             <li
-              key={index}
+              key={slug}
               className="group inline-block py-4 border-b-2 border-transparent hover:border-red-600 transition-colors duration-200"
-              onMouseEnter={() => handleMouseEnter(producer)}
+              onMouseEnter={() => handleMouseEnter(slug)}
               onMouseLeave={handleMouseLeave}
             >
               <span className="text-sm uppercase cursor-pointer font-medium text-black transition-colors duration-200 group-hover:text-red-600">
-                {producer}
+                {name}
               </span>
             </li>
           ))}
@@ -121,9 +92,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
             <ul className="space-y-4 mb-10 mt-2">
               <li className="pl-10 py-3">
                 <Link
-                  to={`/cranes/producers/${encodeURIComponent(
-                    slugify(openSubnav)
-                  )}`}
+                  to={`/cranes/producers/${encodeURIComponent(openSubnav)}`}
                   className="text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
                 >
                   <div className="flex items-center gap-2">
@@ -133,37 +102,40 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
                 </Link>
               </li>
               <div className="w-200 pl-10 grid grid-cols-2 gap-x-4 gap-y-8 justify-items-start">
-                {itemsByProducer[openSubnav].slice(0, 4).map((crane) => {
-                  const model = [
-                    crane.seriesCode,
-                    crane.capacityClassNumber,
-                    crane.variantRevision,
-                  ]
-                    .filter(Boolean)
-                    .join(" ");
+                {producers
+                  .find((p) => p.slug === openSubnav)
+                  .models.slice(0, 4)
+                  .map((crane) => {
+                    const model = [
+                      crane.seriesCode,
+                      crane.capacityClassNumber,
+                      crane.variantRevision,
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
 
-                  const firstImage = crane.images?.[0];
+                    const firstImage = crane.images?.[0];
 
-                  return (
-                    <Link
-                      to={`/cranes/${crane._id}`}
-                      key={crane._id}
-                      className="group flex gap-3 items-start"
-                    >
-                      <div className="w-32 h-24 overflow-hidden mb-2">
-                        <img
-                          src={firstImage}
-                          alt={model}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <div className="text-sm">
-                        <p>{model}</p>
-                        <span className="text-gray-500">{crane.title}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
+                    return (
+                      <Link
+                        to={`/cranes/${crane._id}`}
+                        key={crane._id}
+                        className="group flex gap-3 items-start"
+                      >
+                        <div className="w-32 h-24 overflow-hidden mb-2">
+                          <img
+                            src={firstImage}
+                            alt={model}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                        <div className="text-sm">
+                          <p>{model}</p>
+                          <span className="text-gray-500">{crane.title}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
               </div>
             </ul>
           </div>

@@ -91,7 +91,7 @@ function TaskItem({ task }) {
   return (
     <>
       <div
-        className="w-88 h-24 cursor-pointer rounded-md p-2.5 mb-2.5 flex flex-col justify-center"
+        className="w-88 h-28 cursor-pointer rounded-md p-2.5 mb-2.5 flex flex-col justify-center"
         key={task.id}
         onClick={openHandler}
         ref={drag}
@@ -105,7 +105,7 @@ function TaskItem({ task }) {
         }}
       >
         <h3
-          className={`mb-2 flex justify-between items-center ${
+          className={`mb-2 flex justify-between items-center text-center ${
             {
               new: "gradient-low",
               in_progress: "gradient-medium",

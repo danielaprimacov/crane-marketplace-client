@@ -1,7 +1,9 @@
 import { useState, useEffect, useContext } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/auth.context";
+
+import { useProducers } from "../hooks/useProducers";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -9,7 +11,13 @@ import goBackIcon from "../assets/icons/angle-double-small-left.png";
 
 function AdminLayout() {
   const { isLoggedIn, user } = useContext(AuthContext);
+
+  const { producers, loading: producersLoading } = useProducers();
+  const firstProducer = producers[0];
+
   const [messagesCount, setMessagesCount] = useState(0);
+
+  const location = useLocation();
 
   useEffect(() => {
     // only for admins
@@ -30,7 +38,7 @@ function AdminLayout() {
     };
 
     fetchMessagesCount();
-  }, [isLoggedIn, user?.role]);
+  }, [isLoggedIn, user?.role, location.pathname]);
 
   return (
     <div className="bg-orange-50 h-screen w-screen min-h-screen">
@@ -39,11 +47,16 @@ function AdminLayout() {
         <div className="flex justify-evenly border-b border-b-black/30 items-center pb-5">
           {/* Link to back to all cranes */}
           <Link
-            to="/cranes/producers/liebherr"
+            to={
+              // while producers are loading, fall back to /cranes
+              producersLoading || !firstProducer
+                ? "/cranes"
+                : `/cranes/producers/${firstProducer.slug}`
+            }
             className="inline-flex items-center text-gray-600 hover:text-gray-900 cursor-pointer"
           >
             <img src={goBackIcon} alt="back" className="w-5 mr-2" />
-            Back
+            {firstProducer ? `Back` : "Back to all cranes"}
           </Link>
           <Link
             to="/admin/inquiries"
