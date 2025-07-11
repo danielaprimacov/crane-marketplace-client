@@ -6,7 +6,11 @@ import AvailabilityRange from "./AvailabilityRange";
 
 import { slugify } from "../utils/helpers";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${
+  import.meta.env.VITE_CLOUD_NAME
+}/upload`;
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
 function AddCraneForm() {
   const [producer, setProducer] = useState("");
@@ -20,7 +24,7 @@ function AddCraneForm() {
   const [rentAmount, setRentAmount] = useState("");
   const [rentInterval, setRentInterval] = useState("day");
   const [images, setImages] = useState([]);
-  const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState("");
@@ -30,18 +34,30 @@ function AddCraneForm() {
   });
 
   const [isSuccess, setIsSuccess] = useState(false);
-  const [imageFeedback, setImageFeedback] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
   const [newProducerSlug, setNewProducerSlug] = useState("");
 
-  const handleAddImage = () => {
-    const url = newImageUrl.trim();
-    if (!url) return;
-    setImages((prev) => [...prev, url]);
-    setNewImageUrl("");
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
 
-    setImageFeedback("✅ Image added!");
-    setTimeout(() => setImageFeedback(""), 3000);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const res = await axios.post(CLOUDINARY_URL, formData);
+      const imageUrl = res.data.secure_url;
+
+      setImages((prev) => [...prev, imageUrl]);
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      alert("Could not upload the image!");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -104,7 +120,6 @@ function AddCraneForm() {
       setRadius("");
       setVariantRevision("");
       setImages([]);
-      setNewImageUrl("");
       setDescription("");
       setSalePrice("");
       setRentAmount("");
@@ -441,34 +456,33 @@ function AddCraneForm() {
           {/* Input + floating label */}
           <div className="relative flex-1">
             <input
-              id="newImageUrl"
-              name="newImageUrl"
-              type="url"
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              placeholder=" "
-              className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
+              id="imageFile"
+              name="imageFile"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition hidden"
             />
             <label
-              htmlFor="newImageUrl"
-              className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              htmlFor="imageFile"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg cursor-pointer hover:bg-red-500 transition"
             >
-              Image URL
+              {uploading ? "Uploading…" : "Upload Image"}
             </label>
           </div>
 
-          {/* Button */}
-          <button
-            type="button"
-            onClick={handleAddImage}
-            className="px-5 py-2 rounded-md cursor-pointer text-sm bg-red-600 text-white hover:bg-red-500 transition-colors duration-300"
-          >
-            Add Image
-          </button>
+          <div className="flex gap-2 mb-4">
+            {images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`Crane ${i}`}
+                className="w-20 h-20 object-cover"
+              />
+            ))}
+          </div>
         </div>
-        {imageFeedback && (
-          <p className="text-green-600 text-sm mb-1">{imageFeedback}</p>
-        )}
 
         {/* AvailabilityRange  */}
         <div className="flex items-center mb-6">

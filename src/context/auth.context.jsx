@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AuthContext = createContext();
 
@@ -16,10 +16,10 @@ function AuthProviderWrapper(props) {
 
   const authenticateUser = async () => {
     // Get stored token from localStorage
-    const storeToken = localStorage.getItem("authToken");
+    const storedToken = localStorage.getItem("authToken");
 
     // If there's no token, clear user state immediately
-    if (!storeToken) {
+    if (!storedToken) {
       setIsLoggedIn(false);
       setIsLoading(false);
       setUser(null);
@@ -29,7 +29,7 @@ function AuthProviderWrapper(props) {
     try {
       // Attempt verification
       const response = await axios.get(`${API_URL}/users/profile`, {
-        headers: { Authorization: `Bearer ${storeToken}` },
+        headers: { Authorization: `Bearer ${storedToken}` },
       });
 
       // On success, update state

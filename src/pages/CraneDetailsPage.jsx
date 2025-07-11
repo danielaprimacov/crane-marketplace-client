@@ -5,7 +5,7 @@ import axios from "axios";
 import { AuthContext } from "../context/auth.context";
 import Modal from "../components/Modal";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 import goBackIcon from "../assets/icons/angle-double-small-left.png";
 
@@ -19,12 +19,8 @@ function CraneDetailsPage() {
   const { user } = useContext(AuthContext);
 
   const getCrane = async () => {
-    const storedToken = localStorage.getItem("authToken");
-
     try {
-      const response = await axios.get(`${API_URL}/cranes/${craneId}`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
+      const response = await axios.get(`${API_URL}/cranes/${craneId}`);
 
       setCrane(response.data);
     } catch (error) {

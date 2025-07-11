@@ -6,7 +6,7 @@ import { AuthContext } from "../context/auth.context";
 
 import AvailabilityRange from "./AvailabilityRange";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AddInquiryForm({ craneId }) {
   const { user } = useContext(AuthContext);
@@ -52,6 +52,7 @@ function AddInquiryForm({ craneId }) {
     event.preventDefault();
     setSuccessMessage("");
     setErrorMessage("");
+    
     const storedToken = localStorage.getItem("authToken");
 
     const requestBody = {

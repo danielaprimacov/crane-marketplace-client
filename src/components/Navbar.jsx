@@ -12,7 +12,7 @@ import craneIcon from "../assets/icons/crane.png";
 import inboxLogo from "../assets/icons/envelope.png";
 import logo from "../assets/icons/shipping.png"; // temporary
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Navbar({ openLogin }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);

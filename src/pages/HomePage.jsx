@@ -8,7 +8,7 @@ import LastAddedCranes from "../components/LastAddedCranes";
 import InformationSection from "../components/InformationSection";
 import OurClients from "../components/OurClients";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function HomePage() {
   const [cranes, setCranes] = useState([]);
@@ -17,10 +17,7 @@ function HomePage() {
   useEffect(() => {
     const fetchCranes = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        const { data } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(`${API_URL}/cranes`);
         // sort newest first
         const recent = data
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))

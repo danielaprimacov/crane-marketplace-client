@@ -5,7 +5,7 @@ import axios from "axios";
 
 import { slugify } from "../utils/helpers";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function LoginForm({ onSuccess, onSwitchToSignup }, formRef) {
   const [email, setEmail] = useState("");

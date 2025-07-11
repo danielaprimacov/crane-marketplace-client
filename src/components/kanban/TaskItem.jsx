@@ -9,7 +9,7 @@ import InquiryCard from "../InquiryCard";
 import Modal from "../Modal";
 import KanbanContext from "./KanbanContext";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function TaskItem({ task }) {
   const { deleteTask, updateTask, markRead } = useContext(KanbanContext);

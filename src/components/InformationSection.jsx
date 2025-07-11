@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 import Modal from "./Modal";
 import ContactForm from "./ContactForm";

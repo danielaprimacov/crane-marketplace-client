@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import InquiryCard from "../components/InquiryCard";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";

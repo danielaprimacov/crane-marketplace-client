@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import ProducersSidebar from "../components/ProducersSidebar";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 import { slugify } from "../utils/helpers";
 
@@ -16,10 +16,7 @@ function ProducersPage() {
     const getCranes = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("authToken");
-        const { data } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(`${API_URL}/cranes`);
 
         const unique = Array.from(
           new Set(data.map((c) => c.producer).filter(Boolean))

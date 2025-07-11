@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/auth.context";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ProfilePage() {
   const { user } = useContext(AuthContext);
@@ -15,7 +15,6 @@ function ProfilePage() {
     if (!user) return;
     const fetchMyCranes = async () => {
       try {
-        const token = localStorage.getItem("authToken");
         const { data: allCranes } = await axios.get(`${API_URL}/cranes`, {
           headers: { Authorization: `Bearer ${token}` },
         });

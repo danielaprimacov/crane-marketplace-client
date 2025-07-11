@@ -6,7 +6,7 @@ import ProducersSidebar from "../components/ProducersSidebar";
 import FilterDropDown from "../components/FilterDropDown";
 import RangeDropDown from "../components/RangeDropDown";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 
 import { slugify } from "../utils/helpers";
 
@@ -34,10 +34,7 @@ function ProducerPage() {
   useEffect(() => {
     (async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        const { data } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(`${API_URL}/cranes`);
         setCranes(data);
       } catch (err) {
         console.error(err);

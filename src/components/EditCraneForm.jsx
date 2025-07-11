@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import AvailabilityRange from "./AvailabilityRange";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${
+  import.meta.env.VITE_CLOUD_NAME
+}/upload`;
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
 function EditCraneForm() {
   const { craneId } = useParams();
@@ -16,7 +20,7 @@ function EditCraneForm() {
   const [radius, setRadius] = useState("");
   const [producer, setProducer] = useState("");
   const [images, setImages] = useState([]);
-  const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [description, setDescription] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [rentAmount, setRentAmount] = useState("");
@@ -28,17 +32,34 @@ function EditCraneForm() {
     availabilityEnd: "",
   });
 
-  const [imageFeedback, setImageFeedback] = useState("");
-
   const navigate = useNavigate();
 
-  const handleAddImage = () => {
-    const url = newImageUrl.trim();
-    if (!url) return;
-    setImages((prev) => [...prev, url]);
-    setNewImageUrl("");
+  const fileInputRef = useRef(null);
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const res = await axios.post(CLOUDINARY_URL, formData);
+      const imageUrl = res.data.secure_url;
+      setImages((prev) => [...prev, imageUrl]);
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      alert("Could not upload the image!");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
   const getCraneData = async () => {
     const storedToken = localStorage.getItem("authToken");
 
@@ -236,74 +257,45 @@ function EditCraneForm() {
             <div className="flex items-center gap-4">
               <div className="relative flex-1">
                 <input
-                  type="url"
-                  id="newImageUrl"
-                  placeholder=" "
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  className="
-          peer block w-full h-10 bg-transparent 
-          border-b border-gray-300 
-          focus:outline-none focus:border-black 
-          transition
-        "
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="peer block w-full h-10 bg-transparent border-b border-gray-300 focus:outline-none focus:border-black transition hidden"
+                  disabled={uploading}
                 />
-                <label
-                  htmlFor="newImageUrl"
-                  className="
-          absolute left-0 -top-6 text-sm text-gray-500 
-          transition-all duration-300 
-          peer-placeholder-shown:top-0 
-          peer-placeholder-shown:text-base 
-          peer-focus:-top-6
-        "
+                <button
+                  type="button"
+                  onClick={triggerFileSelect}
+                  disabled={uploading}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition-colors duration-200"
                 >
-                  Image URL
-                </label>
+                  {uploading ? "Uploading…" : "Upload Image"}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={handleAddImage}
-                className="
-        px-4 py-2 bg-red-600 text-white rounded 
-        hover:bg-red-500 transition-colors duration-200
-      "
-              >
-                Add Image
-              </button>
             </div>
 
-            {/* optional feedback message */}
-            {imageFeedback && (
-              <p className="text-green-600 text-sm mt-2">{imageFeedback}</p>
-            )}
-
             {/* thumbnail list */}
-            {images.length > 0 && (
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                {images.map((url, i) => (
-                  <div key={i} className="relative group">
-                    <img
-                      src={url}
-                      alt={`crane ${i + 1}`}
-                      className="w-full h-32 object-cover rounded"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setImages((prev) => prev.filter((_, idx) => idx !== i))
-                      }
-                      className="
-              absolute top-1 right-1 p-1 bg-black bg-opacity-50 text-white 
-              rounded opacity-0 group-hover:opacity-100 transition-opacity
-            "
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              {images.map((url, i) => (
+                <div key={i} className="relative group">
+                  <img
+                    src={url}
+                    alt={`crane ${i + 1}`}
+                    className="w-full h-32 object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImages((prev) => prev.filter((_, idx) => idx !== i))
+                    }
+                    className="absolute top-1 right-1 p-1 bg-black bg-opacity-50 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="relative">

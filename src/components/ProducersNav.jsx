@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://localhost:5005";
+const API_URL = import.meta.env.VITE_API_URL;
 const SCROLL_STEP = 1;
 const FRAME_INTERVAL = 16;
 
@@ -21,10 +21,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
   useEffect(() => {
     const getCranes = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        const { data } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(`${API_URL}/cranes`);
         setCranes(data); // data is an array of { producer, /* other fields */ }
       } catch (err) {
         console.error("Failed to fetch cranes:", err);
