@@ -7,7 +7,7 @@ import VolvoLogo from "../assets/images/volvo-logo-1959-2020-01.jpg";
 import HitachiLogo from "../assets/images/Hitachi-Logo.png";
 import JohnDeereLogo from "../assets/images/john-deere-logo.png";
 import JCBLogo from "../assets/images/JCB-Logo.jpg";
-import SanyLogo from "../assets/images/Sany-logo.png";
+import SanyLogo from "../assets/images/Sany-Logo.png";
 import XCMGLogo from "../assets/images/xcmg-horizontal-logo.png";
 import KonesCranesLogo from "../assets/images/Konecranes-Logo.png";
 import TadanoLogo from "../assets/images/Tadano_Faun_logo.png";
