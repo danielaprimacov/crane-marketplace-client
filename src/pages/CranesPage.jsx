@@ -7,6 +7,9 @@ import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import VideoComponent from "../components/VideoComponent";
 import ArrowDownIcon from "../components/ArrowDownIcon";
 
+import Modal from "../components/Modal";
+import ExpertForm from "../components/ExpertForm";
+
 import videoWebm from "../assets/video/choose-a-crane.webm";
 import videoMp4 from "../assets/video/choose-a-crane.mp4";
 import videoPoster from "../assets/images/poster-cranes-page.png";
@@ -20,6 +23,7 @@ import crawlerCrane from "../assets/images/crawler-crane.png";
 
 function CranesPage() {
   const [videoMuted, setVideoMuted] = useState(true);
+  const [isAdviceOpen, setAdviceOpen] = useState(false);
 
   return (
     <>
@@ -32,22 +36,27 @@ function CranesPage() {
           onMuteChange={setVideoMuted}
         />
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pointer-events-none">
-          <div className={`flex-1 flex flex-col justify-center items-center transition-opacity duration-700 ${videoMuted ? "opacity-100" : "opacity-0"}`}>
+          <div
+            className={`flex-1 flex flex-col justify-center items-center transition-opacity duration-700 ${
+              videoMuted ? "opacity-100" : "opacity-0"
+            }`}
+          >
             <p className="text-white uppercase text-xl md:text-2xl lg:text-3xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              Choose the Right Crane on KranHub
+              Unlock Expert Crane Insights
             </p>
             <p className="mt-2 text-red-600 uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
-              Unmute video sound
+              Unmute for the Full Story
             </p>
             <p className="my-5 text-red-600 text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              click on the video
+              Tap the video to hear our step-by-step crane selection guide.
             </p>
             <p className="my-5 text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              for an audio walkthrough on choosing the right crane
+              Get insider tips on capacity, reach, and setup—straight from the
+              pros.
             </p>
             <p className="text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              or <span className="text-red-600">scroll down</span> for the full
-              step-by-step guide in text.
+              Prefer reading? <span className="text-red-600">Scroll down</span>{" "}
+              for the full text walkthrough.
             </p>
           </div>
           <div className="pb-15">
@@ -236,26 +245,30 @@ function CranesPage() {
           </section>
         </div>
 
-        <div className="max-w-full mx-auto bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl shadow-lg text-center mt-8">
+        <div className="max-w-full mx-auto bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-lg text-center mt-8">
           <div className="flex justify-center items-center gap-5 mb-4">
-            <QuestionMarkCircleIcon className="h-12 w-12 text-blue-500" />
+            <QuestionMarkCircleIcon className="h-12 w-12 text-red-500" />
             <h2 className="text-3xl font-semibold text-gray-800 mb-2">
               Need Help?
             </h2>
           </div>
           <p className="text-gray-600 mb-6">
             Click{" "}
-            <Link
-              to=""
-              className="inline-block bg-blue-600 text-white px-4 py-1 rounded-full font-medium transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <button
+              onClick={() => setAdviceOpen(true)}
+              className="inline-block bg-red-600 cursor-pointer text-white px-4 py-1 mx-3 rounded-full font-medium transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               Get Expert Advice
-            </Link>{" "}
+            </button>{" "}
             at the top of any page. Our team will review your requirements and
             recommend the perfect crane—no technical jargon, guaranteed!
           </p>
         </div>
       </div>
+
+      <Modal isOpen={isAdviceOpen} onClose={() => setAdviceOpen(false)}>
+        <ExpertForm onClose={() => setAdviceOpen(false)} />
+      </Modal>
     </>
   );
 }
