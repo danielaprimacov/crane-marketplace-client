@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import AvailabilityRange from "./AvailabilityRange";
 
 import { slugify } from "../utils/helpers";
+
+import goBackIcon from "../assets/icons/angle-double-small-left.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${
@@ -36,6 +38,8 @@ function AddCraneForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
   const [newProducerSlug, setNewProducerSlug] = useState("");
+
+  const navigate = useNavigate();
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -151,6 +155,14 @@ function AddCraneForm() {
 
   return (
     <>
+      {/* Back button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="ml-30 inline-flex items-center text-gray-600 hover:text-gray-900 cursor-pointer"
+      >
+        <img src={goBackIcon} alt="back" className="w-5 mr-2" />
+        Back
+      </button>
       <h1 className="text-2xl uppercase mx-auto mb-5 border-b pb-3 border-b-red-600">
         Add your crane
       </h1>

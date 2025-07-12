@@ -7,7 +7,6 @@ import FilterDropDown from "../components/FilterDropDown";
 import RangeDropDown from "../components/RangeDropDown";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
 import { slugify } from "../utils/helpers";
 
 function ProducerPage() {
@@ -35,7 +34,6 @@ function ProducerPage() {
     (async () => {
       try {
         const { data } = await axios.get(`${API_URL}/cranes`);
-        // annotate each crane with a .price field:
         const withPrice = data.map((c) => ({
           ...c,
           price:
@@ -108,18 +106,10 @@ function ProducerPage() {
   const [rRange, setRRange] = useState([minR, maxR]);
   const [pRange, setPRange] = useState([minP, maxP]);
 
-  useEffect(() => {
-    setCapRange([minCap, maxCap]);
-  }, [minCap, maxCap]);
-  useEffect(() => {
-    setHRange([minH, maxH]);
-  }, [minH, maxH]);
-  useEffect(() => {
-    setRRange([minR, maxR]);
-  }, [minR, maxR]);
-  useEffect(() => {
-    setPRange([minP, maxP]);
-  }, [minP, maxP]);
+  useEffect(() => setCapRange([minCap, maxCap]), [minCap, maxCap]);
+  useEffect(() => setHRange([minH, maxH]), [minH, maxH]);
+  useEffect(() => setRRange([minR, maxR]), [minR, maxR]);
+  useEffect(() => setPRange([minP, maxP]), [minP, maxP]);
 
   const applyCapacity = ([a, b]) =>
     setFilters((f) => ({ ...f, capacityMin: a, capacityMax: b }));
@@ -141,13 +131,10 @@ function ProducerPage() {
 
   const filteredCranes = useMemo(() => {
     return myCranes.filter((c) => {
-      // text
       const txtOk =
         !filters.search ||
         c.title.toLowerCase().includes(filters.search) ||
         (c.description || "").toLowerCase().includes(filters.search);
-
-      // numeric ranges
       const inRange = (val, min, max) =>
         val >= (min !== "" ? +min : -Infinity) &&
         val <= (max !== "" ? +max : +Infinity);
@@ -159,69 +146,110 @@ function ProducerPage() {
       if (!inRange(c.radius, filters.radiusMin, filters.radiusMax))
         return false;
       if (!inRange(c.price, filters.priceMin, filters.priceMax)) return false;
-
-      // status / location
       if (filters.status && c.status !== filters.status) return false;
       if (filters.location && c.location !== filters.location) return false;
-
       return txtOk;
     });
   }, [myCranes, filters]);
 
   const hasAny = Object.values(filters).some((v) => v !== "");
-
   const displayList = hasAny ? filteredCranes : myCranes;
+
+  // Reset all filters
+  const resetAllFilters = () => {
+    setFilters({
+      capacityMin: "",
+      capacityMax: "",
+      heightMin: "",
+      heightMax: "",
+      radiusMin: "",
+      radiusMax: "",
+      priceMin: "",
+      priceMax: "",
+      status: "",
+      location: "",
+      search: "",
+    });
+    setCapRange([minCap, maxCap]);
+    setHRange([minH, maxH]);
+    setRRange([minR, maxR]);
+    setPRange([minP, maxP]);
+  };
 
   if (loading) return <p>Loading…</p>;
   if (error) return <p className="text-red-600">{error}</p>;
-  if (!activeGroup) {
+  if (!activeGroup)
     return <p className="text-red-600">Unknown producer “{producerSlug}”.</p>;
-  }
 
   return (
     <div className="flex mt-15 mx-5">
-      {/* Sidebar with ALL producers */}
       <ProducersSidebar producers={groupCranes} activeSlug={producerSlug} />
-
-      {/* Main content: list of this producer's cranes */}
       <main className="flex-1 p-6">
         {myCranes.length === 0 ? (
           <p>No cranes found for “{producerSlug}.”</p>
         ) : (
           <div className="mt-10 ml-10">
+            {/* Reset all filters button */}
+            <div className="mb-2 text-right">
+              <button
+                onClick={resetAllFilters}
+                className="text-sm text-red-600 hover:underline"
+              >
+                Reset all filters
+              </button>
+            </div>
+            {/* Filter controls */}
             <div className="mb-5 flex flex-wrap gap-4 items-center">
               {/* Capacity */}
-              <RangeDropDown
-                label="Capacity (t)"
-                min={minCap}
-                max={maxCap}
-                step={1}
-                value={capRange}
-                onChange={setCapRange}
-                onApply={applyCapacity}
-              />
+              {minCap < maxCap ? (
+                <RangeDropDown
+                  label="Capacity (t)"
+                  min={minCap}
+                  max={maxCap}
+                  step={1}
+                  value={capRange}
+                  onChange={setCapRange}
+                  onApply={applyCapacity}
+                />
+              ) : (
+                <div className="px-4 py-2 bg-gray-100 rounded">
+                  Capacity: {minCap} t
+                </div>
+              )}
 
               {/* Height */}
-              <RangeDropDown
-                label="Height (m)"
-                min={minH}
-                max={maxH}
-                step={1}
-                value={hRange}
-                onChange={setHRange}
-                onApply={applyHeight}
-              />
+              {minH < maxH ? (
+                <RangeDropDown
+                  label="Height (m)"
+                  min={minH}
+                  max={maxH}
+                  step={1}
+                  value={hRange}
+                  onChange={setHRange}
+                  onApply={applyHeight}
+                />
+              ) : (
+                <div className="px-4 py-2 bg-gray-100 rounded">
+                  Height: {minH} m
+                </div>
+              )}
 
               {/* Radius */}
-              <RangeDropDown
-                label="Radius (m)"
-                min={minR}
-                max={maxR}
-                step={1}
-                value={rRange}
-                onChange={setRRange}
-                onApply={applyRadius}
-              />
+              {minR < maxR ? (
+                <RangeDropDown
+                  label="Radius (m)"
+                  min={minR}
+                  max={maxR}
+                  step={1}
+                  value={rRange}
+                  onChange={setRRange}
+                  onApply={applyRadius}
+                />
+              ) : (
+                <div className="px-4 py-2 bg-gray-100 rounded">
+                  Radius: {minR} m
+                </div>
+              )}
 
               {/* Price */}
               {minP < maxP ? (
@@ -235,11 +263,11 @@ function ProducerPage() {
                   onApply={applyPrice}
                 />
               ) : (
-                // either hide it or show a static label
                 <div className="px-4 py-2 bg-gray-100 rounded">
                   Price: €{minP}
                 </div>
               )}
+
               <FilterDropDown
                 label="Status"
                 options={statusOptions}
@@ -284,18 +312,15 @@ function ProducerPage() {
                   ]
                     .filter(Boolean)
                     .join(" ");
-
                   const bgUrl =
                     Array.isArray(c.images) && c.images.length > 0
                       ? c.images[0]
                       : null;
-
                   return (
                     <div
                       key={c._id}
-                      className="w-72 h-72 mr-5 rounded-md shadow-md overflow-hidden"
+                      className="w-72 h-72 rounded-md shadow-md overflow-hidden"
                     >
-                      {/* Image */}
                       <div className="w-full h-44 overflow-hidden rounded-t-md">
                         {bgUrl ? (
                           <div
@@ -306,8 +331,6 @@ function ProducerPage() {
                           <div className="w-full h-full bg-gray-100" />
                         )}
                       </div>
-
-                      {/* Title + Model */}
                       <div className="ml-2 mt-2">
                         <Link
                           to={`/cranes/${c._id}`}
@@ -317,8 +340,6 @@ function ProducerPage() {
                         </Link>
                         <p className="text-gray-500 pb-2">{model}</p>
                       </div>
-
-                      {/* Status */}
                       <div className="py-2 text-right">
                         <span className="p-2 font-bold tracking-wider">
                           {c.status === "for sale" ? "For Sale" : "For Rent"}

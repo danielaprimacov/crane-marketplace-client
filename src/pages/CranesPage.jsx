@@ -41,22 +41,11 @@ function CranesPage() {
               videoMuted ? "opacity-100" : "opacity-0"
             }`}
           >
-            <p className="text-white uppercase text-xl md:text-2xl lg:text-3xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              Unlock Expert Crane Insights
-            </p>
             <p className="mt-2 text-red-600 uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
-              Unmute for the Full Story
+              To get crane choosing advice
             </p>
-            <p className="my-5 text-red-600 text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              Tap the video to hear our step-by-step crane selection guide.
-            </p>
-            <p className="my-5 text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              Get insider tips on capacity, reach, and setup—straight from the
-              pros.
-            </p>
-            <p className="text-white text-xl md:text-2xl lg:text-3xl tracking-wider [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
-              Prefer reading? <span className="text-red-600">Scroll down</span>{" "}
-              for the full text walkthrough.
+            <p className="mt-2 text-white uppercase text-xl md:text-2xl lg:text-3xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+              Click on the video to unmute
             </p>
           </div>
           <div className="pb-15">

@@ -232,6 +232,7 @@ function AddInquiryForm({ craneId }) {
       <div className="mt-6 text-center">
         <Link
           to={`/cranes/${craneId}`}
+          replace
           className="inline-block text-red-600 hover:underline"
         >
           ← Back to {crane && crane.title} Details

@@ -169,7 +169,7 @@ function CraneDetailsPage() {
           {/* Actions */}
           {(!user || user.role !== "admin") && !isOwner && (
             <div className="mt-8">
-              <Link to={`/cranes/${craneId}/new-inquiry`}>
+              <Link to={`/cranes/${craneId}/new-inquiry`} replace>
                 <button className="bg-orange-500 text-white py-2 px-4 cursor-pointer rounded hover:bg-orange-400 transition">
                   Send Inquiry
                 </button>
