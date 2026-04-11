@@ -2,6 +2,7 @@ import {
   MailIcon,
   PhoneIcon,
   IdentificationIcon,
+  OfficeBuildingIcon,
   BadgeCheckIcon,
 } from "@heroicons/react/outline";
 
@@ -113,7 +114,7 @@ function ImprintPage() {
               .
             </p>
             <div className="flex items-center gap-3 text-gray-700">
-              <CheckBadgeIcon className="w-6 h-6 text-red-600" />
+              <BadgeCheckIcon className="w-6 h-6 text-red-600" />
               <p>
                 KranHub GmbH is willing to participate in dispute resolution
                 proceedings before the Berlin Consumer Arbitration Board.
