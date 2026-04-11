@@ -17,12 +17,22 @@ import logo from "../assets/icons/shipping.png"; // temporary
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const services = [
+  { label: "Transportation", to: "/services#transportation" },
+  { label: "Sale / Rent", to: "/services#sale-rent" },
+  {
+    label: "Installation / Disassembly",
+    to: "/services#installation-disassembly",
+  },
+];
+
 function Navbar({ openLogin }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const [showNavbar, setShowNavbar] = useState(true);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
 
   const [myCranesCount, setMyCranesCount] = useState(0);
   const [inquiriesCount, setInquiriesCount] = useState(0);
@@ -47,6 +57,44 @@ function Navbar({ openLogin }) {
   const isNewCrane = location.pathname === "/cranes/new";
   const isProfile = location.pathname.startsWith("/profile");
 
+  const shouldShowDrawerMenuButton =
+    isHome || isAbout || isRevocation || isTerms || isImprint || isPrivacy;
+
+  const serviceLinkClass = `
+  relative inline-block
+  transition-colors duration-200
+  after:content-['']
+  after:absolute after:left-0 after:-bottom-1
+  after:h-[1.5px] after:w-0
+  after:bg-red-600
+  after:transition-all after:duration-300 after:ease-out
+  hover:after:w-full
+`;
+
+  const servicesCloseTimer = useRef(null);
+
+  const openServicesMenu = () => {
+    if (servicesCloseTimer.current) {
+      clearTimeout(servicesCloseTimer.current);
+      servicesCloseTimer.current = null;
+    }
+    setServicesOpen(true);
+  };
+
+  const closeServicesMenu = () => {
+    servicesCloseTimer.current = setTimeout(() => {
+      setServicesOpen(false);
+      servicesCloseTimer.current = null;
+    }, 120);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (servicesCloseTimer.current) {
+        clearTimeout(servicesCloseTimer.current);
+      }
+    };
+  }, []);
   const cancelClose = () => {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
@@ -56,7 +104,33 @@ function Navbar({ openLogin }) {
 
   useEffect(() => {
     setMenuOpen(false);
-  }, [location]);
+    setServicesOpen(false);
+  }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setModalOpen(false);
+        setServicesOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Called when pointer enters the LI or the fly-out itself:
   const handleMouseEnter = (producer) => {
@@ -169,7 +243,7 @@ function Navbar({ openLogin }) {
   return (
     <>
       <nav
-        className={`fixed inset-x-0 h-16 z-50 transition-all duration-800 ease-out overflow-visible 
+        className={`fixed inset-x-0 h-16 z-50 transition-all duration-700 ease-out overflow-visible 
       ${showNavbar ? "top-0" : "-top-16"} ${
           isCranes ? "bg-white" : "bg-transparent"
         }
@@ -177,16 +251,13 @@ function Navbar({ openLogin }) {
       >
         <div className="flex items-center h-full px-4 w-full">
           <div className="flex items-center flex-none">
-            {(isHome ||
-              isAbout ||
-              isRevocation ||
-              isTerms ||
-              isImprint ||
-              isPrivacy) && (
+            {shouldShowDrawerMenuButton && (
               <button
                 onClick={() => setMenuOpen((o) => !o)}
                 className="p-2 mr-4 cursor-pointer"
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={menuOpen}
+                aria-controls="mobile-drawer-menu"
               >
                 <img
                   src={menuOpen ? closeIcon : menuIcon}
@@ -315,23 +386,44 @@ function Navbar({ openLogin }) {
           />
 
           {/* side drawer */}
-          <aside className="fixed top-0 left-0 h-full w-84 bg-white shadow-lg z-50 p-6 overflow-auto">
+          <aside
+            id="mobile-drawer-menu"
+            className="fixed top-0 left-0 h-full w-84 bg-white shadow-lg z-50 p-6 overflow-auto"
+          >
             {/* Close button inside too */}
             <button
               onClick={() => setMenuOpen(false)}
-              className="absolute top-4 right-4 p-1 cursor-pointer"
+              className="
+                absolute top-4 right-4
+                flex items-center justify-center
+                w-10 h-10 rounded-full cursor-pointer
+                transition-all duration-300 ease-out
+                hover:bg-black/5 hover:scale-110
+                active:scale-95
+                animate-[menuCloseIn_280ms_ease-out]
+              "
               aria-label="Close menu"
             >
-              <img src={closeIcon} alt="Close" className="w-5 h-5" />
+              <img
+                src={closeIcon}
+                alt="Close"
+                className="
+                  w-5 h-5
+                  transition-transform duration-300 ease-out
+                  hover:rotate-90
+                  "
+              />
             </button>
 
-            <nav className="mt-8 space-y-4">
-              <Link
-                to="/"
-                className="block text-2xl font-medium hover:text-red-600"
-              >
-                Home
-              </Link>
+            <nav className="mt-16 space-y-4">
+              {!isHome && (
+                <Link
+                  to="/"
+                  className="block text-2xl font-medium hover:text-red-600"
+                >
+                  Home
+                </Link>
+              )}
               <Link
                 to="/about"
                 className="block text-2xl font-medium hover:text-red-600"
@@ -339,43 +431,55 @@ function Navbar({ openLogin }) {
                 About Us
               </Link>
 
-              {/* Our Services with sub-links */}
-              <div>
-                <p className="text-2xl font-medium mb-2">Our Services</p>
-                <ul className="pl-4 space-y-1">
-                  <li>
-                    <Link
-                      to="/services#transportation"
-                      className="hover:text-red-600"
-                    >
-                      Transportation
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/services#sale-rent"
-                      className="hover:text-red-600"
-                    >
-                      Sale / Rent
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/services#installation-disassembly"
-                      className="hover:text-red-600"
-                    >
-                      Installation / Disassembly
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
               <button
                 onClick={() => setModalOpen(true)}
-                className="block text-lg font-medium hover:text-red-600 cursor-pointer"
+                className="block text-2xl font-medium hover:text-red-600 cursor-pointer"
               >
                 Contact
               </button>
+              <div
+                className="pb-3"
+                onMouseEnter={openServicesMenu}
+                onMouseLeave={closeServicesMenu}
+              >
+                <button
+                  type="button"
+                  onClick={() => setServicesOpen((prev) => !prev)}
+                  aria-expanded={servicesOpen}
+                  aria-controls="services-submenu"
+                  className="flex w-full items-center justify-between text-left text-2xl font-medium cursor-pointer hover:text-red-600 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40 rounded-sm"
+                >
+                  <span>Our Services</span>
+                </button>
+
+                <div
+                  id="services-submenu"
+                  className={`grid transition-all duration-300 ease-out ${
+                    servicesOpen
+                      ? "grid-rows-[1fr] opacity-100 mt-3"
+                      : "grid-rows-[0fr] opacity-0 mt-0"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <ul className="pl-4 pb-2 space-y-2">
+                      {services.map((service) => (
+                        <li key={service.to}>
+                          <Link
+                            to={service.to}
+                            className={serviceLinkClass}
+                            onClick={() => {
+                              setMenuOpen(false);
+                              setServicesOpen(false);
+                            }}
+                          >
+                            {service.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </nav>
           </aside>
           <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
