@@ -7,6 +7,7 @@ import Services from "../components/Services";
 import LastAddedCranes from "../components/LastAddedCranes";
 import InformationSection from "../components/InformationSection";
 import OurClients from "../components/OurClients";
+import { useProducers } from "../hooks/useProducers";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -45,9 +46,11 @@ function HomePage() {
       .map(([producer]) => producer);
   }, [cranes]);
 
+  const { producers } = useProducers();
+
   return (
     <>
-      <HeroSection />
+      <HeroSection producers={producers} />
       <main className="relative z-20 bg-white">
         <AllProducers allProducers={allProducers} />
         <Services />

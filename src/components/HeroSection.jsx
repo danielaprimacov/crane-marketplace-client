@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+import { slugify } from "../utils/helpers";
 
 import VideoComponent from "./VideoComponent";
 
@@ -14,7 +16,7 @@ const textVariants = {
   exit: { opacity: 0, transition: { duration: 1 } },
 };
 
-function HeroSection() {
+function HeroSection({ producers }) {
   const [muted, setMuted] = useState(true);
   const [showAlternate, setShowAlternate] = useState(false);
 
@@ -22,6 +24,16 @@ function HeroSection() {
     const timer = setTimeout(() => setShowAlternate((prev) => !prev), 8000);
     return () => clearTimeout(timer);
   }, [showAlternate]);
+
+  const firstProducerSlug = useMemo(() => {
+    if (!producers.length) return null;
+
+    return producers[0]?.slug || null;
+  }, [producers]);
+
+  const targetPath = firstProducerSlug
+    ? `/cranes/producers/${firstProducerSlug}`
+    : "/cranes";
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -65,7 +77,7 @@ function HeroSection() {
           )}
         </AnimatePresence>
 
-        <Link to="/cranes">
+        <Link to={targetPath}>
           <button className="m-5 h-15 w-50 bg-white cursor-pointer text-xl uppercase text-center rounded hover:bg-red-700 hover:text-white transition duration-400 ease-in-out">
             Discover more
           </button>

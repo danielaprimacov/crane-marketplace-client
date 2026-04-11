@@ -281,12 +281,11 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
                 />
               </div>
             )}
-            {isProfile ||
-              (isServices && (
-                <Link to="/">
-                  <img src={logo} alt="Logo" className="w-[36px]" />
-                </Link>
-              ))}
+            {(isProfile || isServices) && (
+              <Link to="/">
+                <img src={logo} alt="Logo" className="w-[36px]" />
+              </Link>
+            )}
           </div>
 
           <div className="flex-1 flex justify-center">
@@ -428,6 +427,13 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
                 className="block text-2xl font-medium hover:text-red-600"
               >
                 About Us
+              </Link>
+
+              <Link
+                to="/cranes"
+                className="block text-2xl font-medium hover:text-red-600"
+              >
+                Advices
               </Link>
 
               <button
