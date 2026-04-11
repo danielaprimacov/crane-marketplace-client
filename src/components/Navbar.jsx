@@ -26,11 +26,10 @@ const services = [
   },
 ];
 
-function Navbar({ openLogin }) {
+function Navbar({ openLogin, menuOpen, setMenuOpen }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const [showNavbar, setShowNavbar] = useState(true);
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
 
