@@ -1,19 +1,41 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import ArrowIcon from "./ArrowIcon";
 import { slugify } from "../utils/helpers";
 
-const SCROLL_STEP = 2; // px per frame
-const FRAME_INTERVAL = 16; // ms per frame
-const VISIBLE = 5; // how many cards are visible
-const CARD_WIDTH = 320; // px — matches w-[20rem]
-const GAP = 16;
+const SCROLL_STEP = 2;
+const EDGE_ZONE = 0.28; // 28% left and right zones, middle stays still
 
 function AllProducers({ allProducers }) {
   const scrollRef = useRef(null);
-  const timerRef = useRef(null);
+  const animationRef = useRef(null);
+  const directionRef = useRef(0); // -1 = left, 1 = right, 0 = stop
 
   const [needsScroll, setNeedsScroll] = useState(false);
+  const [isHoverDevice, setIsHoverDevice] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    const updateHoverMode = () => {
+      setIsHoverDevice(mediaQuery.matches);
+    };
+
+    updateHoverMode();
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", updateHoverMode);
+    } else {
+      mediaQuery.addListener(updateHoverMode);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener("change", updateHoverMode);
+      } else {
+        mediaQuery.removeListener(updateHoverMode);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -23,48 +45,106 @@ function AllProducers({ allProducers }) {
     };
 
     checkOverflow();
-
     window.addEventListener("resize", checkOverflow);
-    return () => window.removeEventListener("resize", checkOverflow);
+
+    return () => {
+      window.removeEventListener("resize", checkOverflow);
+    };
   }, [allProducers]);
 
-  // start auto-scroll
-  const startScroll = () => {
-    if (timerRef.current) return;
-    timerRef.current = setInterval(() => {
+  const stopScroll = useCallback(() => {
+    directionRef.current = 0;
+
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+  }, []);
+
+  const runScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) {
+      animationRef.current = null;
+      return;
+    }
+
+    const maxScrollLeft = el.scrollWidth - el.clientWidth;
+    const direction = directionRef.current;
+
+    if (direction === 0) {
+      animationRef.current = null;
+      return;
+    }
+
+    const nextScrollLeft = el.scrollLeft + direction * SCROLL_STEP;
+    const clamped = Math.max(0, Math.min(nextScrollLeft, maxScrollLeft));
+
+    el.scrollLeft = clamped;
+
+    // stop only if is reached one end and keep trying to go further
+    if (
+      (clamped === 0 && direction < 0) ||
+      (clamped === maxScrollLeft && direction > 0)
+    ) {
+      animationRef.current = null;
+      return;
+    }
+
+    animationRef.current = requestAnimationFrame(runScroll);
+  }, []);
+
+  const ensureAnimation = useCallback(() => {
+    if (!animationRef.current) {
+      animationRef.current = requestAnimationFrame(runScroll);
+    }
+  }, [runScroll]);
+
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!isHoverDevice || !needsScroll) return;
+
       const el = scrollRef.current;
       if (!el) return;
-      // stop at end
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth) return;
-      el.scrollLeft += SCROLL_STEP;
-    }, FRAME_INTERVAL);
-  };
 
-  // stop & reset
-  const stopScroll = () => {
-    clearInterval(timerRef.current);
-    timerRef.current = null;
-    if (scrollRef.current) scrollRef.current.scrollLeft = 0;
-  };
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const ratio = x / rect.width;
 
-  // container width: 5 cards + 4 gaps
-  const maxWidth = VISIBLE * CARD_WIDTH + (VISIBLE - 1) * GAP;
+      if (ratio < EDGE_ZONE) {
+        directionRef.current = -1; // left
+        ensureAnimation();
+      } else if (ratio > 1 - EDGE_ZONE) {
+        directionRef.current = 1; // right
+        ensureAnimation();
+      } else {
+        stopScroll(); // middle zone
+      }
+    },
+    [isHoverDevice, needsScroll, ensureAnimation, stopScroll]
+  );
+
+  useEffect(() => {
+    return () => stopScroll();
+  }, [stopScroll]);
 
   return (
-    <div className="z-30 py-10" onMouseLeave={stopScroll}>
-      {/* scrollable list */}
+    <section className="relative z-30 py-10">
       <div
         ref={scrollRef}
-        className="relative flex gap-4 overflow-x-auto w-full max-w-[1664px]"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={stopScroll}
+        className="flex gap-4 overflow-x-auto w-full max-w-[1664px] px-2"
         style={{
           scrollBehavior: "smooth",
-          // hide scrollbar
           msOverflowStyle: "none",
           scrollbarWidth: "none",
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-x",
         }}
       >
         {allProducers.map((prod) => {
           const slug = encodeURIComponent(slugify(prod));
+
           return (
             <Link
               key={prod}
@@ -76,20 +156,7 @@ function AllProducers({ allProducers }) {
           );
         })}
       </div>
-
-      {/* hover-scroll arrow */}
-      {needsScroll && (
-        <button
-          onMouseEnter={startScroll}
-          className="
-            absolute right-2 top-17 -translate-y-1/2 z-40 cursor-pointer
-            bg-white p-2 rounded-full shadow hover:bg-gray-100 transition
-          "
-        >
-          <ArrowIcon className="w-5 h-5 text-gray-600" />
-        </button>
-      )}
-    </div>
+    </section>
   );
 }
 
