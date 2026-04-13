@@ -8,7 +8,12 @@ const FRAME_INTERVAL = 16;
 
 import ArrowIcon from "./ArrowIcon";
 
-function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
+function ProducersNav({
+  openSubnav,
+  handleMouseEnter,
+  handleMouseLeave,
+  menuOpen,
+}) {
   const { producers } = useProducers();
   const [needsScroll, setNeedsScroll] = useState(false);
 
@@ -29,7 +34,8 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
   }, [producers]);
 
   const startScroll = () => {
-    if (timerRef.current) return;
+    if (menuOpen || timerRef.current) return;
+
     timerRef.current = setInterval(() => {
       const el = scrollRef.current;
       if (!el) return;
@@ -37,6 +43,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
       el.scrollLeft += SCROLL_STEP;
     }, FRAME_INTERVAL);
   };
+
   const stopScroll = () => {
     clearInterval(timerRef.current);
     timerRef.current = null;
@@ -45,7 +52,9 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
 
   return (
     <div
-      className="relative flex items-center w-full ml-4"
+      className={`relative flex items-center w-full ml-4 ${
+        menuOpen ? "pointer-events-none" : ""
+      }`}
       onMouseLeave={stopScroll}
     >
       <div className="overflow-hidden flex-1 pr-14">
@@ -61,11 +70,19 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
           {producers.map(({ name, slug }) => (
             <li
               key={slug}
-              className="group inline-block py-4 border-b-2 border-transparent hover:border-red-600 transition-colors duration-200"
+              className={`group inline-block py-4 border-b-2 border-transparent transition-colors duration-200 ${
+                menuOpen ? "" : "hover:border-red-600"
+              }`}
               onMouseEnter={() => handleMouseEnter(slug)}
               onMouseLeave={handleMouseLeave}
             >
-              <span className="text-sm uppercase cursor-pointer font-medium text-black transition-colors duration-200 group-hover:text-red-600">
+              <span
+                className={`text-sm uppercase font-medium transition-colors duration-200 ${
+                  menuOpen
+                    ? "text-black cursor-default"
+                    : "text-black cursor-pointer group-hover:text-red-600"
+                }`}
+              >
                 {name}
               </span>
             </li>
@@ -73,7 +90,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
         </ul>
       </div>
 
-      {needsScroll && (
+      {needsScroll && !menuOpen && (
         <button
           onMouseEnter={startScroll}
           className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full shadow hover:bg-gray-100 transition"
@@ -82,7 +99,7 @@ function ProducersNav({ openSubnav, handleMouseEnter, handleMouseLeave }) {
         </button>
       )}
 
-      {openSubnav && (
+      {openSubnav && !menuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30">
           <div
             className="w-full p-5 shadow-lg bg-white overflow-auto"

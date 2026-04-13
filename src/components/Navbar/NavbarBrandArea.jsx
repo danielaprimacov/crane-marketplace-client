@@ -26,18 +26,30 @@ function NavbarBrandArea({
   };
 
   const handleMouseEnter = (producer) => {
+    if (menuOpen) return;
+
     cancelClose();
+
     if (producer) {
       setOpenSubnav(producer);
     }
   };
 
   const handleMouseLeave = () => {
+    if (menuOpen) return;
+
     closeTimer.current = window.setTimeout(() => {
       setOpenSubnav(null);
       closeTimer.current = null;
     }, 100);
   };
+
+  useEffect(() => {
+    if (menuOpen) {
+      cancelClose();
+      setOpenSubnav(null);
+    }
+  }, [menuOpen]);
 
   useEffect(() => {
     return () => {
@@ -49,7 +61,7 @@ function NavbarBrandArea({
 
   return (
     <div className="flex items-center flex-none">
-      {shouldShowDrawerMenuButton && (
+      {shouldShowDrawerMenuButton && !isCranes && (
         <button
           onClick={() => setMenuOpen((o) => !o)}
           className="p-2 mr-4 cursor-pointer"
@@ -70,13 +82,25 @@ function NavbarBrandArea({
           onMouseEnter={cancelClose}
           onMouseLeave={handleMouseLeave}
         >
-          <Link to="/" className="py-4">
-            <img src={logo} alt="Logo" className="w-[36px]" />
-          </Link>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="py-4 mr-3 cursor-pointer"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-drawer-menu"
+          >
+            <img
+              src={menuOpen ? menuClose : menuIcon}
+              alt={menuOpen ? "Close" : "Menu"}
+              className="w-[24px]"
+            />
+          </button>
           <ProducersNav
             openSubnav={openSubnav}
             handleMouseEnter={handleMouseEnter}
             handleMouseLeave={handleMouseLeave}
+            menuOpen={menuOpen}
           />
         </div>
       )}
