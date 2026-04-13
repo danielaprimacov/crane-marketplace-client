@@ -12,6 +12,7 @@ function ProducersNav({
   openSubnav,
   handleMouseEnter,
   handleMouseLeave,
+  closeSubnav,
   menuOpen,
 }) {
   const { producers } = useProducers();
@@ -76,7 +77,9 @@ function ProducersNav({
               onMouseEnter={() => handleMouseEnter(slug)}
               onMouseLeave={handleMouseLeave}
             >
-              <span
+              <Link
+                to={`/cranes/producers/${encodeURIComponent(slug)}`}
+                onClick={closeSubnav}
                 className={`text-sm uppercase font-medium transition-colors duration-200 ${
                   menuOpen
                     ? "text-black cursor-default"
@@ -84,7 +87,7 @@ function ProducersNav({
                 }`}
               >
                 {name}
-              </span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -110,6 +113,7 @@ function ProducersNav({
               <li className="pl-10 py-3">
                 <Link
                   to={`/cranes/producers/${encodeURIComponent(openSubnav)}`}
+                  onClick={closeSubnav}
                   className="text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
                 >
                   <div className="flex items-center gap-2">
@@ -121,7 +125,7 @@ function ProducersNav({
               <div className="w-200 pl-10 grid grid-cols-2 gap-x-4 gap-y-8 justify-items-start">
                 {producers
                   .find((p) => p.slug === openSubnav)
-                  .models.slice(0, 4)
+                  ?.models.slice(0, 4)
                   .map((crane) => {
                     const model = [
                       crane.seriesCode,
@@ -136,6 +140,7 @@ function ProducersNav({
                     return (
                       <Link
                         to={`/cranes/${crane._id}`}
+                        onClick={closeSubnav}
                         key={crane._id}
                         className="group flex gap-3 items-start"
                       >

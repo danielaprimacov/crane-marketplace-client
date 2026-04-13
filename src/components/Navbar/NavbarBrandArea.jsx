@@ -44,10 +44,14 @@ function NavbarBrandArea({
     }, 100);
   };
 
+  const closeSubnav = () => {
+    cancelClose();
+    setOpenSubnav(null);
+  };
+
   useEffect(() => {
     if (menuOpen) {
-      cancelClose();
-      setOpenSubnav(null);
+      closeSubnav();
     }
   }, [menuOpen]);
 
@@ -100,6 +104,7 @@ function NavbarBrandArea({
             openSubnav={openSubnav}
             handleMouseEnter={handleMouseEnter}
             handleMouseLeave={handleMouseLeave}
+            closeSubnav={closeSubnav}
             menuOpen={menuOpen}
           />
         </div>
