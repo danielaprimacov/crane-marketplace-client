@@ -16,24 +16,15 @@ function AllProducers({ allProducers }) {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
 
-    const updateHoverMode = () => {
-      setIsHoverDevice(mediaQuery.matches);
+    const updateHoverMode = (e) => {
+      setIsHoverDevice(e.matches);
     };
 
-    updateHoverMode();
-
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", updateHoverMode);
-    } else {
-      mediaQuery.addListener(updateHoverMode);
-    }
+    setIsHoverDevice(mediaQuery.matches);
+    mediaQuery.addEventListener("change", updateHoverMode);
 
     return () => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener("change", updateHoverMode);
-      } else {
-        mediaQuery.removeListener(updateHoverMode);
-      }
+      mediaQuery.removeEventListener("change", updateHoverMode);
     };
   }, []);
 
