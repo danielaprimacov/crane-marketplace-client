@@ -6,8 +6,23 @@ import ProducersSidebar from "../components/ProducersSidebar";
 import FilterDropDown from "../components/FilterDropDown";
 import RangeDropDown from "../components/RangeDropDown";
 
+import { slugify, formatPrice, getMinMax } from "../utils/helpers";
+
 const API_URL = import.meta.env.VITE_API_URL;
-import { slugify } from "../utils/helpers";
+
+const INITIAL_FILTERS = {
+  capacityMin: "",
+  capacityMax: "",
+  heightMin: "",
+  heightMax: "",
+  radiusMin: "",
+  radiusMax: "",
+  priceMin: "",
+  priceMax: "",
+  status: "",
+  location: "",
+  search: "",
+};
 
 function ProducerPage() {
   const { producerSlug } = useParams();
@@ -16,19 +31,7 @@ function ProducerPage() {
   const [error, setError] = useState(null);
 
   // Filters state
-  const [filters, setFilters] = useState({
-    capacityMin: "",
-    capacityMax: "",
-    heightMin: "",
-    heightMax: "",
-    radiusMin: "",
-    radiusMax: "",
-    priceMin: "",
-    priceMax: "",
-    status: "",
-    location: "",
-    search: "",
-  });
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
 
   useEffect(() => {
     (async () => {
@@ -37,7 +40,9 @@ function ProducerPage() {
         const withPrice = data.map((c) => ({
           ...c,
           price:
-            c.status === "for sale" ? c.salePrice : c.rentPrice?.amount ?? 0,
+            c.status === "for sale"
+              ? c.salePrice ?? 0
+              : c.rentPrice?.amount ?? 0,
         }));
         setCranes(withPrice);
       } catch (err) {
@@ -77,29 +82,25 @@ function ProducerPage() {
     return cranes.filter((c) => c.producer === activeGroup.name);
   }, [cranes, activeGroup]);
 
-  const [minCap, maxCap] = useMemo(() => {
-    if (!myCranes.length) return [0, 0];
-    const arr = myCranes.map((c) => c.capacity || 0);
-    return [Math.min(...arr), Math.max(...arr)];
-  }, [myCranes]);
+  const [minCap, maxCap] = useMemo(
+    () => getMinMax(myCranes, (c) => c.capacity ?? 0),
+    [myCranes]
+  );
 
-  const [minH, maxH] = useMemo(() => {
-    if (!myCranes.length) return [0, 0];
-    const arr = myCranes.map((c) => c.height || 0);
-    return [Math.min(...arr), Math.max(...arr)];
-  }, [myCranes]);
+  const [minH, maxH] = useMemo(
+    () => getMinMax(myCranes, (c) => c.height ?? 0),
+    [myCranes]
+  );
 
-  const [minR, maxR] = useMemo(() => {
-    if (!myCranes.length) return [0, 0];
-    const arr = myCranes.map((c) => c.radius || 0);
-    return [Math.min(...arr), Math.max(...arr)];
-  }, [myCranes]);
+  const [minR, maxR] = useMemo(
+    () => getMinMax(myCranes, (c) => c.radius ?? 0),
+    [myCranes]
+  );
 
-  const [minP, maxP] = useMemo(() => {
-    if (!myCranes.length) return [0, 0];
-    const arr = myCranes.map((c) => c.price || 0);
-    return [Math.min(...arr), Math.max(...arr)];
-  }, [myCranes]);
+  const [minP, maxP] = useMemo(
+    () => getMinMax(myCranes, (c) => c.price ?? 0),
+    [myCranes]
+  );
 
   const [capRange, setCapRange] = useState([minCap, maxCap]);
   const [hRange, setHRange] = useState([minH, maxH]);
@@ -130,11 +131,13 @@ function ProducerPage() {
   }, [myCranes]);
 
   const filteredCranes = useMemo(() => {
+    const searchTerm = filters.search.trim().toLowerCase();
+
     return myCranes.filter((c) => {
       const txtOk =
-        !filters.search ||
-        c.title.toLowerCase().includes(filters.search) ||
-        (c.description || "").toLowerCase().includes(filters.search);
+        !searchTerm ||
+        (c.title || "").toLowerCase().includes(searchTerm) ||
+        (c.description || "").toLowerCase().includes(searchTerm);
       const inRange = (val, min, max) =>
         val >= (min !== "" ? +min : -Infinity) &&
         val <= (max !== "" ? +max : +Infinity);
@@ -147,29 +150,16 @@ function ProducerPage() {
         return false;
       if (!inRange(c.price, filters.priceMin, filters.priceMax)) return false;
       if (filters.status && c.status !== filters.status) return false;
-      if (filters.location && c.location !== filters.location) return false;
       return txtOk;
     });
   }, [myCranes, filters]);
 
   const hasAny = Object.values(filters).some((v) => v !== "");
-  const displayList = hasAny ? filteredCranes : myCranes;
+  const displayList = filteredCranes;
 
   // Reset all filters
   const resetAllFilters = () => {
-    setFilters({
-      capacityMin: "",
-      capacityMax: "",
-      heightMin: "",
-      heightMax: "",
-      radiusMin: "",
-      radiusMax: "",
-      priceMin: "",
-      priceMax: "",
-      status: "",
-      location: "",
-      search: "",
-    });
+    setFilters(INITIAL_FILTERS);
     setCapRange([minCap, maxCap]);
     setHRange([minH, maxH]);
     setRRange([minR, maxR]);
@@ -316,36 +306,44 @@ function ProducerPage() {
                     Array.isArray(c.images) && c.images.length > 0
                       ? c.images[0]
                       : null;
+
                   return (
-                    <div
+                    <Link
+                      to={`/cranes/${c._id}`}
                       key={c._id}
                       className="w-72 h-72 rounded-md shadow-md overflow-hidden"
                     >
-                      <div className="w-full h-44 overflow-hidden rounded-t-md">
+                      <div className="w-full h-44 overflow-hidden rounded-t-md bg-gray-100">
                         {bgUrl ? (
-                          <div
-                            className="w-full h-full bg-cover bg-center transform transition-transform duration-200 hover:scale-105"
-                            style={{ backgroundImage: `url(${bgUrl})` }}
+                          <img
+                            className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+                            src={bgUrl}
+                            alt={c.title}
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-100" />
                         )}
                       </div>
                       <div className="ml-2 mt-2">
-                        <Link
-                          to={`/cranes/${c._id}`}
-                          className="font-medium hover:underline"
-                        >
-                          {c.title}
-                        </Link>
+                        <div className="font-medium">{c.title}</div>
                         <p className="text-gray-500 pb-2">{model}</p>
                       </div>
-                      <div className="py-2 text-right">
-                        <span className="p-2 font-bold tracking-wider">
-                          {c.status === "for sale" ? "For Sale" : "For Rent"}
+                      <div className="px-2 py-2 flex items-center justify-between">
+                        <span className="font-bold tracking-wider">
+                          {c.status === "for sale"
+                            ? "For Sale"
+                            : c.status === "for rent"
+                            ? "For Rent"
+                            : c.status}
+                        </span>
+                        <span className="font-semibold text-red-600">
+                          {formatPrice(c.price)}
+                          {c.status === "for rent" && c.rentPrice?.interval
+                            ? ` / ${c.rentPrice.interval}`
+                            : ""}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
