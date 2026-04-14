@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
+
 import Modal from "../components/Modal";
+import InfoRow from "../components/InfoRow";
 
 import goBackIcon from "../assets/icons/angle-double-small-left.png";
 
@@ -24,6 +26,9 @@ function CraneDetailsPage() {
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isPointerOnImage, setIsPointerOnImage] = useState(false);
+
+  // full view
+  const [isFullViewOpen, setIsFullViewOpen] = useState(false);
 
   const imageAreaRef = useRef(null);
 
@@ -186,7 +191,7 @@ function CraneDetailsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-[1fr_auto] h-full">
             <div className="relative bg-white lg:row-span-2 min-h-[320px] lg:min-h-0">
               {crane.images?.length ? (
-                <div className="flex h-full">
+                <div className="flex h-full gap-3 px-3 pt-3 pb-4">
                   {/* Thumbnails */}
                   <div className="w-[56px] shrink-0 flex flex-col gap-3 overflow-y-auto px-1">
                     {crane.images.slice(0, 5).map((image, i) => (
@@ -221,34 +226,45 @@ function CraneDetailsPage() {
                       </button>
                     )}
                   </div>
-                  <div
-                    ref={imageAreaRef}
-                    className="relative min-w-0 flex-1  h-full overflow-hidden bg-white cursor-pointer"
-                    onMouseEnter={handleImageMouseEnter}
-                    onMouseLeave={handleImageMouseLeave}
-                    onMouseMove={handleImageMouseMove}
-                  >
-                    <img
-                      src={selectedImage}
-                      alt={crane.title}
-                      onLoad={handleImageLoad}
-                      draggable="false"
-                      className="absolute inset-0 w-full h-full object-contain select-none"
-                    />
-
-                    {/* Hover Lens */}
-                    {isZoomed && isPointerOnImage && (
-                      <div
-                        className="pointer-events-none absolute border border-black/20 bg-white/20 shadow-sm hidden xl:block"
-                        style={{
-                          width: `${LENS_SIZE}px`,
-                          height: `${LENS_SIZE}px`,
-                          left: `${lensPosition.x}px`,
-                          top: `${lensPosition.y}px`,
-                        }}
+                  <div className="min-w-0 flex-1 flex flex-col">
+                    <div
+                      ref={imageAreaRef}
+                      className="relative min-h-0 flex-1 overflow-hidden bg-white cursor-pointer"
+                      onMouseEnter={handleImageMouseEnter}
+                      onMouseLeave={handleImageMouseLeave}
+                      onMouseMove={handleImageMouseMove}
+                    >
+                      <img
+                        src={selectedImage}
+                        alt={crane.title}
+                        onClick={() => setIsFullViewOpen(true)}
+                        onLoad={handleImageLoad}
+                        draggable="false"
+                        className="absolute inset-0 w-full h-full object-contain select-none"
                       />
-                    )}
+
+                      {/* Hover Lens */}
+                      {isZoomed && isPointerOnImage && (
+                        <div
+                          className="pointer-events-none absolute border border-black/20 bg-white/20 shadow-sm hidden xl:block"
+                          style={{
+                            width: `${LENS_SIZE}px`,
+                            height: `${LENS_SIZE}px`,
+                            left: `${lensPosition.x}px`,
+                            top: `${lensPosition.y}px`,
+                          }}
+                        />
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsFullViewOpen(true)}
+                      className="mt-3 self-center cursor-pointer text-sm text-red-400 hover:underline"
+                    >
+                      Click to see full view
+                    </button>
                   </div>
+
                   {/* Zoom Preview */}
                   {isZoomed && isPointerOnImage && (
                     <div className="absolute top-0 left-full ml-4 hidden xl:block z-30 h-full w-full overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl">
@@ -321,11 +337,22 @@ function CraneDetailsPage() {
             </div>
 
             <div className="px-5 pb-8 lg:col-start-2 lg:row-start-2">
-              <div className="space-y-3 pt-6">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <p className="flex items-center">
-                    <strong className="w-24">Location:</strong> {crane.location}
-                  </p>
+              <div className="pt-6">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <dl className="space-y-3">
+                    <InfoRow label="Location:">
+                      {crane.location || "Not set"}
+                    </InfoRow>
+                    <InfoRow label="Avaible:">
+                      {crane.availability?.from && crane.availability?.to
+                        ? `${new Date(
+                            crane.availability.from
+                          ).toLocaleDateString()} – ${new Date(
+                            crane.availability.to
+                          ).toLocaleDateString()}`
+                        : "Not set"}
+                    </InfoRow>
+                  </dl>
 
                   {(!user || user.role !== "admin") && !isOwner && (
                     <Link to={`/cranes/${craneId}/new-inquiry`} replace>
@@ -335,18 +362,6 @@ function CraneDetailsPage() {
                     </Link>
                   )}
                 </div>
-
-                {crane.availability?.from && crane.availability?.to ? (
-                  <p className="flex items-center">
-                    <strong className="w-24">Available:</strong>{" "}
-                    {new Date(crane.availability.from).toLocaleDateString()} –{" "}
-                    {new Date(crane.availability.to).toLocaleDateString()}
-                  </p>
-                ) : (
-                  <p className="flex items-center">
-                    <strong className="w-24">Available:</strong> Not set
-                  </p>
-                )}
               </div>
 
               {(user?.role === "admin" || isOwner) && (
@@ -391,6 +406,54 @@ function CraneDetailsPage() {
           </button>
         </div>
       </Modal>
+
+      {isFullViewOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6">
+          <div className="relative w-full max-w-6xl h-[85vh] rounded-xl bg-white shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setIsFullViewOpen(false)}
+              className="absolute top-4 right-4 z-10 text-2xl text-gray-600 hover:text-black"
+            >
+              ×
+            </button>
+
+            <div className="flex h-full gap-4 p-6">
+              <div className="w-[88px] shrink-0 flex flex-col gap-3 overflow-y-auto">
+                {crane.images?.map((image, i) => (
+                  <button
+                    key={`${image}-${i}`}
+                    type="button"
+                    onMouseEnter={() => setSelectedImageIndex(i)}
+                    onClick={() => setSelectedImageIndex(i)}
+                    className={`relative h-[72px] w-[72px] overflow-hidden rounded-lg border transition ${
+                      selectedImageIndex === i
+                        ? "border-blue-500 ring-1 ring-blue-300"
+                        : "border-black/10 hover:border-black/30"
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${crane.title} ${i + 1}`}
+                      className="h-full w-full object-cover"
+                      draggable="false"
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div className="min-w-0 flex-1 flex items-center justify-center bg-white rounded-lg">
+                <img
+                  src={selectedImage}
+                  alt={crane.title}
+                  className="max-w-full max-h-full object-contain select-none"
+                  draggable="false"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
