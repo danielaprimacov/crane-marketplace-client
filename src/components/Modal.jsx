@@ -5,7 +5,8 @@ function Modal({
   isOpen,
   onClose,
   widthClass = "w-[45rem] max-w-full",
-  extraClass = "",
+  panelClass = "",
+  contentClass = "p-10",
 }) {
   // lock scroll when open
   useEffect(() => {
@@ -39,11 +40,11 @@ function Modal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-2xl p-10 relative ${widthClass} ${extraClass}` }
+        className={`bg-white rounded-2xl relative ${widthClass} ${panelClass}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -53,7 +54,7 @@ function Modal({
           &times;
         </button>
 
-        {children}
+        <div className={contentClass}>{children}</div>
       </div>
     </div>
   );

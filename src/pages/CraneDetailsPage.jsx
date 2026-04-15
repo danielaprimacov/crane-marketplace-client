@@ -2,6 +2,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
+import { ZoomIn, ZoomOut } from "lucide-react";
+
 import { AuthContext } from "../context/auth.context";
 
 import Modal from "../components/Modal";
@@ -11,7 +13,7 @@ import goBackIcon from "../assets/icons/angle-double-small-left.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const LENS_SIZE = 140;
-const ZOOM_SCALE = 2.4;
+const FULL_VIEW_ZOOM_SCALE = 2;
 
 function CraneDetailsPage() {
   const [crane, setCrane] = useState(null);
@@ -29,6 +31,10 @@ function CraneDetailsPage() {
 
   // full view
   const [isFullViewOpen, setIsFullViewOpen] = useState(false);
+  const [fullViewZoom, setFullViewZoom] = useState(1);
+  const [fullViewOrigin, setFullViewOrigin] = useState({ x: 50, y: 50 });
+
+  const fullViewStageRef = useRef(null);
 
   const imageAreaRef = useRef(null);
 
@@ -62,6 +68,11 @@ function CraneDetailsPage() {
     setIsZoomed(false);
     setIsPointerOnImage(false);
   }, [selectedImageIndex]);
+
+  useEffect(() => {
+    setFullViewZoom(1);
+    setFullViewOrigin({ x: 50, y: 50 });
+  }, [isFullViewOpen, selectedImageIndex]);
 
   if (!crane) return <p>Loading…</p>;
 
@@ -174,6 +185,86 @@ function CraneDetailsPage() {
     setIsPointerOnImage(false);
   };
 
+  const handleFullViewZoomIn = () => {
+    setFullViewZoom(FULL_VIEW_ZOOM_SCALE);
+  };
+
+  const handleFullViewZoomOut = () => {
+    setFullViewZoom(1);
+    setFullViewOrigin({ x: 50, y: 50 });
+  };
+
+  const handleFullViewImageClick = (event) => {
+    const pointer = getFullViewPointerPosition(event);
+    if (!pointer) return;
+
+    if (fullViewZoom > 1) {
+      setFullViewZoom(1);
+      setFullViewOrigin({ x: 50, y: 50 });
+      return;
+    }
+
+    setFullViewOrigin(pointer);
+    setFullViewZoom(FULL_VIEW_ZOOM_SCALE);
+  };
+
+  const handleFullViewMouseMove = (event) => {
+    if (fullViewZoom <= 1) return;
+
+    const pointer = getFullViewPointerPosition(event);
+    if (!pointer) return;
+
+    setFullViewOrigin(pointer);
+  };
+
+  const getFullViewPointerPosition = (event) => {
+    if (!fullViewStageRef.current) return null;
+    if (!imageMeta.width || !imageMeta.height) return null;
+
+    const rect = fullViewStageRef.current.getBoundingClientRect();
+
+    const containerWidth = rect.width;
+    const containerHeight = rect.height;
+
+    const imageRatio = imageMeta.width / imageMeta.height;
+    const containerRatio = containerWidth / containerHeight;
+
+    let visibleWidth;
+    let visibleHeight;
+    let offsetX;
+    let offsetY;
+
+    if (imageRatio > containerRatio) {
+      visibleWidth = containerWidth;
+      visibleHeight = containerWidth / imageRatio;
+      offsetX = 0;
+      offsetY = (containerHeight - visibleHeight) / 2;
+    } else {
+      visibleHeight = containerHeight;
+      visibleWidth = containerHeight * imageRatio;
+      offsetY = 0;
+      offsetX = (containerWidth - visibleWidth) / 2;
+    }
+
+    const rawX = event.clientX - rect.left;
+    const rawY = event.clientY - rect.top;
+
+    const isInsideVisibleImage =
+      rawX >= offsetX &&
+      rawX <= offsetX + visibleWidth &&
+      rawY >= offsetY &&
+      rawY <= offsetY + visibleHeight;
+
+    if (!isInsideVisibleImage) return null;
+
+    return {
+      x: ((rawX - offsetX) / visibleWidth) * 100,
+      y: ((rawY - offsetY) / visibleHeight) * 100,
+    };
+  };
+
+  const isFullViewZoomActive = fullViewZoom > 1;
+
   return (
     <div className="mt-20 mb-8 max-w-7xl mx-auto px-4">
       {/* Back button */}
@@ -196,7 +287,7 @@ function CraneDetailsPage() {
                   <div className="w-[56px] shrink-0 flex flex-col gap-3 overflow-y-auto px-1">
                     {crane.images.slice(0, 5).map((image, i) => (
                       <button
-                        key={image + i}
+                        key={`${image}-${i}`}
                         type="button"
                         onMouseEnter={() => handleThumbnailHover(i)}
                         onClick={() => handleThumbnailHover(i)}
@@ -218,8 +309,8 @@ function CraneDetailsPage() {
                     {crane.images.length > 5 && (
                       <button
                         type="button"
-                        onClick={() => setSelectedImageIndex(5)}
-                        className="h-[76px] w-[76px] rounded-xl border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
+                        onClick={() => setIsFullViewOpen(true)}
+                        className="h-[48px] w-[48px] rounded-xl border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
                       >
                         {" "}
                         +{crane.images.length - 5}
@@ -259,7 +350,7 @@ function CraneDetailsPage() {
                     <button
                       type="button"
                       onClick={() => setIsFullViewOpen(true)}
-                      className="mt-3 self-center cursor-pointer text-sm text-red-400 hover:underline"
+                      className="mt-3 self-center cursor-pointer text-sm text-[#007185] hover:text-[#c7511f] hover:underline"
                     >
                       Click to see full view
                     </button>
@@ -267,13 +358,13 @@ function CraneDetailsPage() {
 
                   {/* Zoom Preview */}
                   {isZoomed && isPointerOnImage && (
-                    <div className="absolute top-0 left-full ml-4 hidden xl:block z-30 h-full w-full overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl">
+                    <div className="absolute top-0 left-full ml-4 hidden xl:block z-30 h-full w-[620px] overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl">
                       <div
                         className="h-full w-full bg-no-repeat"
                         style={{
                           backgroundImage: `url(${selectedImage})`,
                           backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                          backgroundSize: `${ZOOM_SCALE * 100}%`,
+                          backgroundSize: `${FULL_VIEW_ZOOM_SCALE * 100}%`,
                         }}
                       />
                     </div>
@@ -343,7 +434,7 @@ function CraneDetailsPage() {
                     <InfoRow label="Location:">
                       {crane.location || "Not set"}
                     </InfoRow>
-                    <InfoRow label="Avaible:">
+                    <InfoRow label="Available:">
                       {crane.availability?.from && crane.availability?.to
                         ? `${new Date(
                             crane.availability.from
@@ -355,10 +446,12 @@ function CraneDetailsPage() {
                   </dl>
 
                   {(!user || user.role !== "admin") && !isOwner && (
-                    <Link to={`/cranes/${craneId}/new-inquiry`} replace>
-                      <button className="bg-orange-500 text-lg text-white py-1 px-4 cursor-pointer rounded hover:bg-orange-400 transition">
-                        Send Inquiry
-                      </button>
+                    <Link
+                      to={`/cranes/${craneId}/new-inquiry`}
+                      replace
+                      className="bg-orange-500 text-lg text-white py-1 px-4 cursor-pointer rounded hover:bg-orange-400 transition inline-flex items-center justify-center"
+                    >
+                      Send Inquiry
                     </Link>
                   )}
                 </div>
@@ -407,53 +500,112 @@ function CraneDetailsPage() {
         </div>
       </Modal>
 
-      {isFullViewOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6">
-          <div className="relative w-full max-w-6xl h-[85vh] rounded-xl bg-white shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setIsFullViewOpen(false)}
-              className="absolute top-4 right-4 z-10 text-2xl text-gray-600 hover:text-black"
-            >
-              ×
-            </button>
+      <Modal
+        isOpen={isFullViewOpen}
+        onClose={() => setIsFullViewOpen(false)}
+        widthClass="w-[95vw] max-w-6xl"
+        panelClass="h-[85vh] overflow-hidden"
+        contentClass="h-full p-0"
+      >
+        <div className="grid h-full grid-cols-[1fr_320px]">
+          {/* main image */}
+          <div
+            ref={fullViewStageRef}
+            onClick={handleFullViewImageClick}
+            onMouseMove={handleFullViewMouseMove}
+            className={`relative flex items-center justify-center overflow-hidden p-8 select-none transition-colors duration-200 ${
+              fullViewZoom > 1 ? "bg-[#e9eef5]" : "bg-[#f7f7f7]"
+            }`}
+            style={{ cursor: fullViewZoom > 1 ? "zoom-out" : "zoom-in" }}
+          >
+            {/* Zoom controls */}
+            <div className="absolute top-4 right-4 z-20 flex flex-col gap-4">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFullViewZoomIn();
+                }}
+                className={`flex h-14 w-14 items-center justify-center rounded-full border shadow-md transition ${
+                  isFullViewZoomActive
+                    ? "bg-white border-black/20 text-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.12)]"
+                    : "bg-[#f1f3f5] border-black/15 text-gray-700 hover:bg-[#e9ecef]"
+                }`}
+                aria-label="Zoom in"
+                title="Zoom in"
+                disabled={isFullViewZoomActive}
+              >
+                <ZoomIn className="h-7 w-7" strokeWidth={2.25} />
+              </button>
 
-            <div className="flex h-full gap-4 p-6">
-              <div className="w-[88px] shrink-0 flex flex-col gap-3 overflow-y-auto">
-                {crane.images?.map((image, i) => (
-                  <button
-                    key={`${image}-${i}`}
-                    type="button"
-                    onMouseEnter={() => setSelectedImageIndex(i)}
-                    onClick={() => setSelectedImageIndex(i)}
-                    className={`relative h-[72px] w-[72px] overflow-hidden rounded-lg border transition ${
-                      selectedImageIndex === i
-                        ? "border-blue-500 ring-1 ring-blue-300"
-                        : "border-black/10 hover:border-black/30"
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${crane.title} ${i + 1}`}
-                      className="h-full w-full object-cover"
-                      draggable="false"
-                    />
-                  </button>
-                ))}
-              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFullViewZoomOut();
+                }}
+                className={`flex h-14 w-14 items-center justify-center rounded-full border shadow-md transition ${
+                  isFullViewZoomActive
+                    ? "bg-[#f1f3f5] border-black/15 text-gray-700 hover:bg-[#e9ecef]"
+                    : "bg-[#f1f3f5] border-black/15 text-gray-400"
+                }`}
+                aria-label="Zoom out"
+                title="Zoom out"
+                disabled={!isFullViewZoomActive}
+              >
+                <ZoomOut className="h-7 w-7" strokeWidth={2.25} />
+              </button>
+            </div>
 
-              <div className="min-w-0 flex-1 flex items-center justify-center bg-white rounded-lg">
-                <img
-                  src={selectedImage}
-                  alt={crane.title}
-                  className="max-w-full max-h-full object-contain select-none"
-                  draggable="false"
-                />
-              </div>
+            <img
+              src={selectedImage}
+              alt={crane.title}
+              onLoad={handleImageLoad}
+              className="max-h-full max-w-full object-contain select-none transition-transform duration-100 will-change-transform"
+              draggable="false"
+              style={{
+                transform: `scale(${fullViewZoom})`,
+                transformOrigin: `${fullViewOrigin.x}% ${fullViewOrigin.y}%`,
+              }}
+            />
+          </div>
+
+          {/* all images */}
+          <div className="flex h-full flex-col border-l border-black/10 bg-white p-6">
+            <div className="pr-10">
+              <h2 className="text-2xl font-semibold leading-tight text-gray-900">
+                {crane.title}
+              </h2>
+
+              {crane.producer && (
+                <p className="mt-2 text-sm text-gray-500">{crane.producer}</p>
+              )}
+            </div>
+
+            <div className="mt-6 grid grid-cols-4 gap-3 content-start overflow-y-auto">
+              {crane.images?.map((image, i) => (
+                <button
+                  key={`${image}-${i}`}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(i)}
+                  className={`relative aspect-square overflow-hidden cursor-pointer rounded border transition ${
+                    selectedImageIndex === i
+                      ? "border-sky-500 ring-1 ring-sky-300"
+                      : "border-black/10 hover:border-black/30"
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={`${crane.title} ${i + 1}`}
+                    className="h-full w-full object-cover"
+                    draggable="false"
+                  />
+                </button>
+              ))}
             </div>
           </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }
