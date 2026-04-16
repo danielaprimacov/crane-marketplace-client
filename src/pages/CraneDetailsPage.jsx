@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { ArrowLeft } from "lucide-react";
 
 import { AuthContext } from "../context/auth.context";
 
@@ -8,7 +9,6 @@ import Modal from "../components/Modal";
 import CraneGallery from "../components/cranes/CraneGallery";
 import FullViewGalleryModal from "../components/cranes/FullViewGalleryModal";
 
-import goBackIcon from "../assets/icons/angle-double-small-left.png";
 import CraneDetailsPanel from "../components/cranes/CraneDetailsPanel";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -66,20 +66,30 @@ function CraneDetailsPage() {
 
   const handleDeleteClick = () => setConfirmOpen(true);
 
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/cranes", { replace: true });
+    }
+  };
+
   return (
     <div className="mt-20 mb-8 max-w-7xl mx-auto px-4">
       {/* Back button */}
       <button
-        onClick={() => navigate(-1)}
-        className="inline-flex items-center text-gray-600 hover:text-gray-900 cursor-pointer"
+        onClick={handleGoBack}
+        className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 transition hover:text-gray-900 cursor-pointer"
       >
-        <img src={goBackIcon} alt="back" className="w-5 mr-2" />
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white shadow-sm">
+          <ArrowLeft className="h-4 w-4" strokeWidth={2.25} />
+        </span>
         Back
       </button>
 
       {/* Main Card */}
-      <div className="mt-8 relative">
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden xl:overflow-visible lg:h-[480px]">
+      <div className="mt-6 relative">
+        <div className="pb-6 bg-white shadow-lg rounded-lg overflow-hidden xl:overflow-visible lg:h-[450px]">
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-[1fr_auto] h-full">
             <CraneGallery
               crane={crane}

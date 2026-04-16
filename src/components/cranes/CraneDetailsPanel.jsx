@@ -1,6 +1,7 @@
 import InfoRow from "../InfoRow";
 import CraneSpecsGrid from "./CraneSpecsGrid";
-import CraneActionButtons from "./CraneActionButtons";
+import CraneInquiryButton from "./CraneInquiryButton";
+import CraneManageButtons from "./CraneManageButtons";
 
 function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
   const canSendInquiry = (!user || user.role !== "admin") && !isOwner;
@@ -41,15 +42,15 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
 
         <CraneSpecsGrid crane={crane} />
 
-        <div className="mt-6 min-h-0 overflow-y-auto pr-2">
-          <p className=" text-gray-700 leading-relaxed">{crane.description}</p>
+        <div className="mt-2 min-h-0 overflow-y-auto pr-2">
+          <p className="text-gray-700 leading-relaxed">{crane.description}</p>
         </div>
       </div>
 
       <div className="px-5 pb-8 lg:col-start-2 lg:row-start-2">
         <div className="pt-6">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <dl className="space-y-3">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
+            <dl className="space-y-4">
               <InfoRow label="Location:">{crane.location || "Not set"}</InfoRow>
               <InfoRow label="Available:">
                 {crane.availability?.from && crane.availability?.to
@@ -62,21 +63,15 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
               </InfoRow>
             </dl>
 
-            <CraneActionButtons
-              craneId={craneId}
-              canSendInquiry={canSendInquiry}
-              canManage={false}
-              onDeleteClick={onDeleteClick}
-            />
+            <div className="flex lg:justify-end">
+              {canSendInquiry && <CraneInquiryButton craneId={craneId} />}
+            </div>
           </div>
         </div>
 
-        <CraneActionButtons
-          craneId={craneId}
-          canSendInquiry={false}
-          canManage={canManage}
-          onDeleteClick={onDeleteClick}
-        />
+        {canManage && (
+          <CraneManageButtons craneId={craneId} onDeleteClick={onDeleteClick} />
+        )}
       </div>
     </>
   );

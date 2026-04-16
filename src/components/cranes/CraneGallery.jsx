@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import { getContainedImageBounds } from "../../utils/helpers";
-
 const LENS_SIZE = 140;
 const HOVER_PREVIEW_SCALE = 2;
 
@@ -19,6 +17,7 @@ function CraneGallery({
   const [isPointerOnImage, setIsPointerOnImage] = useState(false);
 
   const imageAreaRef = useRef(null);
+  const imageRef = useRef(null);
 
   const selectedImage = crane?.images?.[selectedImageIndex];
 
@@ -49,36 +48,44 @@ function CraneGallery({
     if (!imageAreaRef.current) return;
     if (!imageMeta.width || !imageMeta.height) return;
 
-    const rect = imageAreaRef.current.getBoundingClientRect();
+    const containerRect = imageAreaRef.current.getBoundingClientRect();
+    const imageRect = imageRef.current.getBoundingClientRect();
 
-    const { visibleWidth, visibleHeight, offsetX, offsetY } =
-      getContainedImageBounds(rect, imageMeta.width, imageMeta.height);
-
-    const rawX = event.clientX - rect.left;
-    const rawY = event.clientY - rect.top;
+    const rawX = event.clientX - imageRect.left;
+    const rawY = event.clientY - imageRect.top;
 
     const isInsideVisibleImage =
-      rawX >= offsetX &&
-      rawX <= offsetX + visibleWidth &&
-      rawY >= offsetY &&
-      rawY <= offsetY + visibleHeight;
+      rawX >= 0 &&
+      rawX <= imageRect.width &&
+      rawY >= 0 &&
+      rawY <= imageRect.height;
 
     setIsPointerOnImage(isInsideVisibleImage);
 
     if (!isInsideVisibleImage) return;
 
-    const percentX = ((rawX - offsetX) / visibleWidth) * 100;
-    const percentY = ((rawY - offsetY) / visibleHeight) * 100;
+    const percentX = (rawX / imageRect.width) * 100;
+    const percentY = (rawY / imageRect.height) * 100;
 
     const halfLens = LENS_SIZE / 2;
 
+    const imageOffsetX = imageRect.left - containerRect.left;
+    const imageOffsetY = imageRect.top - containerRect.top;
+
     const lensCenterX = Math.max(
-      offsetX + halfLens,
-      Math.min(offsetX + visibleWidth - halfLens, rawX)
+      imageOffsetX + halfLens,
+      Math.min(
+        imageOffsetX + imageRect.width - halfLens,
+        event.clientX - containerRect.left
+      )
     );
+
     const lensCenterY = Math.max(
-      offsetY + halfLens,
-      Math.min(offsetY + visibleHeight - halfLens, rawY)
+      imageOffsetY + halfLens,
+      Math.min(
+        imageOffsetY + imageRect.height - halfLens,
+        event.clientY - containerRect.top
+      )
     );
 
     setZoomPosition({
@@ -101,7 +108,7 @@ function CraneGallery({
   return (
     <div className="relative bg-white lg:row-span-2 min-h-[320px] lg:min-h-0">
       {crane.images?.length ? (
-        <div className="flex h-full gap-3 px-3 pt-3 pb-4">
+        <div className="flex h-full gap-3 px-3 pt-3 pb-0">
           {/* Thumbnails */}
           <div className="w-[56px] shrink-0 flex flex-col gap-3 overflow-y-auto px-1">
             {crane.images.slice(0, 5).map((image, i) => (
@@ -139,18 +146,19 @@ function CraneGallery({
           <div className="min-w-0 flex-1 flex flex-col">
             <div
               ref={imageAreaRef}
-              className="relative min-h-0 flex-1 overflow-hidden bg-white cursor-pointer"
+              className="relative min-h-0 flex-1 overflow-hidden bg-white cursor-pointer flex items-end justify-center"
               onMouseEnter={handleImageMouseEnter}
               onMouseLeave={handleImageMouseLeave}
               onMouseMove={handleImageMouseMove}
             >
               <img
+                ref={imageRef}
                 src={selectedImage}
                 alt={crane.title}
                 onClick={onOpenFullView}
                 onLoad={handleImageLoad}
                 draggable="false"
-                className="absolute inset-0 w-full h-full object-contain select-none"
+                className="max-h-full max-w-full select-none"
               />
 
               {/* Hover Lens */}
@@ -169,7 +177,7 @@ function CraneGallery({
             <button
               type="button"
               onClick={onOpenFullView}
-              className="mt-3 self-center cursor-pointer text-sm text-[#007185] hover:text-[#c7511f] hover:underline"
+              className="mt-4 self-center cursor-pointer text-sm text-[#007185] hover:text-[#c7511f] hover:underline"
             >
               Click to see full view
             </button>
