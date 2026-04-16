@@ -27,3 +27,30 @@ export function getMinMax(items, getter) {
   if (!values.length) return [0, 0];
   return [Math.min(...values), Math.max(...values)];
 }
+
+export function getContainedImageBounds(rect, imageWidth, imageHeight) {
+  const containerWidth = rect.width;
+  const containerHeight = rect.height;
+
+  const imageRatio = imageWidth / imageHeight;
+  const containerRatio = containerWidth / containerHeight;
+
+  let visibleWidth;
+  let visibleHeight;
+  let offsetX;
+  let offsetY;
+
+  if (imageRatio > containerRatio) {
+    visibleWidth = containerWidth;
+    visibleHeight = containerWidth / imageRatio;
+    offsetX = 0;
+    offsetY = (containerHeight - visibleHeight) / 2;
+  } else {
+    visibleHeight = containerHeight;
+    visibleWidth = containerHeight * imageRatio;
+    offsetY = 0;
+    offsetX = (containerWidth - visibleWidth) / 2;
+  }
+
+  return { visibleWidth, visibleHeight, offsetX, offsetY };
+}
