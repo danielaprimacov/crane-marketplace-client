@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import AddInquiryForm from "../components/AddInquiryForm";
+import AddInquiryForm from "../components/cranes/AddInquiryForm";
 
 function NewInquiryPage() {
   const { craneId } = useParams();

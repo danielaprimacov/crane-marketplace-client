@@ -4,9 +4,9 @@ import axios from "axios";
 
 import AvailabilityRange from "./AvailabilityRange";
 
-import { slugify } from "../utils/helpers";
+import { slugify } from "../../utils/helpers";
 
-import goBackIcon from "../assets/icons/angle-double-small-left.png";
+import goBackIcon from "../../assets/icons/angle-double-small-left.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${

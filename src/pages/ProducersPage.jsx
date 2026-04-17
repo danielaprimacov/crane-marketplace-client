@@ -1,4 +1,4 @@
-import ProducersSidebar from "../components/ProducersSidebar";
+import ProducersSidebar from "../components/cranes/ProducersSidebar";
 
 import { useProducers } from "../hooks/useProducers";
 

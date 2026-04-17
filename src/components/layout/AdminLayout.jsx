@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import axios from "axios";
-import { AuthContext } from "../context/auth.context";
+import { AuthContext } from "../../context/auth.context";
 
-import { useProducers } from "../hooks/useProducers";
+import { useProducers } from "../../hooks/useProducers";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-import goBackIcon from "../assets/icons/angle-double-small-left.png";
+import goBackIcon from "../../assets/icons/angle-double-small-left.png";
 
 function AdminLayout() {
   const { isLoggedIn, user } = useContext(AuthContext);

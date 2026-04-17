@@ -1,14 +1,13 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
 
 import { CheckCircleIcon } from "@heroicons/react/solid";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 
-import VideoComponent from "../components/VideoComponent";
-import ArrowDownIcon from "../components/ArrowDownIcon";
+import VideoComponent from "../components/home/VideoComponent";
+import ArrowDownIcon from "../components/ui/ArrowDownIcon";
 
-import Modal from "../components/Modal";
-import ExpertForm from "../components/ExpertForm";
+import Modal from "../components/ui/Modal";
+import ExpertForm from "../components/forms/contact/ExpertForm";
 
 import videoWebm from "../assets/video/choose-a-crane.webm";
 import videoMp4 from "../assets/video/choose-a-crane.mp4";

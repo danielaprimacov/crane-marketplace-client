@@ -2,9 +2,9 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
-import ProducersSidebar from "../components/ProducersSidebar";
-import FilterDropDown from "../components/FilterDropDown";
-import RangeDropDown from "../components/RangeDropDown";
+import ProducersSidebar from "../components/cranes/ProducersSidebar";
+import FilterDropDown from "../components/ui/FilterDropDown";
+import RangeDropDown from "../components/ui/RangeDropDown";
 
 import { slugify, formatPrice, getMinMax } from "../utils/helpers";
 

@@ -1,16 +1,16 @@
 import { useState } from "react";
 
-import CaterpillarLogo from "../assets/images/crane-producer.png";
-import KomatsuLogo from "../assets/images/crane-producer.png";
-import LiebherrLogo from "../assets/images/crane-producer.png";
-import VolvoLogo from "../assets/images/crane-producer.png";
-import HitachiLogo from "../assets/images/crane-producer.png";
-import JohnDeereLogo from "../assets/images/crane-producer.png";
-import JCBLogo from "../assets/images/crane-producer.png";
-import SanyLogo from "../assets/images/crane-producer.png";
-import XCMGLogo from "../assets/images/crane-producer.png";
-import KonesCranesLogo from "../assets/images/crane-producer.png";
-import TadanoLogo from "../assets/images/crane-producer.png";
+import CaterpillarLogo from "../../assets/images/crane-producer.png";
+import KomatsuLogo from "../../assets/images/crane-producer.png";
+import LiebherrLogo from "../../assets/images/crane-producer.png";
+import VolvoLogo from "../../assets/images/crane-producer.png";
+import HitachiLogo from "../../assets/images/crane-producer.png";
+import JohnDeereLogo from "../../assets/images/crane-producer.png";
+import JCBLogo from "../../assets/images/crane-producer.png";
+import SanyLogo from "../../assets/images/crane-producer.png";
+import XCMGLogo from "../../assets/images/crane-producer.png";
+import KonesCranesLogo from "../../assets/images/crane-producer.png";
+import TadanoLogo from "../../assets/images/crane-producer.png";
 
 const logos = [
   CaterpillarLogo,

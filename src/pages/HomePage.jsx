@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
-import HeroSection from "../components/HeroSection";
-import AllProducers from "../components/AllProducers";
-import Services from "../components/Services";
-import LastAddedCranes from "../components/LastAddedCranes";
-import InformationSection from "../components/InformationSection";
-import OurClients from "../components/OurClients";
+import HeroSection from "../components/home/HeroSection";
+import AllProducers from "../components/cranes/AllProducers";
+import Services from "../components/home/Services";
+import LastAddedCranes from "../components/cranes/LastAddedCranes";
+import InformationSection from "../components/home/InformationSection";
+import OurClients from "../components/home/OurClients";
+
 import { useProducers } from "../hooks/useProducers";
 
 const API_URL = import.meta.env.VITE_API_URL;

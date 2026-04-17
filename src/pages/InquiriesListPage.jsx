@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+
 import KanbanProvider from "../components/kanban/KanbanProvider";
 import Columns from "../components/kanban/Columns";
 import DragLayer from "../components/kanban/DragLayer";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function InquiriesListPage() {
   const [inquiries, setInquiries] = useState([]);

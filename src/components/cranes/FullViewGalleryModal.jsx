@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 
-import Modal from "../Modal";
+import Modal from "../ui/Modal";
 import { getContainedImageBounds } from "../../utils/helpers";
 
 const FULL_VIEW_ZOOM_SCALE = 2;

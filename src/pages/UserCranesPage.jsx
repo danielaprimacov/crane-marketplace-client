@@ -4,7 +4,7 @@ import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
 
-import ArrowIcon from "../components/ArrowIcon";
+import ArrowIcon from "../components/ui/ArrowIcon";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

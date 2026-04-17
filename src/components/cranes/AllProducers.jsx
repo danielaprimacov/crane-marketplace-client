@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { slugify } from "../utils/helpers";
+import { slugify } from "../../utils/helpers";
 
 const SCROLL_STEP = 2;
 const EDGE_ZONE = 0.28; // 28% left and right zones, middle stays still

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-import Modal from "../components/Modal";
+import Modal from "../components/ui/Modal";
 import DeleteIcon from "../components/kanban/Icons/DeleteIcon";
 
 const API_URL = import.meta.env.VITE_API_URL;

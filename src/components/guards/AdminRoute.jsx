@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../context/auth.context";
+
+import { AuthContext } from "../../context/auth.context";
 
 function AdminRoute({ redirectTo = "/login" }) {
   const { isLoggedIn, user, isLoading } = useContext(AuthContext);

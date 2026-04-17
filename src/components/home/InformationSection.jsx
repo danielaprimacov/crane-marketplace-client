@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import Modal from "./Modal";
-import ContactForm from "./ContactForm";
+import Modal from "../ui/Modal";
+import ContactForm from "../forms/contact/ContactForm";
 
-import teamPhoto from "../assets/images/team.jpg";
+import teamPhoto from "../../assets/images/team.jpg";
 
 function InformationSection() {
   const [isModalOpen, setModalOpen] = useState(false);
-  
+
   return (
     <>
       <div className="p-5 m-2">

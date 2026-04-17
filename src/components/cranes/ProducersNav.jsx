@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-import { useProducers } from "../hooks/useProducers";
+import { useProducers } from "../../hooks/useProducers";
 
 const SCROLL_STEP = 1;
 const FRAME_INTERVAL = 16;
 
-import ArrowIcon from "./ArrowIcon";
+import ArrowIcon from "../ui/ArrowIcon";
 
 function ProducersNav({
   openSubnav,

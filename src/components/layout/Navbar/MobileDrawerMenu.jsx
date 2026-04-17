@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import Modal from "../Modal";
-import ContactForm from "../ContactForm";
+import Modal from "../../ui/Modal";
+import ContactForm from "../../forms/contact/ContactForm";
 import ServicesAccordion from "./ServicesAccordion";
 
-import closeIcon from "../../assets/icons/cross.png";
+import closeIcon from "../../../assets/icons/cross.png";
 
 function MobileDrawerMenu({ isHome, setMenuOpen }) {
   const [isModalOpen, setModalOpen] = useState(false);

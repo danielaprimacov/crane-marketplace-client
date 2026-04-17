@@ -1,9 +1,9 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
-import Navbar from "./../components/Navbar/Navbar";
-import Footer from "./Footer";
-import ExpertAdviceWidget from "./ExpertAdviceWidget";
+import Navbar from "../layout/Navbar/Navbar";
+import Footer from "../layout/Footer";
+import ExpertAdviceWidget from "../home/ExpertAdviceWidget";
 
 function PublicLayout({ openLogin, openSignup }) {
   const [menuOpen, setMenuOpen] = useState(false);

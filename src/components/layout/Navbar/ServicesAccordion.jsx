@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { Link } from "react-router-dom";
-import { services, serviceLinkClass } from "../../constants/navbar";
+import { services, serviceLinkClass } from "../../../constants/navbar";
 
 function ServicesAccordion({ servicesOpen, setServicesOpen, onLinkClick }) {
   const servicesCloseTimer = useRef(null);

@@ -1,18 +1,18 @@
 import { useContext, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-import { AuthContext } from "../../context/auth.context";
+import { AuthContext } from "../../../context/auth.context";
 
 import NavbarBrandArea from "./NavbarBrandArea";
 import NavbarActions from "./NavbarActions";
 import MobileDrawerMenu from "./MobileDrawerMenu";
 
-import useNavbarVisibility from "../../hooks/useNavbarVisibility";
-import useBodyScrollLock from "../../hooks/useBodyScrollLock";
-import useEscapeClose from "../../hooks/useEscapeClose";
-import useNavbarCounts from "../../hooks/useNavbarCounts";
+import useNavbarVisibility from "../../../hooks/useNavbarVisibility";
+import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
+import useEscapeClose from "../../../hooks/useEscapeClose";
+import useNavbarCounts from "../../../hooks/useNavbarCounts";
 
-import logo from "../../assets/icons/shipping.png";
+import logo from "../../../assets/icons/shipping.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-import play from "../assets/icons/play.png";
-import stop from "../assets/icons/stop-circle.png";
+import play from "../../assets/icons/play.png";
+import stop from "../../assets/icons/stop-circle.png";
 
 function VideoComponent({ introWebm, introMp4, poster, muted, onMuteChange }) {
   const videoRef = useRef(null);

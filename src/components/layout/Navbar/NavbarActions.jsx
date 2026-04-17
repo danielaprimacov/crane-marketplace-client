@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 
-import userIcon from "../../assets/icons/circle-user.png";
-import logOutIcon from "../../assets/icons/leave.png";
-import craneIcon from "../../assets/icons/crane.png";
-import inboxLogo from "../../assets/icons/envelope.png";
+import userIcon from "../../../assets/icons/circle-user.png";
+import logOutIcon from "../../../assets/icons/leave.png";
+import craneIcon from "../../../assets/icons/crane.png";
+import inboxLogo from "../../../assets/icons/envelope.png";
 
 function NavbarActions({
   isLoggedIn,

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
-import installationPhoto from "../assets/images/installation.jpg";
-import transportPhoto from "../assets/images/transport.jpeg";
-import salePhoto from "../assets/images/sale.png";
+import installationPhoto from "../../assets/images/installation.jpg";
+import transportPhoto from "../../assets/images/transport.jpeg";
+import salePhoto from "../../assets/images/sale.png";
 
-import { slugify } from "../utils/helpers";
+import { slugify } from "../../utils/helpers";
 
 const MotionLink = motion.create(Link);
 

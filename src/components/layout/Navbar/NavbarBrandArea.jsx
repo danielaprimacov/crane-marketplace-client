@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-import ProducersNav from "../ProducersNav";
+import ProducersNav from "../../cranes/ProducersNav";
 
-import menuIcon from "../../assets/icons/menu-burger.png";
-import menuClose from "../../assets/icons/cross.png";
-import logo from "../../assets/icons/shipping.png";
+import menuIcon from "../../../assets/icons/menu-burger.png";
+import menuClose from "../../../assets/icons/cross.png";
+import logo from "../../../assets/icons/shipping.png";
 
 function NavbarBrandArea({
   shouldShowDrawerMenuButton,

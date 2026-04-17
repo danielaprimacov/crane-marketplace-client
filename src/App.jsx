@@ -3,27 +3,29 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 
 import HomePage from "./pages/HomePage";
-import ScrollToTop from "./components/ScrollToTop";
 import CranesPage from "./pages/CranesPage";
 import CraneDetailsPage from "./pages/CraneDetailsPage";
 import EditCraneDetailsPage from "./pages/EditCraneDetailsPage";
 import NewInquiryPage from "./pages/NewInquiryPage";
-import AdminRoute from "./components/AdminRoute";
 import AdminPage from "./pages/AdminPage";
 import InquiriesListPage from "./pages/InquiriesListPage";
-import PublicLayout from "./components/PublicLayout";
 import ProfilePage from "./pages/ProfilePage";
 
-import Modal from "./components/Modal";
-import IsPrivate from "./components/IsPrivate";
-import LoginForm from "./components/LoginForm";
-import SignupForm from "./components/SignupForm";
+import ScrollToTop from "./components/ui/ScrollToTop";
+import PublicLayout from "./components/layout/PublicLayout";
+import AdminRoute from "./components/guards/AdminRoute";
+import Modal from "./components/ui/Modal";
+import IsPrivate from "./components/guards/IsPrivate";
+import LoginForm from "./components/forms/auth/LoginForm";
+import SignupForm from "./components/forms/auth/SignupForm";
+import AdminLayout from "./components/layout/AdminLayout";
+
 import ProducersPage from "./pages/ProducersPage";
 import ProducerPage from "./pages/ProducerPage";
 import AddCranePage from "./pages/AddCranePage";
 import UserCranesPage from "./pages/UserCranesPage";
 import EditProfilePage from "./pages/EditProfilePage";
-import AdminLayout from "./components/AdminLayout";
+
 import OurServicesPage from "./pages/OurServicesPage";
 import MessagesPage from "./pages/MessagesPage";
 import AboutPage from "./pages/AboutPage";

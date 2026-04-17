@@ -5,8 +5,8 @@ import axios from "axios";
 import ArrowsOutIcon from "./Icons/ArrowsOutIcon";
 import DeleteIcon from "./Icons/DeleteIcon";
 
-import InquiryCard from "../InquiryCard";
-import Modal from "../Modal";
+import InquiryCard from "../cranes/InquiryCard";
+import Modal from "../ui/Modal";
 import KanbanContext from "./KanbanContext";
 
 const API_URL = import.meta.env.VITE_API_URL;

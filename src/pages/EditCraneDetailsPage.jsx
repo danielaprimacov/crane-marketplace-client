@@ -1,4 +1,4 @@
-import EditCraneForm from "../components/EditCraneForm";
+import EditCraneForm from "../components/cranes/EditCraneForm";
 
 function EditCraneDetailsPage() {
   return (

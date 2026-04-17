@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import AvailabilityRange from "./AvailabilityRange";
-import Modal from "./Modal";
+import AvailabilityRange from "../cranes/AvailabilityRange";
+import Modal from "../ui/Modal";
 
 function InquiryCard({
   _id: inquiryId,

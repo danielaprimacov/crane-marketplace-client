@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import Modal from "./Modal";
-import ContactForm from "./ContactForm";
-import CookieForm from "./CookieForm";
-import NewsletterForm from "./NewsletterForm";
+import Modal from "../ui/Modal";
+import ContactForm from "../forms/contact/ContactForm";
+import CookieForm from "../forms/contact/CookieForm";
+import NewsletterForm from "../forms/contact/NewsletterForm";
 
-import instagramIcon from "../assets/icons/instagram.png";
-import whatsappIcon from "../assets/icons/whatsapp.png";
-import facebookIcon from "../assets/icons/facebook.png";
-import xIcon from "../assets/icons/twitter-alt-circle.png";
+import instagramIcon from "../../assets/icons/instagram.png";
+import whatsappIcon from "../../assets/icons/whatsapp.png";
+import facebookIcon from "../../assets/icons/facebook.png";
+import xIcon from "../../assets/icons/twitter-alt-circle.png";
 
 function Footer() {
   const [modalMode, setModalMode] = useState(null);

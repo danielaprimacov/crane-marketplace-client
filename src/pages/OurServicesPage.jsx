@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import Modal from "../components/Modal";
-import ExpertForm from "../components/ExpertForm";
+import Modal from "../components/ui/Modal";
+import ExpertForm from "../components/forms/contact/ExpertForm";
 
 import transportationImg from "../assets/images/crane-gettyimages.jpg";
 import saleCrane from "../assets/images/crane-sale.webp";

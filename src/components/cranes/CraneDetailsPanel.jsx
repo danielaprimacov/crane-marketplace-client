@@ -1,4 +1,4 @@
-import InfoRow from "../InfoRow";
+import InfoRow from "../ui/InfoRow";
 import CraneSpecsGrid from "./CraneSpecsGrid";
 import CraneInquiryButton from "./CraneInquiryButton";
 import CraneManageButtons from "./CraneManageButtons";

@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 import heroImage from "../assets/images/crane-gettyimages.jpg";
 import buySellImage from "../assets/images/crane-sale.webp";
 import rentImage from "../assets/images/install-crane.png";

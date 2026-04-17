@@ -1,9 +1,9 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/auth.context";
+import { AuthContext } from "../../../context/auth.context";
 import axios from "axios";
 
-import { slugify } from "../utils/helpers";
+import { slugify } from "../../../utils/helpers";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

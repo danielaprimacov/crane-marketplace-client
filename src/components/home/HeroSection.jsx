@@ -2,13 +2,11 @@ import { Link } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { slugify } from "../utils/helpers";
-
 import VideoComponent from "./VideoComponent";
 
-import introWebm from "../assets/video/video-intro.webm";
-import introMp4 from "../assets/video/video-intro.mp4";
-import videoPoster from "../assets/images/poster-home-page.png";
+import introWebm from "../../assets/video/video-intro.webm";
+import introMp4 from "../../assets/video/video-intro.mp4";
+import videoPoster from "../../assets/images/poster-home-page.png";
 
 const textVariants = {
   initial: { opacity: 0 },

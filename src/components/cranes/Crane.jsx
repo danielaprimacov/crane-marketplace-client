@@ -12,7 +12,7 @@ function Crane({
   _id,
 }) {
   const noImage =
-    "https://cdn.webshopapp.com/shops/166166/files/467071907/image.jpg";
+    "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg";
 
   const imageUrl = images[0] || noImage;
   const hoverImage = images[1] || imageUrl;

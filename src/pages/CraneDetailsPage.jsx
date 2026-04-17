@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { AuthContext } from "../context/auth.context";
 
-import Modal from "../components/Modal";
+import Modal from "../components/ui/Modal";
 import CraneGallery from "../components/cranes/CraneGallery";
 import FullViewGalleryModal from "../components/cranes/FullViewGalleryModal";
 

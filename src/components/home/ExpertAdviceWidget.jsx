@@ -1,8 +1,9 @@
-import { useState, useEffect, useContext } from "react";
-import Modal from "./Modal";
-import ExpertForm from "./ExpertForm";
-import { AuthContext } from "../context/auth.context";
-import { XIcon } from "@heroicons/react/solid";
+import { useState, useContext } from "react";
+
+import Modal from "../ui/Modal";
+import ExpertForm from "../forms/contact/ExpertForm";
+import { AuthContext } from "../../context/auth.context";
+
 
 function ExpertAdviceWidget() {
   const { user } = useContext(AuthContext);
