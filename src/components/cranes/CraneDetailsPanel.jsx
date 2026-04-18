@@ -48,7 +48,7 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
       </div>
 
       <div className="px-5 pb-8 lg:col-start-2 lg:row-start-2">
-        <div className="pt-6">
+        <div className="pt-2">
           <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
             <dl className="space-y-4">
               <InfoRow label="Location:">{crane.location || "Not set"}</InfoRow>

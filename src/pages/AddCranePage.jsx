@@ -1,4 +1,4 @@
-import AddCraneForm from "../components/cranes/AddCraneForm";
+import AddCraneForm from "../components/cranes/forms/AddCraneForm";
 
 function AddCranePage() {
   return (

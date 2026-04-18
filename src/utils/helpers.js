@@ -54,3 +54,5 @@ export function getContainedImageBounds(rect, imageWidth, imageHeight) {
 
   return { visibleWidth, visibleHeight, offsetX, offsetY };
 }
+
+// craneformhelpers
