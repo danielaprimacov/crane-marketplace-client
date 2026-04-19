@@ -3,7 +3,7 @@ import AvailabilityRange from "../AvailabilityRange";
 function CraneAvailabilitySection({ form, setForm }) {
   return (
     <>
-      <div className="flex items-center mb-6">
+      <div className="flex items-start mb-6 sm:items-center">
         <input
           type="checkbox"
           id="isAvailable"
@@ -19,7 +19,7 @@ function CraneAvailabilitySection({ form, setForm }) {
                 : { availabilityStart: "", availabilityEnd: "" },
             }));
           }}
-          className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+          className="mt-0.5 sm:mt-0 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
         />
         <label htmlFor="isAvailable" className="ml-2 text-sm text-gray-700">
           Is Available?

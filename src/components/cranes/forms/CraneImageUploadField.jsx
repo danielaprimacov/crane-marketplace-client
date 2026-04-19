@@ -1,8 +1,8 @@
 function CraneImageUploadField({ images, uploading, onFileChange }) {
   return (
-    <div className="mb-8 flex items-center gap-4">
+    <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
       {/* Input + floating label */}
-      <div className="relative flex-1">
+      <div className="relative w-full sm:w-auto">
         <input
           id="imageFile"
           name="imageFile"
@@ -14,19 +14,19 @@ function CraneImageUploadField({ images, uploading, onFileChange }) {
         />
         <label
           htmlFor="imageFile"
-          className="px-4 py-2 bg-red-600 text-white rounded-lg cursor-pointer hover:bg-red-500 transition"
+          className="w-full sm:auto inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg cursor-pointer hover:bg-red-500 transition"
         >
           {uploading ? "Uploading…" : "Upload Image"}
         </label>
       </div>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2">
         {images.map((src, i) => (
           <img
             key={i}
             src={src}
             alt={`Crane ${i}`}
-            className="w-20 h-20 object-cover"
+            className="w-16 h-16 sm:h-20 sm:w-20 object-cover rounded"
           />
         ))}
       </div>

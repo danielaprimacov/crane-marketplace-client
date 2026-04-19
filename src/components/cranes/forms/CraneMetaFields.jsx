@@ -1,7 +1,9 @@
+import { ChevronDown } from "lucide-react";
+
 function CraneMetaFields({ form, updateField }) {
   return (
     <>
-      <div className="relative">
+      <div className="relative mb-8">
         <input
           id="description"
           name="description"
@@ -9,7 +11,7 @@ function CraneMetaFields({ form, updateField }) {
           value={form.description}
           onChange={(e) => updateField("description", e.target.value)}
           placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
         />
         <label
           htmlFor="description"
@@ -19,7 +21,7 @@ function CraneMetaFields({ form, updateField }) {
         </label>
       </div>
 
-      <div className="relative">
+      <div className="relative mb-8">
         <input
           id="location"
           name="location"
@@ -28,7 +30,7 @@ function CraneMetaFields({ form, updateField }) {
           onChange={(e) => updateField("location", e.target.value)}
           required
           placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
         />
         <label
           htmlFor="location"
@@ -38,14 +40,14 @@ function CraneMetaFields({ form, updateField }) {
         </label>
       </div>
 
-      <div className="relative">
+      <div className="relative mb-8">
         <select
           id="status"
           name="status"
           value={form.status}
           onChange={(e) => updateField("status", e.target.value)}
           required
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black"
+          className="peer block w-full h-11 appearance-none bg-transparent border-b border-b-black/20 pr-10 focus:outline-none focus:border-black"
         >
           <option value="" disabled>
             -- Select Status --
@@ -59,6 +61,9 @@ function CraneMetaFields({ form, updateField }) {
         >
           Status
         </label>
+        <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-gray-500">
+          <ChevronDown className="h-4 w-4" />
+        </span>
       </div>
     </>
   );

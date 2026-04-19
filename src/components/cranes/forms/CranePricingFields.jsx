@@ -1,7 +1,9 @@
+import { ChevronDown } from "lucide-react";
+
 function CranePricingFields({ form, updateField }) {
   if (form.status === "for sale") {
     return (
-      <div className="relative">
+      <div className="relative mb-8">
         <input
           id="salePrice"
           name="salePrice"
@@ -11,7 +13,7 @@ function CranePricingFields({ form, updateField }) {
           onChange={(e) => updateField("salePrice", e.target.value)}
           required
           placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black"
+          className="peer block w-full h-11 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black"
         />
         <label
           htmlFor="salePrice"
@@ -26,7 +28,7 @@ function CranePricingFields({ form, updateField }) {
   if (form.status === "for rent") {
     return (
       <>
-        <div className="relative">
+        <div className="relative mb-8">
           <input
             id="rentAmount"
             name="rentAmount"
@@ -36,7 +38,7 @@ function CranePricingFields({ form, updateField }) {
             onChange={(e) => updateField("rentAmount", e.target.value)}
             required
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black"
+            className="peer block w-full h-11 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black"
           />
           <label
             htmlFor="rentAmount"
@@ -46,14 +48,14 @@ function CranePricingFields({ form, updateField }) {
           </label>
         </div>
 
-        <div className="relative">
+        <div className="relative mb-8">
           <select
             id="rentInterval"
             name="rentInterval"
             value={form.rentInterval}
             onChange={(e) => updateField("rentInterval", e.target.value)}
             required
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black"
+            className="peer block w-full h-11 appearance-none bg-transparent border-b border-b-black/20 pr-10 focus:outline-none focus:border-black"
           >
             <option value="" disabled>
               -- Interval --
@@ -69,6 +71,9 @@ function CranePricingFields({ form, updateField }) {
           >
             Interval
           </label>
+          <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-gray-500">
+            <ChevronDown className="h-4 w-4" />
+          </span>
         </div>
       </>
     );

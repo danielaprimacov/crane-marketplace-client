@@ -1,7 +1,7 @@
 function CraneSpecsFields({ form, updateField }) {
   return (
     <>
-      <div className="flex gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
         {/* Producer */}
         <div className="relative flex-1">
           <input
@@ -12,7 +12,7 @@ function CraneSpecsFields({ form, updateField }) {
             onChange={(e) => updateField("producer", e.target.value)}
             required
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
           />
           <label
             htmlFor="producer"
@@ -23,7 +23,7 @@ function CraneSpecsFields({ form, updateField }) {
         </div>
 
         {/* Series Code */}
-        <div className="relative flex-1">
+        <div className="relative">
           <input
             id="seriesCode"
             name="seriesCode"
@@ -32,7 +32,7 @@ function CraneSpecsFields({ form, updateField }) {
             onChange={(e) => updateField("seriesCode", e.target.value)}
             required
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
           />
           <label
             htmlFor="seriesCode"
@@ -42,9 +42,9 @@ function CraneSpecsFields({ form, updateField }) {
           </label>
         </div>
       </div>
-      <div className="flex gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
         {/* class capacity */}
-        <div className="relative flex-1">
+        <div className="relative">
           <input
             id="capacityClassNumber"
             name="capacityClassNumber"
@@ -54,7 +54,7 @@ function CraneSpecsFields({ form, updateField }) {
             onChange={(e) => updateField("capacityClassNumber", e.target.value)}
             required
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
           />
           <label
             htmlFor="capacityClassNumber"
@@ -65,7 +65,7 @@ function CraneSpecsFields({ form, updateField }) {
         </div>
 
         {/* max capacity */}
-        <div className="relative flex-1">
+        <div className="relative">
           <input
             id="capacity"
             name="capacity"
@@ -74,7 +74,7 @@ function CraneSpecsFields({ form, updateField }) {
             value={form.capacity}
             onChange={(e) => updateField("capacity", e.target.value)}
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
           />
           <label
             htmlFor="capacity"
@@ -86,7 +86,7 @@ function CraneSpecsFields({ form, updateField }) {
       </div>
 
       {/* ── Next, height stays full width ── */}
-      <div className="relative">
+      <div className="relative mb-8">
         <input
           id="height"
           name="height"
@@ -96,7 +96,7 @@ function CraneSpecsFields({ form, updateField }) {
           onChange={(e) => updateField("height", e.target.value)}
           required
           placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
         />
         <label
           htmlFor="height"
@@ -107,9 +107,9 @@ function CraneSpecsFields({ form, updateField }) {
       </div>
 
       {/* ── Now Variant + Max Radius side by side ── */}
-      <div className="flex gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
         {/* variant revision */}
-        <div className="relative flex-1">
+        <div className="relative">
           <input
             id="variantRevision"
             name="variantRevision"
@@ -117,7 +117,7 @@ function CraneSpecsFields({ form, updateField }) {
             value={form.variantRevision}
             onChange={(e) => updateField("variantRevision", e.target.value)}
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
           />
           <label
             htmlFor="variantRevision"
@@ -128,7 +128,7 @@ function CraneSpecsFields({ form, updateField }) {
         </div>
 
         {/* max radius */}
-        <div className="relative flex-1">
+        <div className="relative">
           <input
             id="radius"
             name="radius"
@@ -138,7 +138,7 @@ function CraneSpecsFields({ form, updateField }) {
             onChange={(e) => updateField("radius", e.target.value)}
             required
             placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-8 focus:outline-none focus:border-black transition"
+            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
           />
           <label
             htmlFor="radius"

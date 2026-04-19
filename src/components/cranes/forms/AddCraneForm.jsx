@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft } from "lucide-react";
 
 import CraneSpecsFields from "./CraneSpecsFields";
 import CraneMetaFields from "./CraneMetaFields";
 import CranePricingFields from "./CranePricingFields";
-import CraneImageUploadField from "./CraneImageUpload";
+import CraneImageUploadField from "./CraneImageUploadField";
 import CraneAvailabilitySection from "./CraneAvailabilitySection";
 import BackButton from "../../ui/BackButton";
 
@@ -52,10 +51,10 @@ function AddCraneForm() {
 
     const storedToken = localStorage.getItem("authToken");
 
-    if (form.status === "for sale" && salePrice === "") {
+    if (form.status === "for sale" && form.salePrice === "") {
       return alert("Please enter a sale price.");
     }
-    if (form.status === "for rent" && rentAmount === "") {
+    if (form.status === "for rent" && form.rentAmount === "") {
       return alert("Please enter a rent amount.");
     }
 
@@ -80,13 +79,13 @@ function AddCraneForm() {
 
   if (isSuccess) {
     return (
-      <div className="max-w-full mx-auto mt-30 text-center mb-20">
-        <p className="text-green-600 text-2xl mb-10 tracking-widest">
+      <div className="w-full mx-auto max-w-2xl px-4 sm:px-6 lg:px-0 mt-16 sm:mt-24 text-center mb-16">
+        <p className="text-green-600 text-xl sm:text-2xl mb-8 sm:mb-10 tracking-wide sm:tracking-widest">
           ✅ Your crane was added successfully!
         </p>
         <Link
           to={`/cranes/producers/${encodeURIComponent(newProducerSlug)}`}
-          className="inline-block bg-red-600 text-white text-lg px-4 py-2 rounded hover:bg-red-500 transition"
+          className="inline-flex items-center justify-center bg-red-600 rounded px-4 py-2 text-base sm:text-lg text-white transition hover:bg-red-500"
         >
           View All Cranes
         </Link>
@@ -95,15 +94,14 @@ function AddCraneForm() {
   }
 
   return (
-    <>
-      <BackButton className="ml-30" />
-      <h1 className="text-2xl uppercase mx-auto mb-5 border-b pb-3 border-b-red-600">
+    <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 lg:px-0 pb-10">
+      <div className="mb-6 sm:mb-8">
+        <BackButton />
+      </div>
+      <h1 className="mb-6 pb-3 text-xl sm:text-2xl text-center uppercase tracking-wide border-b border-b-red-600">
         Add your crane
       </h1>
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col w-full max-w-2xl mx-auto mt-10"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col mt-6 sm:mt-10">
         <CraneSpecsFields form={form} updateField={updateField} />
         <CraneMetaFields form={form} updateField={updateField} />
         <CranePricingFields form={form} updateField={updateField} />
@@ -115,12 +113,12 @@ function AddCraneForm() {
         <CraneAvailabilitySection form={form} setForm={setForm} />
         <button
           type="submit"
-          className="bg-black text-white py-2 mt-6 rounded cursor-pointer uppercase hover:bg-orange-600 transition"
+          className="mt-6 inline-flex justify-center rounded px-6 py-3 text-sm sm:text-base sm:w-full uppercase bg-black text-white cursor-pointer transition hover:bg-orange-600"
         >
           Add Crane
         </button>
       </form>
-    </>
+    </div>
   );
 }
 
