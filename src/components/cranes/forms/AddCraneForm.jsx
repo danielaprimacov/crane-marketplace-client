@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 import CraneSpecsFields from "./CraneSpecsFields";
 import CraneMetaFields from "./CraneMetaFields";
@@ -38,9 +39,11 @@ function AddCraneForm() {
         ...prev,
         images: [...prev.images, imageUrl],
       }));
+
+      toast.success("Image uploaded!");
     } catch (error) {
       console.error("Cloudinary upload error:", error);
-      alert("Could not upload the image!");
+      toast.error("Could not upload the image!");
     } finally {
       event.target.value = "";
     }
@@ -52,10 +55,10 @@ function AddCraneForm() {
     const storedToken = localStorage.getItem("authToken");
 
     if (form.status === "for sale" && form.salePrice === "") {
-      return alert("Please enter a sale price.");
+      toast.error("Please enter a sale price!");
     }
     if (form.status === "for rent" && form.rentAmount === "") {
-      return alert("Please enter a rent amount.");
+      toast.error("Please enter a rent amount.");
     }
 
     const requestBody = buildCraneRequestBody(form);
@@ -71,9 +74,11 @@ function AddCraneForm() {
       // On success, reset form and refresh list
       setIsSuccess(true);
       setForm(initialCraneState);
+      toast.success("Crane added successfully!");
     } catch (error) {
       // Handle or log the error
       console.error("Failed to create crane:", error);
+      toast.error("Failed to create crane!");
     }
   };
 

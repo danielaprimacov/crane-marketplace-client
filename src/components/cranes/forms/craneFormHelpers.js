@@ -58,3 +58,40 @@ export function buildCraneRequestBody(form) {
 
   return requestBody;
 }
+
+export function mapCraneToForm(crane) {
+  const hasAvailability = crane.availability?.from && crane.availability?.to;
+
+  return {
+    producer: crane.producer || "",
+    seriesCode: crane.seriesCode || "",
+    capacityClassNumber: crane.capacityClassNumber ?? "",
+    variantRevision: crane.variantRevision || "",
+    capacity: crane.capacity ?? "",
+    height: crane.height ?? "",
+    radius: crane.radius ?? "",
+    salePrice: crane.status === "for sale" ? crane.salePrice ?? "" : "",
+    rentAmount:
+      crane.status === "for rent" ? crane.rentPrice?.amount ?? "" : "",
+    rentInterval:
+      crane.status === "for rent" ? crane.rentPrice?.interval ?? "day" : "day",
+    images: crane.images || [],
+    description: crane.description || "",
+    location: crane.location || "",
+    status: crane.status || "",
+    availability: hasAvailability
+      ? {
+          availabilityStart: new Date(crane.availability.from)
+            .toISOString()
+            .slice(0, 10),
+          availabilityEnd: new Date(crane.availability.to)
+            .toISOString()
+            .slice(0, 10),
+        }
+      : {
+          availabilityStart: "",
+          availabilityEnd: "",
+        },
+    isAvailable: Boolean(hasAvailability),
+  };
+}

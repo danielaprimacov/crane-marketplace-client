@@ -1,6 +1,7 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 import HomePage from "./pages/HomePage";
 import CranesPage from "./pages/CranesPage";
@@ -54,6 +55,29 @@ function App() {
 
   return (
     <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            border: "1px solid rgba(0,0,0,0.08)",
+            borderRadius: "12px",
+            background: "#111",
+            color: "#fff",
+            padding: "12px 14px",
+          },
+          success: {
+            style: {
+              background: "#166534",
+            },
+          },
+          error: {
+            style: {
+              background: "#991b1b",
+            },
+          },
+        }}
+      />
       <ScrollToTop />
       <Routes>
         <Route
