@@ -5,15 +5,22 @@ import { useProducers } from "../hooks/useProducers";
 function ProducersPage() {
   const { producers, loading, error } = useProducers();
 
-  if (loading) return <p>Loading producers…</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading)
+    return (
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-20">
+        <p>Loading producers…</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-20">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
 
   return (
-    <div className="mt-20 mx-5">
-      {/* Producer sidebar */}
-      <div>
-        <ProducersSidebar producers={producers} />
-      </div>
+    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-10">
+      <ProducersSidebar producers={producers} />
     </div>
   );
 }

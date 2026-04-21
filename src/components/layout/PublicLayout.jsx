@@ -5,18 +5,17 @@ import Navbar from "../layout/Navbar/Navbar";
 import Footer from "../layout/Footer";
 import ExpertAdviceWidget from "../home/ExpertAdviceWidget";
 
-function PublicLayout({ openLogin, openSignup }) {
+function PublicLayout({ openLogin }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar
         openLogin={openLogin}
-        openSignup={openSignup}
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
       />
-      <main className="flex-grow">
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />

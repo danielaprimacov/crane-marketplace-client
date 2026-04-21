@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/auth.context";
 
@@ -11,13 +11,17 @@ import goBackIcon from "../../assets/icons/angle-double-small-left.png";
 
 function AdminLayout() {
   const { isLoggedIn, user } = useContext(AuthContext);
+  const location = useLocation();
+
+  const [messagesCount, setMessagesCount] = useState(0);
 
   const { producers, loading: producersLoading } = useProducers();
   const firstProducer = producers[0];
 
-  const [messagesCount, setMessagesCount] = useState(0);
-
-  const location = useLocation();
+  const backTo = useMemo(() => {
+    if (producersLoading || !firstProducer) return "/cranes";
+    return `/cranes/producers/${firstProducer.slug}`;
+  }, [producersLoading, firstProducer]);
 
   useEffect(() => {
     // only for admins
@@ -40,45 +44,45 @@ function AdminLayout() {
     fetchMessagesCount();
   }, [isLoggedIn, user?.role, location.pathname]);
 
+  const adminLinkClass = ({ isActive }) =>
+    `relative inline-flex items-center border-b pb-1 text-sm sm:text-base transition ${
+      isActive
+        ? "border-b-orange-600 text-orange-600"
+        : "border-b-transparent hover:border-b-orange-600 hover:text-orange-600"
+    }`;
+
   return (
-    <div className="bg-orange-50 h-screen w-screen min-h-screen">
+    <div className="bg-orange-50 min-h-screen">
       {/* Admin Navigation */}
-      <header className="pt-10 px-10">
-        <div className="flex justify-evenly border-b border-b-black/30 items-center pb-5">
-          {/* Link to back to all cranes */}
-          <Link
-            to={
-              // while producers are loading, fall back to /cranes
-              producersLoading || !firstProducer
-                ? "/cranes"
-                : `/cranes/producers/${firstProducer.slug}`
-            }
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 cursor-pointer"
-          >
-            <img src={goBackIcon} alt="back" className="w-5 mr-2" />
-            {firstProducer ? `Back` : "Back to all cranes"}
-          </Link>
-          <Link
-            to="/admin/inquiries"
-            className="hover:text-orange-600 border-b border-b-transparent hover:border-b-orange-600 transition duration-300"
-          >
-            <div>All Inquiries</div>
-          </Link>
-          <Link
-            to="/admin/messages"
-            className="relative block hover:text-orange-600 border-b border-b-transparent hover:border-b-orange-600 transition duration-300"
-          >
-            <span>All Messages</span>
-            {messagesCount > 0 && (
-              <span className="absolute -top-2 -right-4 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                {messagesCount}
-              </span>
-            )}
-          </Link>
+      <header className="px-4 pt-6 sm:px-6 sm:pt-8 lg:px-10 lg:pt-10">
+        <div className="border-b border-b-black/30 pb-4 sm:pb-5">
+          <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
+            {/* Link to back to all cranes */}
+            <Link
+              to={backTo} // while producers are loading, fall back to /cranes
+              className="w-fit inline-flex items-center text-gray-600 text-sm sm:text-base hover:text-gray-900 cursor-pointer"
+            >
+              <img src={goBackIcon} alt="back" className="w-5 mr-2" />
+              Back to cranes
+            </Link>
+            <nav className="flex flex-wrap items-center gap-5 sm:gap-6">
+              <NavLink to="/admin/inquiries" className={adminLinkClass}>
+                <div>All Inquiries</div>
+              </NavLink>
+              <NavLink to="/admin/messages" className={adminLinkClass}>
+                <span>All Messages</span>
+                {messagesCount > 0 && (
+                  <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs text-white">
+                    {messagesCount}
+                  </span>
+                )}
+              </NavLink>
+            </nav>
+          </div>
         </div>
       </header>
 
-      <main className="px-10">
+      <main className="px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
         <Outlet />
       </main>
     </div>

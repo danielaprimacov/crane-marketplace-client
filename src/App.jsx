@@ -85,9 +85,9 @@ function App() {
             <PublicLayout openLogin={openLogin} openSignup={openSignup} />
           }
         >
-          <Route exact path="/" element={<HomePage />} />
-          <Route exact path="/cranes" element={<CranesPage />} />
-          <Route exact path="/services" element={<OurServicesPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/cranes" element={<CranesPage />} />
+          <Route path="/services" element={<OurServicesPage />} />
           <Route
             path="/about"
             element={<AboutPage openSignup={openSignup} />}
@@ -97,7 +97,6 @@ function App() {
           <Route path="/imprint" element={<ImprintPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route
-            exact
             path="/cranes/new"
             element={
               <IsPrivate>
@@ -105,14 +104,13 @@ function App() {
               </IsPrivate>
             }
           />
-          <Route exact path="/cranes/:craneId" element={<CraneDetailsPage />} />
+          <Route path="/cranes/:craneId" element={<CraneDetailsPage />} />
           <Route path="/cranes/producers" element={<ProducersPage />} />
           <Route
             path="/cranes/producers/:producerSlug"
             element={<ProducerPage />}
           />
           <Route
-            exact
             path="/cranes/edit/:craneId"
             element={
               <IsPrivate>

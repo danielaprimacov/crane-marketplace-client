@@ -1,10 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { useProducers } from "../../hooks/useProducers";
-
-const SCROLL_STEP = 1;
-const FRAME_INTERVAL = 16;
 
 import ArrowIcon from "../ui/ArrowIcon";
 
@@ -19,7 +16,21 @@ function ProducersNav({
   const [needsScroll, setNeedsScroll] = useState(false);
 
   const scrollRef = useRef(null);
-  const timerRef = useRef(null);
+  const rafRef = useRef(null);
+
+  const activeProducer = useMemo(
+    () => producers.find((producer) => producer.slug === openSubnav),
+    [producers, openSubnav]
+  );
+
+  const featuredModels = activeProducer?.models?.slice(0, 4) ?? [];
+
+  const stopScroll = () => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -35,33 +46,43 @@ function ProducersNav({
   }, [producers]);
 
   const startScroll = () => {
-    if (menuOpen || timerRef.current) return;
+    if (menuOpen || rafRef.current) return;
 
-    timerRef.current = setInterval(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth) return;
-      el.scrollLeft += SCROLL_STEP;
-    }, FRAME_INTERVAL);
+    const step = () => {
+      const element = scrollRef.current;
+      if (!element) {
+        rafRef.current = null;
+        return;
+      }
+
+      const maxScrollLeft = element.scrollWidth - element.clientWidth;
+
+      if (element.scrollLeft < maxScrollLeft) {
+        element.scrollLeft += 1;
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        rafRef.current = null;
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(step);
   };
 
-  const stopScroll = () => {
-    clearInterval(timerRef.current);
-    timerRef.current = null;
-    if (scrollRef.current) scrollRef.current.scrollLeft = 0;
-  };
+  useEffect(() => {
+    return () => stopScroll();
+  }, []);
 
   return (
     <div
-      className={`relative flex items-center w-full ml-4 ${
+      className={`relative flex items-center w-full ml-3 lg:ml-4 ${
         menuOpen ? "pointer-events-none" : ""
       }`}
       onMouseLeave={stopScroll}
     >
-      <div className="overflow-hidden flex-1 pr-14">
+      <div className="min-w-0 overflow-hidden flex-1 pr-12 lg:pr-14">
         <ul
           ref={scrollRef}
-          className="flex gap-6 whitespace-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+          className="flex gap-6 whitespace-nowrap overflow-x-auto hide-scrollbar"
           style={{
             // hide scrollbar
             msOverflowStyle: "none",
@@ -80,7 +101,7 @@ function ProducersNav({
               <Link
                 to={`/cranes/producers/${encodeURIComponent(slug)}`}
                 onClick={closeSubnav}
-                className={`text-sm uppercase font-medium transition-colors duration-200 ${
+                className={`text-xs lg:text-sm uppercase tracking-wide font-medium transition-colors duration-200 ${
                   menuOpen
                     ? "text-black cursor-default"
                     : "text-black cursor-pointer group-hover:text-red-600"
@@ -105,28 +126,26 @@ function ProducersNav({
       {openSubnav && !menuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30">
           <div
-            className="w-full p-5 shadow-lg bg-white overflow-auto"
+            className="max-w-full h-auto p-5 shadow-lg bg-white overflow-auto"
             onMouseEnter={() => handleMouseEnter(openSubnav)}
             onMouseLeave={handleMouseLeave}
           >
-            <ul className="space-y-4 mb-10 mt-2">
-              <li className="pl-10 py-3">
-                <Link
-                  to={`/cranes/producers/${encodeURIComponent(openSubnav)}`}
-                  onClick={closeSubnav}
-                  className="text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
-                >
-                  <div className="flex items-center gap-2">
-                    {" "}
-                    All Cranes <ArrowIcon className="w-2 pt-1" />
-                  </div>
-                </Link>
-              </li>
-              <div className="w-200 pl-10 grid grid-cols-2 gap-x-4 gap-y-8 justify-items-start">
-                {producers
-                  .find((p) => p.slug === openSubnav)
-                  ?.models.slice(0, 4)
-                  .map((crane) => {
+            <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-10">
+              <ul className="space-y-4 mb-8 mt-2">
+                <li className="py-2">
+                  <Link
+                    to={`/cranes/producers/${encodeURIComponent(openSubnav)}`}
+                    onClick={closeSubnav}
+                    className="inline-flex items-center gap-2 text-gray-500 text-sm hover:text-red-600 transition-colors duration-200"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>All Cranes </span>
+                      <ArrowIcon className="w-2 pt-0.5" />
+                    </div>
+                  </Link>
+                </li>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-2">
+                  {featuredModels.map((crane) => {
                     const model = [
                       crane.seriesCode,
                       crane.capacityClassNumber,
@@ -144,22 +163,33 @@ function ProducersNav({
                         key={crane._id}
                         className="group flex gap-3 items-start"
                       >
-                        <div className="w-32 h-24 overflow-hidden mb-2">
-                          <img
-                            src={firstImage}
-                            alt={model}
-                            className="object-cover w-full h-full"
-                          />
+                        <div className="w-32 h-24 shrink-0 rounded overflow-hidden">
+                          {firstImage ? (
+                            <img
+                              src={firstImage}
+                              alt={model}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                              No image
+                            </div>
+                          )}
                         </div>
-                        <div className="text-sm">
-                          <p>{model}</p>
-                          <span className="text-gray-500">{crane.title}</span>
+                        <div className="min-w-0 text-sm">
+                          <p className="truncate font-medium text-black group-hover:text-red-600">
+                            {model}
+                          </p>
+                          <span className="block truncate text-gray-500">
+                            {crane.title}
+                          </span>
                         </div>
                       </Link>
                     );
                   })}
-              </div>
-            </ul>
+                </div>
+              </ul>
+            </div>
           </div>
         </div>
       )}

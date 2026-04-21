@@ -40,7 +40,7 @@ function ServicesAccordion({ servicesOpen, setServicesOpen, onLinkClick }) {
         onClick={() => setServicesOpen((prev) => !prev)}
         aria-expanded={servicesOpen}
         aria-controls="services-submenu"
-        className="flex w-full items-center justify-between text-left text-2xl font-medium cursor-pointer hover:text-red-600 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40 rounded-sm"
+        className="flex w-full items-center justify-between text-left text-xl sm:text-2xl font-medium cursor-pointer hover:text-red-600 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40 rounded-sm"
       >
         <span>Our Services</span>
       </button>

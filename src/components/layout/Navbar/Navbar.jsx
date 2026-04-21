@@ -67,7 +67,7 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
         }
     `}
       >
-        <div className="flex items-center h-full px-4 w-full">
+        <div className="flex items-center h-full w-full px-4 sm:px-6">
           <NavbarBrandArea
             shouldShowDrawerMenuButton={shouldShowDrawerMenuButton}
             menuOpen={menuOpen}
@@ -80,7 +80,7 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
           <div className="flex-1 flex justify-center">
             {isHome && (
               <Link to="/" className="inline-block">
-                <img src={logo} alt="Logo" className="w-[36px]" />
+                <img src={logo} alt="Logo" className="w-8 sm:w-9" />
               </Link>
             )}
           </div>

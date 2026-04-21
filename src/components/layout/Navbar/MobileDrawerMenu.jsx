@@ -27,7 +27,7 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
       {/* side drawer */}
       <aside
         id="mobile-drawer-menu"
-        className="fixed top-0 left-0 h-full w-84 bg-white shadow-lg z-50 p-6 overflow-auto"
+        className="fixed top-0 left-0 h-full z-50 w-[85vw] max-w-[22rem] bg-white shadow-lg p-5 sm:p-6 overflow-auto"
       >
         {/* Close button inside too */}
         <button
@@ -54,32 +54,32 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
           />
         </button>
 
-        <nav className="mt-16 space-y-4">
+        <nav className="mt-14 space-y-4 sm:mt-16">
           {!isHome && (
             <Link
               to="/"
-              className="block text-2xl font-medium hover:text-red-600"
+              className="block text-xl sm:text-2xl font-medium hover:text-red-600"
             >
               Home
             </Link>
           )}
           <Link
             to="/about"
-            className="block text-2xl font-medium hover:text-red-600"
+            className="block text-xl sm:text-2xl font-medium hover:text-red-600"
           >
             About Us
           </Link>
 
           <Link
             to="/cranes"
-            className="block text-2xl font-medium hover:text-red-600"
+            className="block text-xl sm:text-2xl font-medium hover:text-red-600"
           >
             Advices
           </Link>
 
           <button
             onClick={() => setModalOpen(true)}
-            className="block text-2xl font-medium hover:text-red-600 cursor-pointer"
+            className="block text-xl sm:text-2xl font-medium hover:text-red-600 cursor-pointer"
           >
             Contact
           </button>
