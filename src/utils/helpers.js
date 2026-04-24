@@ -55,4 +55,26 @@ export function getContainedImageBounds(rect, imageWidth, imageHeight) {
   return { visibleWidth, visibleHeight, offsetX, offsetY };
 }
 
-// craneformhelpers
+export function getAvailabilityStatus(availability) {
+  if (!availability?.from || !availability?.to) {
+    return "not-set";
+  }
+
+  const now = new Date();
+  const from = new Date(availability.from);
+  const to = new Date(availability.to);
+
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+    return "not-set";
+  }
+
+  if (now > to) {
+    return "expired";
+  }
+
+  if (now < from) {
+    return "upcoming";
+  }
+
+  return "available";
+}

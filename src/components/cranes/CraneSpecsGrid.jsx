@@ -8,7 +8,7 @@ function CraneSpecsGrid({ crane }) {
   ];
 
   return (
-    <dl className="grid grid-cols-2 gap-x-6 gap-y-4 mt-6 text-sm text-gray-600">
+    <dl className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 text-sm text-gray-600">
       {specs.map(([label, value]) => (
         <div key={label}>
           <dt className="uppercase tracking-wide">{label}</dt>

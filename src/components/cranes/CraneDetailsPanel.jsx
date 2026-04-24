@@ -3,8 +3,15 @@ import CraneSpecsGrid from "./CraneSpecsGrid";
 import CraneInquiryButton from "./CraneInquiryButton";
 import CraneManageButtons from "./CraneManageButtons";
 
+import { getAvailabilityStatus } from "../../utils/helpers";
+
 function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
-  const canSendInquiry = (!user || user.role !== "admin") && !isOwner;
+  const availabilityStatus = getAvailabilityStatus(crane.availability);
+
+  const canSendInquiry =
+    (!user || user.role !== "admin") &&
+    !isOwner &&
+    availabilityStatus !== "expired";
   const canManage = user?.role === "admin" || isOwner;
 
   const priceLabel =
@@ -42,7 +49,7 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
 
         <CraneSpecsGrid crane={crane} />
 
-        <div className="mt-2 min-h-0 overflow-y-auto pr-2">
+        <div className="mt-1 min-h-0 overflow-y-auto pr-2">
           <p className="text-gray-700 leading-relaxed">{crane.description}</p>
         </div>
       </div>
@@ -52,7 +59,8 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
           <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
             <dl className="space-y-4">
               <InfoRow label="Location:">{crane.location || "Not set"}</InfoRow>
-              <InfoRow label="Available:">
+
+              <InfoRow label="Period:">
                 {crane.availability?.from && crane.availability?.to
                   ? `${new Date(
                       crane.availability.from
@@ -63,9 +71,19 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
               </InfoRow>
             </dl>
 
-            <div className="flex lg:justify-end">
-              {canSendInquiry && <CraneInquiryButton craneId={craneId} />}
-            </div>
+            {availabilityStatus === "expired" ? (
+              <span className="inline-flex items-center justify-center rounded bg-gray-200 px-4 py-2 text-gray-600">
+                {availabilityStatus === "expired"
+                  ? "Not available"
+                  : availabilityStatus === "available"
+                  ? "Available now"
+                  : availabilityStatus === "upcoming"
+                  ? "Upcoming"
+                  : "Not set"}
+              </span>
+            ) : canSendInquiry ? (
+              <CraneInquiryButton craneId={craneId} />
+            ) : null}
           </div>
         </div>
 
