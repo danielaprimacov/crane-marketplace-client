@@ -42,7 +42,7 @@ function AddInquiryForm({ craneId, crane }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     const storedToken = localStorage.getItem("authToken");
 
     const requestBody = buildInquiryRequestBody(form, craneId);
@@ -78,8 +78,11 @@ function AddInquiryForm({ craneId, crane }) {
   const needsAddress = form.needsTransport || form.needsInstallation;
 
   return (
-    <div className="max-w-2xl mx-auto mt-10">
-      <form onSubmit={handleSubmit} className="flex flex-col">
+    <div className="max-w-2xl mx-auto mt-8 px-4 sm:mt-10 sm:px-6 lg:px-0">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col rounded-2xl bg-white p-4 shadow-sm sm:p-6 lg:p-8"
+      >
         <InquiryContactFields form={form} updateField={updateField} />
 
         <InquiryOptionsSection form={form} setForm={setForm} />
@@ -95,19 +98,21 @@ function AddInquiryForm({ craneId, crane }) {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded bg-black py-2 uppercase text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-black px-4 py-3 text-sm font-medium uppercase text-white tracking-wide transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
         >
           {submitting ? "Sending..." : "Send Inquiry"}
         </button>
       </form>
 
-      <div className="mt-6 text-center">
+      <div className="mt-5 text-center">
         <Link
           to={`/cranes/${craneId}`}
           replace
-          className="inline-block text-red-600 hover:underline"
+          className="inline-flex max-w-full items-center justify-center text-sm transition text-red-600 hover:underline sm:text-base"
         >
-          ← Back to {crane && crane.title} Details
+          <span className="truncate">
+            ← Back to {crane && crane.title} Details
+          </span>
         </Link>
       </div>
     </div>

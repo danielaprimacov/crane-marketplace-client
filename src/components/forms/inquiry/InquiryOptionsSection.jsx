@@ -18,8 +18,8 @@ function InquiryOptionsSection({ form, setForm }) {
         />
       </div>
 
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between">
-        <label className="inline-flex items-center gap-2">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <label className="flex items-start gap-3 rounded-xl border border-black/10 p-4 transition hover:bg-gray-50">
           <input
             type="checkbox"
             checked={form.needsTransport}
@@ -29,12 +29,14 @@ function InquiryOptionsSection({ form, setForm }) {
                 needsTransport: e.target.checked,
               }))
             }
-            className="h-5 w-5 text-blue-600"
+            className="mt-0.5 h-5 w-5 shrink-0 text-blue-600"
           />
-          <span className="text-gray-700">I need transportation</span>
+          <span className="text-sm text-gray-700 sm:text-base">
+            I need transportation
+          </span>
         </label>
 
-        <label className="inline-flex items-center gap-2">
+        <label className="flex items-start gap-3 rounded-xl border border-black/10 p-4 transition hover:bg-gray-50">
           <input
             type="checkbox"
             checked={form.needsInstallation}
@@ -44,9 +46,9 @@ function InquiryOptionsSection({ form, setForm }) {
                 needsInstallation: e.target.checked,
               }))
             }
-            className="h-5 w-5 text-blue-600"
+            className="mt-0.5 h-5 w-5 shrink-0 text-blue-600"
           />
-          <span className="text-gray-700">
+          <span className="text-sm text-gray-700 sm:text-base">
             I need installation / disassembly
           </span>
         </label>

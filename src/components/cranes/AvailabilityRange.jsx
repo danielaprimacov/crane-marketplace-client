@@ -8,7 +8,7 @@ function AvailabilityRange({ field, values, setValues, label }) {
   const endKey = `${field}End`;
 
   return (
-    <div className="flex gap-6 my-8">
+    <div className="flex gap-6 my-8 flex-col sm:flex-row">
       <div className="relative flex-1">
         <input
           type="date"

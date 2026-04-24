@@ -32,7 +32,7 @@ function NewInquiryPage() {
 
   if (loading) {
     return (
-      <div className="mt-20 mx-auto max-w-2xl px-4">
+      <div className="mt-20 mx-auto max-w-2xl px-4 sm:px-6">
         <p>Loading…</p>
       </div>
     );
@@ -40,15 +40,15 @@ function NewInquiryPage() {
 
   if (error) {
     return (
-      <div className="mt-20 mx-auto max-w-2xl px-4">
+      <div className="mt-20 mx-auto max-w-2xl px-4 sm:px-6">
         <p className="text-red-600">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-20 px-4">
-      <h1 className="text-2xl uppercase mx-auto mb-5 border-b pb-3 border-b-red-600 max-w-2xl text-center">
+    <div className="mt-20 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-xl sm:text-2xl uppercase mx-auto mb-5 border-b pb-3 border-b-red-600 max-w-2xl text-center">
         Send Inquiry
       </h1>
       <AddInquiryForm craneId={craneId} crane={crane} />
