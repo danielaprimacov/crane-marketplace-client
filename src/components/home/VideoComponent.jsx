@@ -66,7 +66,7 @@ function VideoComponent({
       </video>
 
       <button
-        onClick={handleToggle}
+        onClick={handleTogglePlayback}
         className="absolute bottom-4 right-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition hover:bg-white/25 sm:bottom-5 sm:right-5 sm:h-12 sm:w-12"
       >
         {playing ? (

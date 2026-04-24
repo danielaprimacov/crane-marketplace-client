@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { getContainedImageBounds } from "../../utils/helpers";
 
 const LENS_SIZE = 140;
 const HOVER_PREVIEW_SCALE = 2;
@@ -15,11 +16,23 @@ function CraneGallery({
   const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
   const [imageMeta, setImageMeta] = useState({ width: 0, height: 0 });
   const [isPointerOnImage, setIsPointerOnImage] = useState(false);
+  const [canHoverZoom, setCanHoverZoom] = useState(false);
 
   const imageAreaRef = useRef(null);
-  const imageRef = useRef(null);
 
   const selectedImage = crane?.images?.[selectedImageIndex];
+  const hasSelectedImage = Boolean(selectedImage);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    const handler = (event) => setCanHoverZoom(event.matches);
+
+    setCanHoverZoom(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handler);
+
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     setZoomPosition({ x: 50, y: 50 });
@@ -36,56 +49,60 @@ function CraneGallery({
   };
 
   const handleImageMouseEnter = () => {
+    if (!canHoverZoom || !hasSelectedImage) return;
     setIsZoomed(true);
+    setIsPointerOnImage(false);
   };
 
   const handleImageMouseLeave = () => {
+    if (!canHoverZoom) return;
     setIsZoomed(false);
     setIsPointerOnImage(false);
   };
 
   const handleImageMouseMove = (event) => {
+    if (!canHoverZoom || !hasSelectedImage) return;
     if (!imageAreaRef.current) return;
     if (!imageMeta.width || !imageMeta.height) return;
 
     const containerRect = imageAreaRef.current.getBoundingClientRect();
-    const imageRect = imageRef.current.getBoundingClientRect();
 
-    const rawX = event.clientX - imageRect.left;
-    const rawY = event.clientY - imageRect.top;
+    const bounds = getContainedImageBounds(
+      containerRect,
+      imageMeta.width,
+      imageMeta.height
+    );
+
+    if (!bounds) return;
+
+    const { visibleWidth, visibleHeight, offsetX, offsetY } = bounds;
+
+    const rawX = event.clientX - containerRect.left;
+    const rawY = event.clientY - containerRect.top;
 
     const isInsideVisibleImage =
-      rawX >= 0 &&
-      rawX <= imageRect.width &&
-      rawY >= 0 &&
-      rawY <= imageRect.height;
+      rawX >= offsetX &&
+      rawX <= offsetX + visibleWidth &&
+      rawY >= offsetY &&
+      rawY <= offsetY + visibleHeight;
 
     setIsPointerOnImage(isInsideVisibleImage);
 
     if (!isInsideVisibleImage) return;
 
-    const percentX = (rawX / imageRect.width) * 100;
-    const percentY = (rawY / imageRect.height) * 100;
+    const percentX = ((rawX - offsetX) / visibleWidth) * 100;
+    const percentY = ((rawY - offsetY) / visibleHeight) * 100;
 
     const halfLens = LENS_SIZE / 2;
 
-    const imageOffsetX = imageRect.left - containerRect.left;
-    const imageOffsetY = imageRect.top - containerRect.top;
-
     const lensCenterX = Math.max(
-      imageOffsetX + halfLens,
-      Math.min(
-        imageOffsetX + imageRect.width - halfLens,
-        event.clientX - containerRect.left
-      )
+      offsetX + halfLens,
+      Math.min(offsetX + visibleWidth - halfLens, rawX)
     );
 
     const lensCenterY = Math.max(
-      imageOffsetY + halfLens,
-      Math.min(
-        imageOffsetY + imageRect.height - halfLens,
-        event.clientY - containerRect.top
-      )
+      offsetY + halfLens,
+      Math.min(offsetY + visibleHeight - halfLens, rawY)
     );
 
     setZoomPosition({
@@ -105,64 +122,79 @@ function CraneGallery({
     setIsPointerOnImage(false);
   };
 
-  return (
-    <div className="relative bg-white lg:row-span-2 min-h-[320px] lg:min-h-0">
-      {crane.images?.length ? (
-        <div className="flex h-full gap-3 px-3 pt-3 pb-0">
-          {/* Thumbnails */}
-          <div className="w-[56px] shrink-0 flex flex-col gap-3 overflow-y-auto px-1">
-            {crane.images.slice(0, 5).map((image, i) => (
-              <button
-                key={`${image}-${i}`}
-                type="button"
-                onMouseEnter={() => handleThumbnailHover(i)}
-                onClick={() => handleThumbnailHover(i)}
-                className={`relative h-[48px] w-[48px] cursor-pointer overflow-hidden rounded-lg border transition ${
-                  selectedImageIndex === i
-                    ? "border-blue-500 ring-1 ring-blue-300"
-                    : "border-black/10 hover:border-black/30"
-                }`}
-              >
-                <img
-                  src={image}
-                  alt={`${crane.title} ${i + 1}`}
-                  className="h-full w-full object-cover"
-                  draggable="false"
-                />
-              </button>
-            ))}
+  if (!crane?.images?.length) {
+    return (
+      <div className="flex min-h-[320px] items-center justify-center bg-white text-gray-400">
+        No image available
+      </div>
+    );
+  }
 
-            {crane.images.length > 5 && (
-              <button
-                type="button"
-                onClick={onOpenFullView}
-                className="h-[48px] w-[48px] rounded-lg border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
-              >
-                {" "}
-                +{crane.images.length - 5}
-              </button>
-            )}
-          </div>
-          <div className="min-w-0 flex-1 flex flex-col">
-            <div
-              ref={imageAreaRef}
-              className="relative min-h-0 flex-1 overflow-hidden bg-white cursor-pointer flex items-end justify-center"
-              onMouseEnter={handleImageMouseEnter}
-              onMouseLeave={handleImageMouseLeave}
-              onMouseMove={handleImageMouseMove}
+  return (
+    <div className="relative bg-white xl:row-span-2 min-h-[320px] xl:min-h-0">
+      <div className="h-full flex flex-col gap-4 px-3 pt-3 pb-4 xl:flex-row xl:gap-8 xl:px-6 xl:pb-0">
+        {/* Thumbnails */}
+        <div className="order-2 flex w-full gap-3 overflow-x-auto px-1 pb-1 xl:order-1 xl:w-[62px] xl:flex-col xl:overflow-y-auto xl:overflow-x-hidden">
+          {crane.images.slice(0, 5).map((image, i) => (
+            <button
+              key={`${image}-${i}`}
+              type="button"
+              onMouseEnter={() => handleThumbnailHover(i)}
+              onClick={() => handleThumbnailHover(i)}
+              className={`relative h-[56px] w-[56px] shrink-0 overflow-hidden rounded-lg border transition ${
+                selectedImageIndex === i
+                  ? "border-blue-500 ring-1 ring-blue-300"
+                  : "border-black/10 hover:border-black/30"
+              }`}
             >
               <img
-                ref={imageRef}
+                src={image}
+                alt={`${crane.title} ${i + 1}`}
+                className="h-full w-full object-cover"
+                draggable="false"
+              />
+            </button>
+          ))}
+
+          {crane.images.length > 5 && (
+            <button
+              type="button"
+              onClick={onOpenFullView}
+              className="h-[56px] w-[56px] shrink-0 rounded-lg border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
+            >
+              {" "}
+              +{crane.images.length - 5}
+            </button>
+          )}
+        </div>
+        <div className="order-1 min-w-0 flex-1 flex flex-col xl:order-2 xl:justify-center">
+          <div
+            ref={imageAreaRef}
+            className="relative h-[260px] sm:h-[320px] sm:px-4 md:h-[380px] xl:h-[360px] xl:px-8 overflow-hidden bg-white cursor-pointer flex items-center justify-center"
+            onMouseEnter={handleImageMouseEnter}
+            onMouseLeave={handleImageMouseLeave}
+            onMouseMove={handleImageMouseMove}
+          >
+            {hasSelectedImage ? (
+              <img
                 src={selectedImage}
                 alt={crane.title}
                 onClick={onOpenFullView}
                 onLoad={handleImageLoad}
                 draggable="false"
-                className="max-h-full max-w-full select-none"
+                className="h-full w-full cursor-pointer object-contain select-none"
               />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-gray-400">
+                No image available
+              </div>
+            )}
 
-              {/* Hover Lens */}
-              {isZoomed && isPointerOnImage && (
+            {/* Hover Lens */}
+            {hasSelectedImage &&
+              canHoverZoom &&
+              isZoomed &&
+              isPointerOnImage && (
                 <div
                   className="pointer-events-none absolute border border-black/20 bg-white/20 shadow-sm hidden xl:block"
                   style={{
@@ -173,35 +205,30 @@ function CraneGallery({
                   }}
                 />
               )}
-            </div>
-            <button
-              type="button"
-              onClick={onOpenFullView}
-              className="mt-4 self-center cursor-pointer text-sm text-[#007185] hover:text-[#c7511f] hover:underline"
-            >
-              Click to see full view
-            </button>
           </div>
+          <button
+            type="button"
+            onClick={onOpenFullView}
+            className="mt-4 self-center cursor-pointer text-sm text-[#007185] hover:text-[#c7511f] hover:underline"
+          >
+            Click to see full view
+          </button>
+        </div>
 
-          {/* Zoom Preview */}
-          {isZoomed && isPointerOnImage && (
-            <div className="absolute top-0 left-full ml-4 hidden xl:block z-30 h-full w-[620px] overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl">
-              <div
-                className="h-full w-full bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${selectedImage})`,
-                  backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                  backgroundSize: `${HOVER_PREVIEW_SCALE * 100}%`,
-                }}
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-400">
-          No image available
-        </div>
-      )}
+        {/* Zoom Preview */}
+        {hasSelectedImage && canHoverZoom && isZoomed && isPointerOnImage && (
+          <div className="absolute top-0 left-full ml-4 hidden xl:block z-30 h-full w-[620px] overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl">
+            <div
+              className="h-full w-full bg-no-repeat"
+              style={{
+                backgroundImage: `url(${selectedImage})`,
+                backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                backgroundSize: `${HOVER_PREVIEW_SCALE * 100}%`,
+              }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

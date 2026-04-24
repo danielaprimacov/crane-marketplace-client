@@ -4,24 +4,25 @@ function Modal({
   children,
   isOpen,
   onClose,
-  widthClass = "w-[45rem] max-w-full",
+  widthClass = "w-full max-w-3xl",
   panelClass = "",
-  contentClass = "p-10",
+  contentClass = "p-4 sm:p-6 lg:p-8",
 }) {
   // lock scroll when open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    // cleanup on unmount
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const onKey = (e) => {
       if (e.key === "Escape") {
         onClose();
@@ -40,21 +41,25 @@ function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 sm:p-6"
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-2xl relative ${widthClass} ${panelClass}`}
+        role="dialog"
+        aria-modal="true"
+        className={`max-h-[90vh] w-full bg-white rounded-2xl relative ${widthClass} ${panelClass}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
+          type="button"
           onClick={onClose}
-          className="absolute cursor-pointer top-4 right-4 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0"
+          aria-label="Close modal"
+          className="absolute h-10 w-10 top-3 right-3 z-10 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0 sm:top-4 sm:right-4"
         >
           &times;
         </button>
 
-        <div className={contentClass}>{children}</div>
+        <div className={`max-h-[90vh] overflow-y-auto ${contentClass}`}>{children}</div>
       </div>
     </div>
   );

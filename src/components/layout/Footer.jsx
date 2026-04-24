@@ -139,7 +139,7 @@ function Footer() {
                 now!
               </p>
               <button
-                className="px-8 py-2 w-full sm:w-auto rounded-md bg-black text-white cursor-pointer hover:bg-red-700 transform transition duration-300 ease-out"
+                className="px-8 py-2 w-full w-auto rounded-md bg-black text-white cursor-pointer hover:bg-red-700 transform transition duration-300 ease-out"
                 onClick={() => setModalMode("newsletter")}
               >
                 Newsletter

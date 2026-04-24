@@ -1,7 +1,9 @@
 function InfoRow({ label, children }) {
   return (
-    <div className="flex items-start gap-3">
-      <dt className="w-24 shrink-0 font-semibold text-gray-700">{label}</dt>
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
+      <dt className="w-auto shrink-0 font-semibold text-gray-700 sm:w-24">
+        {label}
+      </dt>
       <dd className="text-gray-600">{children}</dd>
     </div>
   );

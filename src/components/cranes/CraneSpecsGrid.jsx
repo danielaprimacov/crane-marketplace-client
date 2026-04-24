@@ -8,11 +8,18 @@ function CraneSpecsGrid({ crane }) {
   ];
 
   return (
-    <dl className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 text-sm text-gray-600">
+    <dl className="mt-5 mb-3 grid grid-cols-2 gap-4 sm:gap-5 xl:grid-cols-3 xl:gap-cols-5">
       {specs.map(([label, value]) => (
-        <div key={label}>
-          <dt className="uppercase tracking-wide">{label}</dt>
-          <dd className="font-medium">{value}</dd>
+        <div
+          key={label}
+          className="rounded-xl border border-black/8 bg-gray-50 px-4 py-3"
+        >
+          <dt className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500">
+            {label}
+          </dt>
+          <dd className="mt-2 text-base font-semibold leading-tight text-gray-900">
+            {value ?? "–"}
+          </dd>
         </div>
       ))}
     </dl>

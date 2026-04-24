@@ -102,26 +102,26 @@ function FullViewGalleryModal({
       panelClass="h-[85vh] overflow-hidden"
       contentClass="h-full p-0"
     >
-      <div className="grid h-full grid-cols-[1fr_320px]">
+      <div className="flex h-full flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* main image */}
         <div
           ref={fullViewStageRef}
           onClick={handleFullViewImageClick}
           onMouseMove={handleFullViewMouseMove}
-          className={`relative flex items-center justify-center overflow-hidden p-8 select-none transition-colors duration-200 ${
+          className={`relative min-h-0 flex flex-1 items-center justify-center overflow-hidden p-4 sm:p-6 lg:p-8 select-none transition-colors duration-200 ${
             fullViewZoom > 1 ? "bg-[#e9eef5]" : "bg-[#f7f7f7]"
           }`}
           style={{ cursor: fullViewZoom > 1 ? "zoom-out" : "zoom-in" }}
         >
           {/* Zoom controls */}
-          <div className="absolute top-4 right-4 z-20 flex flex-col gap-4">
+          <div className="absolute top-3 right-3 z-20 flex flex-col gap-4 sm:top-4 sm:right-4 sm:gap-4">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 handleFullViewZoomIn();
               }}
-              className={`flex h-14 w-14 items-center justify-center rounded-full border shadow-md transition ${
+              className={`flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full border shadow-md transition ${
                 isFullViewZoomActive
                   ? "bg-white border-black/20 text-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.12)]"
                   : "bg-[#f1f3f5] border-black/15 text-gray-700 hover:bg-[#e9ecef]"
@@ -130,7 +130,7 @@ function FullViewGalleryModal({
               title="Zoom in"
               disabled={isFullViewZoomActive}
             >
-              <ZoomIn className="h-7 w-7" strokeWidth={2.25} />
+              <ZoomIn className="h-5 w-5 sm:h-7 sm:w-7" strokeWidth={2.25} />
             </button>
 
             <button
@@ -139,7 +139,7 @@ function FullViewGalleryModal({
                 e.stopPropagation();
                 handleFullViewZoomOut();
               }}
-              className={`flex h-14 w-14 items-center justify-center rounded-full border shadow-md transition ${
+              className={`flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full border shadow-md transition ${
                 isFullViewZoomActive
                   ? "bg-[#f1f3f5] border-black/15 text-gray-700 hover:bg-[#e9ecef]"
                   : "bg-[#f1f3f5] border-black/15 text-gray-400"
@@ -148,7 +148,7 @@ function FullViewGalleryModal({
               title="Zoom out"
               disabled={!isFullViewZoomActive}
             >
-              <ZoomOut className="h-7 w-7" strokeWidth={2.25} />
+              <ZoomOut className="h-5 w-5 sm:h-7 sm:w-7" strokeWidth={2.25} />
             </button>
           </div>
 
@@ -166,18 +166,18 @@ function FullViewGalleryModal({
         </div>
 
         {/* all images */}
-        <div className="flex h-full flex-col border-l border-black/10 bg-white p-6">
-          <div className="pr-10">
-            <h2 className="text-2xl font-semibold leading-tight text-gray-900">
-              {crane.title}
+        <div className="flex h-[220px] flex-col border-t border-black/10 bg-white p-4 sm:h-[260px] sm:p-6 lg:h-full lg:border-t-0 lg:border-l">
+          <div className="pr-0 lg:pr-10">
+            <h2 className="text-xl font-semibold leading-tight text-gray-900 sm:text-2xl">
+              {crane?.title}
             </h2>
 
-            {crane.producer && (
+            {crane?.producer && (
               <p className="mt-2 text-sm text-gray-500">{crane.producer}</p>
             )}
           </div>
 
-          <div className="mt-6 grid grid-cols-4 gap-3 content-start overflow-y-auto">
+          <div className="mt-4 grid grid-cols-4 gap-3 content-start overflow-y-auto sm:grid-cols-5 lg:mt-6 lg:grid-cols-4">
             {crane.images?.map((image, i) => (
               <button
                 key={`${image}-${i}`}

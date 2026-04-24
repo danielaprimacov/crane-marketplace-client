@@ -21,18 +21,27 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
       ? `${crane.rentPrice.amount} €/${crane.rentPrice.interval}`
       : "Contact for price";
 
+  const availabilityLabel =
+    availabilityStatus === "expired"
+      ? "Not available"
+      : availabilityStatus === "available"
+      ? "Available now"
+      : availabilityStatus === "upcoming"
+      ? "Upcoming"
+      : "Not set";
+
   return (
     <>
-      <div className="px-6 pt-2 flex flex-col col-start-2 min-h-0 overflow-hidden lg:col-start-2 lg:row-start-1">
-        <div className="flex justify-between items-start gap-4 flex-wrap">
+      <div className="px-4 pt-4 sm:px-6 sm:px-6 xl:col-start-2 xl:row-start-1 xl:min-h-0 xl:overflow-hidden xl:pt-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold">{crane.title}</h1>
             <h2 className="text-gray-500 mt-1">{crane.producer}</h2>
           </div>
 
-          <div className="text-right space-y-2">
+          <div className="text-left sm:text-right space-y-2">
             <span
-              className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mr-3 ${
+              className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mr-0 sm:mr-3 ${
                 crane.status === "for sale"
                   ? "bg-red-100 text-red-700"
                   : "bg-blue-100 text-blue-700"
@@ -49,14 +58,14 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
 
         <CraneSpecsGrid crane={crane} />
 
-        <div className="mt-1 min-h-0 overflow-y-auto pr-2">
+        <div className="mt-4 mb-2 pr-0 xl:mt-1 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <p className="text-gray-700 leading-relaxed">{crane.description}</p>
         </div>
       </div>
 
-      <div className="px-5 pb-8 lg:col-start-2 lg:row-start-2">
+      <div className="px-4 pb-6 sm:px-5 sm:pb-8 xl:col-start-2 xl:row-start-2">
         <div className="pt-2">
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div className="grid gap-6 xl:grid-cols-[1fr_auto] xl:items-center">
             <dl className="space-y-4">
               <InfoRow label="Location:">{crane.location || "Not set"}</InfoRow>
 
@@ -73,13 +82,7 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
 
             {availabilityStatus === "expired" ? (
               <span className="inline-flex items-center justify-center rounded bg-gray-200 px-4 py-2 text-gray-600">
-                {availabilityStatus === "expired"
-                  ? "Not available"
-                  : availabilityStatus === "available"
-                  ? "Available now"
-                  : availabilityStatus === "upcoming"
-                  ? "Upcoming"
-                  : "Not set"}
+                {availabilityLabel}
               </span>
             ) : canSendInquiry ? (
               <CraneInquiryButton craneId={craneId} />
