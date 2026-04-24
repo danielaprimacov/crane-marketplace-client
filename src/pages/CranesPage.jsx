@@ -33,6 +33,8 @@ function CranesPage() {
           poster={videoPoster}
           muted={videoMuted}
           onMuteChange={setVideoMuted}
+          interactive={false}
+          blurred={false}
         />
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pointer-events-none">
           <div

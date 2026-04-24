@@ -37,12 +37,12 @@ function Services() {
   ];
 
   return (
-    <div className="p-5 m-2">
-      <h1 className="text-4xl uppercase font-medium tracking-widest text-center mb-8">
+    <div className="m-2 px-4 py-6 sm:p-5 lg:px-8">
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl uppercase font-medium tracking-widest text-center mb-8 sm:mb-10">
         Our Services
       </h1>
       <motion.div
-        className="flex justify-evenly items-center p-6 gap-7"
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
         variants={servicesContainer}
         initial="hidden"
         whileInView="show"
@@ -53,13 +53,19 @@ function Services() {
             to={`/services#${encodeURIComponent(slugify(label))}`}
             key={label}
             variants={servicesItem}
-            className="flex-1 flex flex-col border border-gray-200 hover:shadow-md transition duration-300 transform"
+            className="flex flex-col overflow-hidden border border-gray-200 transition duration-300 hover:shadow-md"
           >
             <div className="flex items-center justify-center">
-              <img src={src} alt={alt} className="h-70 w-full object-cover" />
+              <img
+                src={src}
+                alt={alt}
+                className="h-56 w-full object-cover sm:h-64 lg:h-72"
+              />
             </div>
-            <div className="py-15 flex items-center justify-center">
-              <p className="text-black-700 text-xl">{label}</p>
+            <div className="flex min-h-[120px] items-center justify-center px-4 py-8 sm:min-h-[140px] sm:py-10">
+              <p className="text-black text-lg text-center sm:text-xl">
+                {label}
+              </p>
             </div>
           </MotionLink>
         ))}

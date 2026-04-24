@@ -41,8 +41,10 @@ function HeroSection({ producers }) {
         poster={videoPoster}
         muted={muted}
         setMuted={setMuted}
+        interactive={true}
+        blurred={true}
       />
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <AnimatePresence mode="wait">
           {!showAlternate ? (
             <motion.div
@@ -51,12 +53,12 @@ function HeroSection({ producers }) {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="space-y-2 text-center"
+              className="space-y-3 text-center"
             >
-              <p className="text-white uppercase text-2xl md:text-4xl lg:text-5xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+              <p className="text-2xl uppercase tracking-tight text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] sm:text-3xl md:text-4xl lg:text-5xl">
                 KranHub presents
               </p>
-              <p className="mt-2 text-white uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
+              <p className="text-3xl uppercase tracking-wide text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] sm:text-5xl md:text-6xl lg:text-7xl">
                 The Art of Precision Lifting
               </p>
             </motion.div>
@@ -67,7 +69,7 @@ function HeroSection({ producers }) {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="mt-15 px-50 text-white uppercase text-center text-xl md:text-2xl lg:text-3xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide"
+              className="max-w-4xl px-2 text-center text-lg uppercase tracking-wide text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] sm:text-xl md:text-2xl lg:text-3xl"
             >
               If you have your own crane and want to sell or to give it to rent,
               then register and add it on our marketplace.
@@ -75,8 +77,8 @@ function HeroSection({ producers }) {
           )}
         </AnimatePresence>
 
-        <Link to={targetPath}>
-          <button className="m-5 h-15 w-50 bg-white cursor-pointer text-xl uppercase text-center rounded hover:bg-red-700 hover:text-white transition duration-400 ease-in-out">
+        <Link to={targetPath} className="mt-6 sm:mt-8">
+          <button className="inline-flex h-12 w-44 items-center justify-center rounded bg-white text-base uppercase transition duration-300 ease-in-out hover:bg-red-700 hover:text-white sm:h-14 sm:w-52 sm:text-lg">
             Discover more
           </button>
         </Link>

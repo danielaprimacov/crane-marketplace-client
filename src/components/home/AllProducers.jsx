@@ -119,12 +119,12 @@ function AllProducers({ allProducers }) {
   }, [stopScroll]);
 
   return (
-    <section className="relative z-30 py-10">
+    <section className="relative z-30 py-8 sm:py-10">
       <div
         ref={scrollRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={stopScroll}
-        className="flex gap-4 overflow-x-auto w-full max-w-[1664px] px-2"
+        className="hide-scrollbar flex w-full gap-3 overflow-x-auto px-4 sm:gap-4 sm:px-6 lg:px-8"
         style={{
           scrollBehavior: "smooth",
           msOverflowStyle: "none",
@@ -140,7 +140,7 @@ function AllProducers({ allProducers }) {
             <Link
               key={prod}
               to={`/cranes/producers/${slug}`}
-              className="flex-none w-[20rem] p-4 text-lg rounded bg-white uppercase text-center font-bold tracking-widest hover:shadow-lg transition"
+              className="flex-none rounded px-4 py-4 text-sm rounded bg-white uppercase text-center font-bold tracking-widest transition hover:shadow-lg sm:w-[18rem] sm:text-base lg:w-[20rem]"
             >
               {prod}
             </Link>

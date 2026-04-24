@@ -4,13 +4,17 @@ import { useLocation } from "react-router-dom";
 import play from "../../assets/icons/play.png";
 import stop from "../../assets/icons/stop-circle.png";
 
-function VideoComponent({ introWebm, introMp4, poster, muted, onMuteChange }) {
+function VideoComponent({
+  introWebm,
+  introMp4,
+  poster,
+  muted,
+  onMuteChange,
+  interactive = false,
+  blurred = true,
+}) {
   const videoRef = useRef(null);
-  const [playing, setPlaying] = useState(true);
-
-  const location = useLocation();
-
-  const isCranes = location.pathname.startsWith("/cranes");
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -18,24 +22,26 @@ function VideoComponent({ introWebm, introMp4, poster, muted, onMuteChange }) {
     }
   }, [muted]);
 
-  const handleToggle = (e) => {
-    e.stopPropagation();
+  const handleTogglePlayback = async (event) => {
+    event.stopPropagation();
+
     const video = videoRef.current;
     if (!video) return;
 
-    if (video.paused) {
-      video.play();
-      setPlaying(true);
-    } else {
-      video.pause();
-      setPlaying(false);
+    try {
+      if (video.paused) {
+        await video.play();
+      } else {
+        video.pause();
+      }
+    } catch (error) {
+      console.error("Video playback error:", error);
     }
   };
 
-  // Toggle mute/unmute (only on video click when isCranes)
   const handleVideoClick = () => {
-    if (!isCranes) return;
-    onMuteChange((m) => !m);
+    if (!interactive || typeof onMuteChange !== "function") return;
+    onMuteChange((prev) => !prev);
   };
 
   return (
@@ -44,8 +50,8 @@ function VideoComponent({ introWebm, introMp4, poster, muted, onMuteChange }) {
         ref={videoRef}
         poster={poster}
         className={`absolute inset-0 w-full h-full object-cover transform filter transition-transform transition-filter duration-500 ${
-          isCranes ? "cursor-pointer" : "blur-[2px] scale-105"
-        }`}
+          interactive ? "cursor-pointer" : ""
+        } ${blurred ? "scale-105 blur-[2px]" : ""}`}
         autoPlay
         muted={muted}
         loop
@@ -61,12 +67,20 @@ function VideoComponent({ introWebm, introMp4, poster, muted, onMuteChange }) {
 
       <button
         onClick={handleToggle}
-        className="absolute bottom-5 right-5 z-20 py-2 px-4 cursor-pointer"
+        className="absolute bottom-4 right-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition hover:bg-white/25 sm:bottom-5 sm:right-5 sm:h-12 sm:w-12"
       >
         {playing ? (
-          <img className="scale-180 pb-3" src={stop} alt="Stop Video" />
+          <img
+            className="h-5 w-5 object-contain sm:h-6 sm:w-6"
+            src={stop}
+            alt="Pause Video"
+          />
         ) : (
-          <img className="scale-180 pb-3" src={play} alt="Play Video" />
+          <img
+            className="h-5 w-5 object-contain sm:h-6 sm:w-6"
+            src={play}
+            alt="Play Video"
+          />
         )}
       </button>
     </section>
