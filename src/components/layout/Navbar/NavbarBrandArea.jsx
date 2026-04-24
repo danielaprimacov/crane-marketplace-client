@@ -81,33 +81,40 @@ function NavbarBrandArea({
         </button>
       )}
       {isCranes && (
-        <div
-          className="flex items-center"
-          onMouseEnter={cancelClose}
-          onMouseLeave={handleMouseLeave}
-        >
-          <button
-            type="button"
-            onClick={() => setMenuOpen((o) => !o)}
-            className="py-4 mr-3 cursor-pointer"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-drawer-menu"
+        <>
+          <div className="flex items-center lg:hidden">
+            <Link to="/">
+              <img src={logo} alt="Logo" className="w-[36px]" />
+            </Link>
+          </div>
+          <div
+            className="hidden lg:flex items-center"
+            onMouseEnter={cancelClose}
+            onMouseLeave={handleMouseLeave}
           >
-            <img
-              src={menuOpen ? menuClose : menuIcon}
-              alt={menuOpen ? "Close" : "Menu"}
-              className="w-[24px]"
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="py-4 mr-3 cursor-pointer"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-drawer-menu"
+            >
+              <img
+                src={menuOpen ? menuClose : menuIcon}
+                alt={menuOpen ? "Close" : "Menu"}
+                className="w-[24px]"
+              />
+            </button>
+            <ProducersNav
+              openSubnav={openSubnav}
+              handleMouseEnter={handleMouseEnter}
+              handleMouseLeave={handleMouseLeave}
+              closeSubnav={closeSubnav}
+              menuOpen={menuOpen}
             />
-          </button>
-          <ProducersNav
-            openSubnav={openSubnav}
-            handleMouseEnter={handleMouseEnter}
-            handleMouseLeave={handleMouseLeave}
-            closeSubnav={closeSubnav}
-            menuOpen={menuOpen}
-          />
-        </div>
+          </div>
+        </>
       )}
       {(isProfile || isServices) && (
         <Link to="/">

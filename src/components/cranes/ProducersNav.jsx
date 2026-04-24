@@ -30,6 +30,7 @@ function ProducersNav({
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
+    if (scrollRef.current) scrollRef.current.scrollLeft = 0;
   };
 
   useEffect(() => {
@@ -74,7 +75,7 @@ function ProducersNav({
 
   return (
     <div
-      className={`relative flex items-center w-full ml-3 lg:ml-4 ${
+      className={`relative hidden lg:flex items-center w-full lg:ml-4 ${
         menuOpen ? "pointer-events-none" : ""
       }`}
       onMouseLeave={stopScroll}
@@ -116,6 +117,7 @@ function ProducersNav({
 
       {needsScroll && !menuOpen && (
         <button
+          type="button"
           onMouseEnter={startScroll}
           className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full shadow hover:bg-gray-100 transition"
         >
@@ -126,13 +128,13 @@ function ProducersNav({
       {openSubnav && !menuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30">
           <div
-            className="max-w-full h-auto shadow-lg bg-white overflow-auto"
+            className="bg-white shadow-lg"
             onMouseEnter={() => handleMouseEnter(openSubnav)}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="mx-auto w-full max-w-7xl py-5">
-              <ul className="space-y-4 mb-8 mt-2">
-                <li className="py-2">
+            <div className="w-full pr-4 pl-12 py-5 lg:pl-18 lg:pr-8">
+              <div className="space-y-4 mb-8 mt-2">
+                <div className="py-2">
                   <Link
                     to={`/cranes/producers/${encodeURIComponent(openSubnav)}`}
                     onClick={closeSubnav}
@@ -143,7 +145,7 @@ function ProducersNav({
                       <ArrowIcon className="w-2 pt-0.5" />
                     </div>
                   </Link>
-                </li>
+                </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-2">
                   {featuredModels.map((crane) => {
                     const model = [
@@ -188,7 +190,7 @@ function ProducersNav({
                     );
                   })}
                 </div>
-              </ul>
+              </div>
             </div>
           </div>
         </div>
