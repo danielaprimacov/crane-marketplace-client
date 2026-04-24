@@ -126,11 +126,11 @@ function ProducersNav({
       {openSubnav && !menuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 bg-white/30 backdrop-blur-sm z-30">
           <div
-            className="max-w-full h-auto p-5 shadow-lg bg-white overflow-auto"
+            className="max-w-full h-auto shadow-lg bg-white overflow-auto"
             onMouseEnter={() => handleMouseEnter(openSubnav)}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-10">
+            <div className="mx-auto w-full max-w-7xl py-5">
               <ul className="space-y-4 mb-8 mt-2">
                 <li className="py-2">
                   <Link

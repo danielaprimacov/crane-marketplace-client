@@ -21,7 +21,6 @@ import LoginForm from "./components/forms/auth/LoginForm";
 import SignupForm from "./components/forms/auth/SignupForm";
 import AdminLayout from "./components/layout/AdminLayout";
 
-import ProducersPage from "./pages/ProducersPage";
 import ProducerPage from "./pages/ProducerPage";
 import AddCranePage from "./pages/AddCranePage";
 import UserCranesPage from "./pages/UserCranesPage";
@@ -105,7 +104,7 @@ function App() {
             }
           />
           <Route path="/cranes/:craneId" element={<CraneDetailsPage />} />
-          <Route path="/cranes/producers" element={<ProducersPage />} />
+
           <Route
             path="/cranes/producers/:producerSlug"
             element={<ProducerPage />}

@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function ProducersSidebar({ producers, activeSlug }) {
-  const [openSlug, setOpenSlug] = useState(
-    activeSlug || producers[0]?.slug || ""
-  );
+import { ChevronDown } from "lucide-react";
 
+function ProducersSidebar({ producers, activeSlug }) {
   const navigate = useNavigate();
 
   const sorted = useMemo(
@@ -16,77 +14,128 @@ function ProducersSidebar({ producers, activeSlug }) {
     [producers]
   );
 
-  useEffect(() => {
-    if (activeSlug) {
-      setOpenSlug(activeSlug);
-      return;
-    }
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    if (!activeSlug && sorted.length > 0 && !openSlug) {
-      setOpenSlug(sorted[0].slug);
-    }
-  }, [activeSlug, sorted, openSlug]);
+  const currentSlug = activeSlug || sorted[0]?.slug || "";
+  const activeProducer = sorted.find((producer) => producer.slug === currentSlug);
+
 
   const selectProducer = (slug) => {
-    setOpenSlug(slug);
+    if (window.innerWidth < 1024) {
+      setIsMobileOpen(false);
+    }
 
-    if (slug !== activeSlug)
+    if (slug !== currentSlug) {
       navigate(`/cranes/producers/${encodeURIComponent(slug)}`);
+    }
   };
 
   return (
-    <aside className="w-full lg:w-1/4 lg:max-w-sm h-auto lg:h-screen max-h-[70vh] lg:max-h-none bg-white border-r border-r-black/20 overflow-y-auto lg:overflow-y-hidden transition-all">
-      <ul className="p-4 pt-6 sm:pt-8 lg:pt-10 space-y-2">
-        {sorted.map(({ name, slug, models }) => (
-          <li
-            key={slug}
-            className="pb-3 border-b border-b-black/10 ml-0 sm:ml-4 lg:ml-8"
-          >
-            <button
-              onClick={() => selectProducer(slug)}
-              className="w-full flex justify-between items-center text-left py-2"
-            >
-              <span
-                className={`cursor-pointer text-base sm:text-lg tracking-wider ${
-                  openSlug === slug ? "text-red-600" : ""
+    <aside className="overflow-hidden bg-white">
+      {/* Mobile header */}
+      <div className="flex items-center justify-between border-b border-b-black/10 px-4 py-4 lg:hidden">
+        <div className="min-w-0">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-gray-500">
+            Producer
+          </p>
+          <p className="truncate text-sm font-medium text-black">
+            {activeProducer?.name || "Select producer"}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsMobileOpen((prev) => !prev)}
+          className="ml-4 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-black/10 text-black transition hover:bg-gray-50"
+          aria-label={isMobileOpen ? "Hide producers" : "Show producers"}
+          aria-expanded={isMobileOpen}
+        >
+          <ChevronDown
+            className={`h-5 w-5 transition-all duration-300 ease-out ${
+              isMobileOpen ? "rotate-180 scale-105" : "rotate-0 scale-100"
+            }`}
+            strokeWidth={2.2}
+          />
+        </button>
+      </div>
+
+      <div className={`${isMobileOpen ? "block" : "hidden"} lg:block`}>
+        <ul className="max-h-[75vh] overflow-y-auto p-4 sm:p-5 lg:max-h-[calc(100vh-2rem)] lg:p-0">
+          {sorted.map(({ name, slug, models = [] }) => {
+            const isActive = currentSlug === slug;
+
+            return (
+              <li
+                key={slug}
+                className={`border-b border-black/10 last:border-b-0 ${
+                  isActive ? "bg-red-50/50" : "bg-white"
                 }`}
               >
-                {name} ({models.length})
-              </span>
-              <span className="ml-2 shrink-0 scale-125 transform sm:scale-150">
-                {openSlug === slug ? "–" : "+"}
-              </span>
-            </button>
+                <button
+                  type="button"
+                  onClick={() => selectProducer(slug)}
+                  className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left cursor-pointer transition hover:bg-gray-50 lg:px-6"
+                >
+                  <span
+                    className={`text-sm uppercase tracking-wide transition sm:text-base ${
+                      isActive ? "font-semibold text-red-600" : "text-black"
+                    }`}
+                  >
+                    {name}
+                    <span className="ml-2 text-black/50">
+                      ({models.length})
+                    </span>
+                  </span>
 
-            {openSlug === slug && (
-              <ul className="mt-2 space-y-4 sm:space-y-5">
-                {(models || []).filter(Boolean).map((model, index) => {
-                  const craneId = model?.id || model?._id;
-                  const label = model?.label || `Model ${index + 1}`;
+                  <span
+                    className={`hidden lg:inline shrink-0 text-lg leading-none transition ${
+                      isActive ? "text-red-600" : "text-black/60"
+                    }`}
+                  >
+                    {isActive ? "–" : "+"}
+                  </span>
+                </button>
 
-                  return (
-                    <li
-                      key={craneId || `${slug}-${index}`}
-                      className="text-sm cursor-pointer text-black/70"
-                    >
-                      {craneId ? (
-                        <Link
-                          to={`/cranes/${craneId}`}
-                          className="hover:text-red-600 transition-colors"
-                        >
-                          {label}
-                        </Link>
-                      ) : (
-                        <span>{label}</span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+                <div
+                  className={`grid transition-all duration-300 ease-out ${
+                    isActive
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="px-4 pb-4 lg:px-6">
+                      <ul className="space-y-3 border-l border-black/10 pl-4">
+                        {(models || []).filter(Boolean).map((model, index) => {
+                          const craneId = model?.id || model?._id;
+                          const label = model?.label || `Model ${index + 1}`;
+
+                          return (
+                            <li key={craneId || `${slug}-${index}`}>
+                              {craneId ? (
+                                <Link
+                                  to={`/cranes/${craneId}`}
+                                  className="block text-sm text-black/70 transition hover:text-red-600"
+                                >
+                                  {label}
+                                </Link>
+                              ) : (
+                                <span className="block text-sm text-black/50">
+                                  {label}
+                                </span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </aside>
   );
 }
