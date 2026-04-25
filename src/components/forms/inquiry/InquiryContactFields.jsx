@@ -1,7 +1,7 @@
 function InquiryContactFields({ form, updateField }) {
   return (
     <>
-      <div className="relative mb-8">
+      <div className="relative mb-8 pt-4">
         <input
           type="text"
           id="customerName"
@@ -15,13 +15,17 @@ function InquiryContactFields({ form, updateField }) {
         />
         <label
           htmlFor="customerName"
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+          className={`absolute left-0 transition-all duration-200 ${
+            form.customerName
+              ? "-top-1 text-sm text-gray-500"
+              : "top-6 text-base text-gray-500"
+          } peer-focus:-top-1 peerfocus:text-sm`}
         >
           Your Name
         </label>
       </div>
 
-      <div className="relative mb-8">
+      <div className="relative mb-8 pt-4">
         <input
           id="email"
           name="email"
@@ -34,13 +38,17 @@ function InquiryContactFields({ form, updateField }) {
         />
         <label
           htmlFor="email"
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+          className={`absolute left-0 transition-all duration-200 ${
+            form.email
+              ? "-top-1 text-sm text-gray-500"
+              : "top-6 text-base text-gray-500"
+          } peer-focus:-top-1 peerfocus:text-sm`}
         >
           Email Address
         </label>
       </div>
 
-      <div className="relative mb-5">
+      <div className="relative mb-5 pt-4">
         <textarea
           id="message"
           name="message"
@@ -54,7 +62,11 @@ function InquiryContactFields({ form, updateField }) {
         />
         <label
           htmlFor="message"
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+          className={`absolute left-0 transition-all duration-200 ${
+            form.message
+              ? "-top-1 text-sm text-gray-500"
+              : "top-6 text-base text-gray-500"
+          } peer-focus:-top-1 peerfocus:text-sm`}
         >
           Message
         </label>

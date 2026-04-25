@@ -1,6 +1,6 @@
 function InquiryAddressField({ address, updateField, required = false }) {
   return (
-    <div className="relative mb-8">
+    <div className="relative mb-8 pt-4">
       <input
         type="text"
         id="address"
@@ -13,7 +13,11 @@ function InquiryAddressField({ address, updateField, required = false }) {
       />
       <label
         htmlFor="address"
-        className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+        className={`absolute left-0 transition-all duration-200 ${
+          address
+            ? "-top-1 text-sm text-gray-500"
+            : "top-6 text-base text-gray-500"
+        } peer-focus:-top-1 peerfocus:text-sm`}
       >
         Address
       </label>
