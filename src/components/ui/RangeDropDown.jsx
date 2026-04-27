@@ -1,6 +1,11 @@
 import { Popover, Transition } from "@headlessui/react";
 import { Range, getTrackBackground } from "react-range";
 import { Fragment, useState, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
 
 function RangeDropDown({
   label,
@@ -16,106 +21,127 @@ function RangeDropDown({
   // if parent value changes (e.g. reset filters), sync
   useEffect(() => {
     setLocal(value);
-  }, [value.join()]);
+  }, [value]);
+
+  const handleMinInputChange = (rawValue) => {
+    if (rawValue === "") {
+      setLocal([min, local[1]]);
+      return;
+    }
+
+    const nextMin = clamp(Number(rawValue), min, local[1]);
+    setLocal([nextMin, local[1]]);
+  };
+
+  const handleMaxInputChange = (rawValue) => {
+    if (rawValue === "") {
+      setLocal([local[0], max]);
+      return;
+    }
+
+    const nextMax = clamp(Number(rawValue), local[0], max);
+    setLocal([local[0], nextMax]);
+  };
 
   return (
-    <Popover className="relative inline-block text-left">
-      <Popover.Button className="flex items-center gap-1 px-4 py-2 border border-gray-400 rounded hover:bg-gray-50">
-        <span className="text-sm">{label}</span>
-        <svg
-          className="w-4 h-4 text-gray-500"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-        >
-          <path d="M5 8l5 5 5-5H5z" />
-        </svg>
-      </Popover.Button>
-
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 translate-y-1"
-        enterTo="opacity-100 translate-y-0"
-        leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 translate-y-0"
-        leaveTo="opacity-0 translate-y-1"
-      >
-        <Popover.Panel className="absolute z-10 mt-2 w-64 bg-white border border-gray-200 rounded shadow-lg p-4">
-          {/* Slider track */}
-          <Range
-            values={local}
-            step={step}
-            min={min}
-            max={max}
-            onChange={(vals) => {
-              setLocal(vals);
-              onChange && onChange(vals);
-            }}
-            renderTrack={({ props, children }) => (
-              <div
-                {...props}
-                className="h-2 flex w-full rounded-lg"
-                style={{
-                  ...props.style,
-                  background: getTrackBackground({
-                    values: local,
-                    colors: ["#E5E7EB", "#e53935", "#E5E7EB"],
-                    min,
-                    max,
-                  }),
-                }}
-              >
-                {children}
-              </div>
-            )}
-            renderThumb={({ props }) => (
-              <div
-                {...props}
-                className="h-4 w-4 rounded-full bg-white border border-gray-400 shadow"
-              />
-            )}
-          />
-
-          {/* Numeric inputs */}
-          <div className="mt-4 flex justify-between items-center space-x-2">
-            <input
-              type="number"
-              className="w-1/2 p-1 border border-gray-300 rounded"
-              value={local[0]}
-              min={min}
-              max={local[1]}
-              onChange={(e) => {
-                const v = Math.min(Number(e.target.value), local[1]);
-                setLocal([v, local[1]]);
-              }}
+    <Popover className="relative w-full sm:w-auto sm:min-w-[12rem]">
+      {({ open }) => (
+        <>
+          {" "}
+          <Popover.Button className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-gray-300 bg-white px-4 text-left transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-600/15">
+            <span className="truncate text-sm text-gray-800">{label}</span>
+            <ChevronDown
+              className={`h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200 ${
+                open ? "rotate-180" : ""
+              }`}
             />
-            <span>–</span>
-            <input
-              type="number"
-              className="w-1/2 p-1 border border-gray-300 rounded"
-              value={local[1]}
-              min={local[0]}
-              max={max}
-              onChange={(e) => {
-                const v = Math.max(Number(e.target.value), local[0]);
-                setLocal([local[0], v]);
-              }}
-            />
-          </div>
-
-          {/* Apply */}
-          <button
-            onClick={() => {
-              if (local[0] > min || local[1] < max) {
-                onApply(local);
-              }
-            }}
-            className="mt-4 w-full bg-red-500 text-white py-2 rounded"
+          </Popover.Button>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-150"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-100"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
           >
-            Apply
-          </button>
-        </Popover.Panel>
-      </Transition>
+            <Popover.Panel className="absolute z-20 mt-2 w-full min-w-[16rem] max-w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-gray-200 bg-white p-4 shadow-lg focus:outline-none sm:w-72">
+              {({ close }) => (
+                <>
+                  <div className="mb-4">
+                    <div className="mb-5 px-1">
+                      <Range
+                        values={local}
+                        step={step}
+                        min={min}
+                        max={max}
+                        onChange={(vals) => {
+                          setLocal(vals);
+                          onChange?.(vals);
+                        }}
+                        renderTrack={({ props, children }) => (
+                          <div
+                            {...props}
+                            className="flex h-2 w-full rounded-lg"
+                            style={{
+                              ...props.style,
+                              background: getTrackBackground({
+                                values: local,
+                                colors: ["#E5E7EB", "#ef4444", "#E5E7EB"],
+                                min,
+                                max,
+                              }),
+                            }}
+                          >
+                            {children}
+                          </div>
+                        )}
+                        renderThumb={({ props }) => (
+                          <div
+                            {...props}
+                            className="h-4 w-4 rounded-full border border-gray-400 bg-white shadow"
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none transition focus:border-red-500"
+                        value={local[0]}
+                        min={min}
+                        max={local[1]}
+                        onChange={(e) => handleMinInputChange(e.target.value)}
+                      />
+                      <span className="shrink-0 text-sm text-gray-500">–</span>
+                      <input
+                        type="number"
+                        className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none transition focus:border-red-500"
+                        value={local[1]}
+                        min={local[0]}
+                        max={max}
+                        onChange={(e) => handleMaxInputChange(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onApply?.(local);
+                      close();
+                    }}
+                    className="h-11 w-full rounded-lg bg-red-500 text-sm font-medium text-white transition hover:bg-red-600"
+                  >
+                    Apply
+                  </button>
+                </>
+              )}
+            </Popover.Panel>
+          </Transition>
+        </>
+      )}
     </Popover>
   );
 }

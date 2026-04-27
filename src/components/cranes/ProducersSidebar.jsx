@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { ChevronDown } from "lucide-react";
@@ -17,8 +17,9 @@ function ProducersSidebar({ producers, activeSlug }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const currentSlug = activeSlug || sorted[0]?.slug || "";
-  const activeProducer = sorted.find((producer) => producer.slug === currentSlug);
-
+  const activeProducer = sorted.find(
+    (producer) => producer.slug === currentSlug
+  );
 
   const selectProducer = (slug) => {
     if (window.innerWidth < 1024) {
@@ -60,7 +61,7 @@ function ProducersSidebar({ producers, activeSlug }) {
       </div>
 
       <div className={`${isMobileOpen ? "block" : "hidden"} lg:block`}>
-        <ul className="max-h-[75vh] overflow-y-auto p-4 sm:p-5 lg:max-h-[calc(100vh-2rem)] lg:p-0">
+        <ul className="max-h-[85vh] overflow-y-auto p-4 sm:p-5 lg:max-h-[calc(100vh-2rem)] lg:p-0 hide-scrollbar">
           {sorted.map(({ name, slug, models = [] }) => {
             const isActive = currentSlug === slug;
 
