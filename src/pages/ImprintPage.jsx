@@ -6,89 +6,122 @@ import {
   BadgeCheckIcon,
 } from "@heroicons/react/outline";
 
+const companyDetails = {
+  companyName: "KranHub GmbH",
+  street: "Crane Way 123",
+  city: "10115 Berlin",
+  country: "Germany",
+  managingDirector: "Anna Müller",
+  registerCourt: "Berlin-Charlottenburg Local Court, HRB 98765",
+  vatId: "DE123456789",
+  phone: "+49 30 123 4567",
+  phoneHref: "tel:+49301234567",
+  email: "legal@kranhub.com",
+  emailHref: "mailto:legal@kranhub.com",
+};
+
+function SectionTitle({ children }) {
+  return (
+    <h2 className="inline-block border-b-4 border-red-600 pb-1 text-xl font-semibold uppercase sm:text-2xl">
+      {children}
+    </h2>
+  );
+}
+
+function InfoRow({ icon: Icon, children, alignStart = false }) {
+  return (
+    <div
+      className={`flex gap-3 ${alignStart ? "items-start" : "items-center"}`}
+    >
+      <Icon
+        className={`h-6 w-6 shrink-0 text-red-600 ${alignStart ? "mt-1" : ""}`}
+      />
+      <div className="min-w-0 text-gray-700">{children}</div>
+    </div>
+  );
+}
+
 function ImprintPage() {
   return (
-    <div className="bg-gray-100 min-h-screen py-16">
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-lg">
         {/* Hero */}
-        <div className="bg-red-600 py-12 text-center">
-          <h1 className="text-4xl font-extrabold text-white uppercase">
+        <div className="bg-red-600 px-4 py-10 text-center sm:px-6 sm:py-12">
+          <h1 className="text-3xl font-extrabold uppercase text-white sm:text-4xl lg:text-5xl">
             Imprint
           </h1>
-          <p className="mt-2 text-red-200">
+          <p className="mt-3 text-sm text-red-100 sm:text-base">
             Legal disclosure and company information
           </p>
         </div>
 
-        <div className="p-8 space-y-12">
-          {/* Company Details */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold uppercase border-b-4 border-red-600 inline-block pb-1">
-                Company
-              </h2>
-              <div className="flex items-start gap-3">
-                <OfficeBuildingIcon className="w-6 h-6 text-red-600 mt-1" />
+        <div className="space-y-8 p-5 sm:space-y-10 sm:p-8 lg:p-10">
+          {/* Company + Contact */}
+          <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <div className="space-y-5 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+              <SectionTitle>Company</SectionTitle>
+
+              <InfoRow icon={OfficeBuildingIcon} alignStart>
                 <div>
-                  <p className="font-medium">KranHub GmbH</p>
-                  <address className="not-italic text-gray-700">
-                    Crane Way 123
+                  <p className="font-medium text-gray-900">
+                    {companyDetails.companyName}
+                  </p>
+                  <address className="not-italic leading-7 text-gray-700">
+                    {companyDetails.street}
                     <br />
-                    10115 Berlin
+                    {companyDetails.city}
                     <br />
-                    Germany
+                    {companyDetails.country}
                   </address>
                 </div>
-              </div>
+              </InfoRow>
 
-              <div className="flex items-start gap-3">
-                <IdentificationIcon className="w-6 h-6 text-red-600 mt-1" />
-                <div className="text-gray-700">
+              <InfoRow icon={IdentificationIcon} alignStart>
+                <div className="space-y-2 leading-7">
                   <p>
-                    <strong>Managing Director:</strong> Anna Müller
+                    <strong>Managing Director:</strong>{" "}
+                    {companyDetails.managingDirector}
                   </p>
                   <p>
-                    <strong>Register Court:</strong> Berlin‐Charlottenburg Local
-                    Court, HRB 98765
+                    <strong>Register Court:</strong>{" "}
+                    {companyDetails.registerCourt}
                   </p>
                   <p>
-                    <strong>VAT‐ID:</strong> DE123456789
+                    <strong>VAT ID:</strong> {companyDetails.vatId}
                   </p>
                 </div>
-              </div>
+              </InfoRow>
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold uppercase border-b-4 border-red-600 inline-block pb-1">
-                Contact
-              </h2>
-              <div className="flex items-center gap-3">
-                <PhoneIcon className="w-6 h-6 text-red-600" />
+            <div className="space-y-5 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+              <SectionTitle>Contact</SectionTitle>
+
+              <InfoRow icon={PhoneIcon}>
                 <a
-                  href="tel:+49301234567"
-                  className="text-gray-800 hover:text-red-600"
+                  href={companyDetails.phoneHref}
+                  className="break-words text-gray-800 transition hover:text-red-600"
                 >
-                  +49 30 123 4567
+                  {companyDetails.phone}
                 </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <MailIcon className="w-6 h-6 text-red-600" />
+              </InfoRow>
+
+              <InfoRow icon={MailIcon}>
                 <a
-                  href="mailto:legal@kranhub.com"
-                  className="text-gray-800 hover:text-red-600"
+                  href={companyDetails.emailHref}
+                  className="break-all text-gray-800 transition hover:text-red-600"
                 >
-                  legal@kranhub.com
+                  {companyDetails.email}
                 </a>
-              </div>
+              </InfoRow>
             </div>
           </section>
 
           {/* Supervisory Authority */}
-          <section className="bg-gray-50 p-6 rounded-lg">
-            <h2 className="text-2xl font-semibold uppercase border-l-4 border-red-600 pl-3 mb-4">
+          <section className="rounded-2xl bg-gray-50 p-5 sm:p-6">
+            <h2 className="mb-4 border-l-4 border-red-600 pl-3 text-xl font-semibold uppercase sm:text-2xl">
               Supervisory Authority
             </h2>
-            <p className="text-gray-700">
+            <p className="leading-7 text-gray-700">
               IHK Berlin (Chamber of Commerce)
               <br />
               Fasanenstraße 85, 10623 Berlin
@@ -96,34 +129,35 @@ function ImprintPage() {
           </section>
 
           {/* Dispute Resolution */}
-          <section className="bg-gray-50 p-6 rounded-lg space-y-4">
-            <h2 className="text-2xl font-semibold uppercase border-l-4 border-red-600 pl-3">
+          <section className="space-y-4 rounded-2xl bg-gray-50 p-5 sm:p-6">
+            <h2 className="border-l-4 border-red-600 pl-3 text-xl font-semibold uppercase sm:text-2xl">
               Online Dispute Resolution
             </h2>
-            <p className="text-gray-700 leading-relaxed">
+
+            <p className="leading-7 text-gray-700">
               Under EU Regulation 524/2013, consumers may file complaints via
-              the EU’s Online Dispute Resolution platform&nbsp;
+              the EU’s Online Dispute Resolution platform{" "}
               <a
                 href="https://ec.europa.eu/consumers/odr/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-red-600 hover:underline"
+                className="break-all text-red-600 transition hover:underline"
               >
                 ec.europa.eu/consumers/odr
               </a>
               .
             </p>
-            <div className="flex items-center gap-3 text-gray-700">
-              <BadgeCheckIcon className="w-6 h-6 text-red-600" />
-              <p>
+
+            <InfoRow icon={BadgeCheckIcon} alignStart>
+              <p className="leading-7 text-gray-700">
                 KranHub GmbH is willing to participate in dispute resolution
                 proceedings before the Berlin Consumer Arbitration Board.
               </p>
-            </div>
+            </InfoRow>
           </section>
 
           {/* Footer */}
-          <footer className="text-center text-gray-500 text-sm">
+          <footer className="border-t border-black/10 pt-6 text-center text-sm text-gray-500">
             &copy; {new Date().getFullYear()} KranHub GmbH. All rights reserved.
           </footer>
         </div>
