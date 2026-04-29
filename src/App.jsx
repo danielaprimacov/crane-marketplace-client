@@ -8,7 +8,6 @@ import CranesPage from "./pages/CranesPage";
 import CraneDetailsPage from "./pages/CraneDetailsPage";
 import EditCraneDetailsPage from "./pages/EditCraneDetailsPage";
 import NewInquiryPage from "./pages/NewInquiryPage";
-import AdminPage from "./pages/AdminPage";
 import InquiriesListPage from "./pages/InquiriesListPage";
 import ProfilePage from "./pages/ProfilePage";
 
@@ -149,7 +148,6 @@ function App() {
 
         <Route element={<AdminRoute />}>
           <Route path="admin" element={<AdminLayout />}>
-            <Route index element={<AdminPage />} />
             <Route path="inquiries" element={<InquiriesListPage />} />
             <Route path="messages" element={<MessagesPage />} />
           </Route>
