@@ -7,8 +7,8 @@ function Columns() {
 
   return (
     <>
-      <div className="mt-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-6 overflow-x-auto pb-4 hide-scrollbar">
+        <div className="flex gap-4 px-4 sm:px-0 lg:grid lg:min-w-0 lg:grid-cols-3 lg:gap-6">
           {columns.map((column) => (
             <ColumnItem key={column.id} column={column} moveTask={moveTask} />
           ))}

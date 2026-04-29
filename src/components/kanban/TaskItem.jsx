@@ -91,15 +91,15 @@ function TaskItem({ task }) {
         onClick={openHandler}
         style={{
           opacity: isDragging ? 0 : 1,
-          transform: isDragging ? "scale(0.98)" : "scale(1)",
-          transition: "transform 0.2s ease, opacity 0.2s ease",
+          transform: isDragging ? "scale(0.7)" : "scale(1)",
+          transition: "transform 0.25s ease, opacity 0.25s ease",
           pointerEvents: isDragging ? "none" : "auto",
           border: `1px solid ${borderColor}`,
           touchAction: "none",
         }}
       >
         <h3
-          className="mb-2 flex items-center justify-between gap-2"
+          className="mb-2 flex items-center justify-between gap-2 text-center"
           style={{ color: titleColor }}
         >
           <button
@@ -110,7 +110,7 @@ function TaskItem({ task }) {
             <ArrowsOutIcon className="transition duration-300 ease-out hover:stroke-[#f9572a]" />
           </button>
 
-          <span className="line-clamp-2 flex-1 text-center text-sm font-medium">{task.message}</span>
+          <span className="truncate text-sm font-medium">{task.message}</span>
 
           <button
             type="button"
