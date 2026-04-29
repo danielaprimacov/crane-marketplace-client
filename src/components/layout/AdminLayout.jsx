@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { Outlet, Link, NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/auth.context";
@@ -11,7 +11,7 @@ import goBackIcon from "../../assets/icons/angle-double-small-left.png";
 
 function AdminLayout() {
   const { isLoggedIn, user } = useContext(AuthContext);
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   const [messagesCount, setMessagesCount] = useState(0);
 
@@ -32,6 +32,11 @@ function AdminLayout() {
     const fetchMessagesCount = async () => {
       try {
         const token = localStorage.getItem("authToken");
+        if (!token) {
+          setMessagesCount(0);
+          return;
+        }
+
         const { data } = await axios.get(`${API_URL}/messages`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -42,7 +47,7 @@ function AdminLayout() {
     };
 
     fetchMessagesCount();
-  }, [isLoggedIn, user?.role, location.pathname]);
+  }, [isLoggedIn, user?.role, pathname]);
 
   const adminLinkClass = ({ isActive }) =>
     `relative inline-flex items-center border-b pb-1 text-sm sm:text-base transition ${
