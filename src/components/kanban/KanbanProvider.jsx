@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import KanbanContext from "./KanbanContext";
 
 const columnsConfig = [
@@ -6,6 +6,11 @@ const columnsConfig = [
   { id: "in_progress", title: "In Progress" },
   { id: "resolved", title: "Resolved" },
 ];
+
+const normalizeTask = ({ _id, ...rest }) => ({
+  id: _id,
+  ...rest,
+});
 
 const KanbanProvider = ({
   initialTasks = [],
@@ -18,85 +23,115 @@ const KanbanProvider = ({
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    setTasks(
-      initialTasks.map(({ _id, ...rest }) => ({
-        id: _id,
-        ...rest,
-      }))
-    );
+    setTasks(initialTasks.map(normalizeTask));
   }, [initialTasks]);
 
-  const [columns, setColumns] = useState([]);
-
-  useEffect(() => {
+  const columns = useMemo(() => {
     const grouped = tasks.reduce((acc, task) => {
       acc[task.status] = acc[task.status] || [];
       acc[task.status].push(task);
       return acc;
     }, {});
 
-    const newCols = columnsConfig.map(({ id, title }) => ({
+    return columnsConfig.map(({ id, title }) => ({
       id,
       title,
       tasks: (grouped[id] || []).sort(
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
       ),
     }));
-    setColumns(newCols);
   }, [tasks]);
 
   // Move a task from one column to another
-  const moveTask = (taskId, targetStatus) => {
-    const full = tasks.find((t) => t.id === taskId);
+  const moveTask = async (taskId, targetStatus) => {
+    const fullTask = tasks.find((t) => t.id === taskId);
+    if (!fullTask || fullTask.status === targetStatus) return;
 
-    // build a complete update object
-    const updatedFields = {
-      status: targetStatus,
-      period: full.period,
-      isRead: full.isRead,
-      customerName: full.customerName,
-      email: full.email,
-      message: full.message,
-      crane: full.crane,
-      address: full.address,
-    };
+    const previousStatus = fullTask.status;
 
-    onMoveTask(taskId, updatedFields);
-
-    // update local state immediately
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: targetStatus } : t))
+      prev.map((task) =>
+        task.id === taskId ? { ...task, status: targetStatus } : task
+      )
     );
+
+    try {
+      await onMoveTask?.(taskId, {
+        ...fullTask,
+        status: targetStatus,
+      });
+    } catch (error) {
+      console.error("Move task failed:", error);
+
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === taskId ? { ...task, status: previousStatus } : task
+        )
+      );
+    }
   };
 
   // Delete a task locally
-  const deleteTask = (taskId) => {
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  const deleteTask = async (taskId) => {
+    const previousTasks = tasks;
+
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+
+    try {
+      await onDeleteTask?.(taskId);
+    } catch (error) {
+      console.error("Delete task failed:", error);
+      setTasks(previousTasks);
+      throw error;
+    }
   };
 
   // Update a task’s fields locally
-  const updateTask = (id, updatedFields) => {
-  if (typeof onUpdateTask === "function") {
-    onUpdateTask(id, updatedFields);
-  }
+  const updateTask = async (id, updatedFields) => {
+    const previousTasks = tasks;
 
-  setTasks(prev =>
-    prev.map(t =>
-      t.id === id ? { ...t, ...updatedFields } : t
-    )
-  );
-};
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, ...updatedFields } : task
+      )
+    );
 
-  const contextValue = {
-    columns,
-    moveTask,
-    deleteTask,
-    updateTask,
-    markRead: onRead,
+    try {
+      await onUpdateTask?.(id, updatedFields);
+    } catch (error) {
+      console.error("Update task failed:", error);
+      setTasks(previousTasks);
+      throw error;
+    }
+  };
+
+  const markRead = async (taskId) => {
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task || task.isRead) return;
+
+    setTasks((prev) =>
+      prev.map((item) =>
+        item.id === taskId ? { ...item, isRead: true } : item
+      )
+    );
+
+    try {
+      await onRead?.(taskId);
+    } catch (error) {
+      console.error("Mark read failed:", error);
+
+      setTasks((prev) =>
+        prev.map((item) =>
+          item.id === taskId ? { ...item, isRead: false } : item
+        )
+      );
+    }
   };
 
   return (
-    <KanbanContext.Provider value={contextValue}>
+    <KanbanContext.Provider
+      value={{ columns, moveTask, deleteTask, updateTask, markRead }}
+    >
       {children}
     </KanbanContext.Provider>
   );

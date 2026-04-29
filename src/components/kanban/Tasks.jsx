@@ -1,22 +1,25 @@
-import FlipMove from "react-flip-move";
-
+import { AnimatePresence, motion } from "framer-motion";
 import TaskItem from "./TaskItem";
 
-function Tasks({ tasks, deleteTask }) {
+function Tasks({ tasks = [] }) {
   return (
-    <FlipMove
-      className="flex flex-col items-center gap-2"
-      duration={350}
-      easing="ease-out"
-      animateOnUpdate={true}
-    >
-      {tasks &&
-        tasks.map((task) => (
-          <div key={`${task.id}-${task.updatedAt || 0}`}>
-            <TaskItem task={task} deleteTask={deleteTask} />
-          </div>
+    <div className="flex flex-col gap-2">
+      <AnimatePresence initial={false}>
+        {tasks.map((task) => (
+          <motion.div
+            key={task.id}
+            layout="position"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="w-full"
+          >
+            <TaskItem task={task} />
+          </motion.div>
         ))}
-    </FlipMove>
+      </AnimatePresence>
+    </div>
   );
 }
 

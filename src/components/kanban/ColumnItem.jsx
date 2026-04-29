@@ -3,9 +3,9 @@ import { useDrop } from "react-dnd";
 
 import Tasks from "./Tasks";
 
-function ColumnItem({ column, moveTask, deleteTask }) {
+function ColumnItem({ column, moveTask }) {
   const dropZoneRef = useRef(null);
-  const extendedMargin = 100;
+  const extendedMargin = 40;
 
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: "TASK",
@@ -34,16 +34,18 @@ function ColumnItem({ column, moveTask, deleteTask }) {
         paddingBottom: extendedMargin,
         marginBottom: -extendedMargin,
       }}
+      className="w-[280px] shrink-0 sm:w-[320px] lg:w-auto lg:min-w-0"
     >
       <div
-        className={`flex flex-col min-w-[370px] flex-[0_1_370px] p-2.5 mr-2.5 rounded-md border  ${borderColorClass}
-                  ${isOver && canDrop ? "bg-white/30" : "bg-transparent"}`}
+        className={`flex min-h-[260px] flex-col rounded-md border p-2.5 lg:min-h-[200px] ${borderColorClass} ${
+          isOver && canDrop ? "bg-white/30" : "bg-transparent"
+        }`}
       >
-        <div className="text-lg font-semibold tracking-widest text-center text-gray-700 mb-5 py-2 mx-1  border-b border-b-orange-300">
+        <div className="mx-1 mb-5 border-b border-b-orange-300 py-2 text-center text-lg font-semibold tracking-widest text-gray-700">
           <h2>{column.title}</h2>
         </div>
 
-        <Tasks tasks={column.tasks} deleteTask={deleteTask} />
+        <Tasks tasks={column.tasks} />
       </div>
     </div>
   );

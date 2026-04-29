@@ -5,6 +5,7 @@ function getItemStyles(currentOffset) {
     return { display: "none" };
   }
   const { x, y } = currentOffset;
+
   return {
     position: "fixed",
     pointerEvents: "none",
@@ -44,26 +45,19 @@ function DragLayer() {
   return (
     <div style={getItemStyles(currentOffset)}>
       <div
-        className="w-88 h-28 cursor-pointer rounded-md p-2.5 mb-2.5 flex flex-col justify-center"
-        style={{ opacity: 0.7, border: `2px solid ${borderColor}` }}
+        className="flex h-28 w-80 flex-col justify-center rounded-md border-2 bg-white p-3 shadow-lg"
+        style={{ opacity: 0.8, borderColor }}
       >
         <h3
-          className={`mb-2 flex justify-between items-center ${
-            {
-              new: "gradient-low",
-              in_progress: "gradient-medium",
-              resolved: "gradient-high",
-            }[item.status] || ""
-          }`}
+          className="mb-2 truncate text-center font-semibold"
           style={{ color: titleColor }}
         >
-          <div className="cursor-pointer"></div>
           {item.title}
-          <div className="cursor-pointer"></div>
         </h3>
-        <div className="flex justify-between items-center mt-6">
-          <p className="text-sm">{item.customerName}</p>
-          <p className="text-xs text-gray-700">{item.email}</p>
+
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <p className="truncate text-sm">{item.customerName}</p>
+          <p className="truncate text-xs text-gray-700">{item.email}</p>
         </div>
       </div>
     </div>
