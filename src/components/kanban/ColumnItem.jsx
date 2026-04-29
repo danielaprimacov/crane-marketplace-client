@@ -34,14 +34,14 @@ function ColumnItem({ column, moveTask }) {
         paddingBottom: extendedMargin,
         marginBottom: -extendedMargin,
       }}
-      className="w-[280px] shrink-0 sm:w-[320px] lg:w-auto lg:min-w-0"
+      className="w-full"
     >
       <div
-        className={`flex min-h-[260px] flex-col rounded-md border p-2.5 lg:min-h-[200px] ${borderColorClass} ${
+        className={`flex min-h-[200px] flex-col rounded-md border p-2.5 sm:min-h-[220px] ${borderColorClass} ${
           isOver && canDrop ? "bg-white/30" : "bg-transparent"
         }`}
       >
-        <div className="mx-1 mb-5 border-b border-b-orange-300 py-2 text-center text-lg font-semibold tracking-widest text-gray-700">
+        <div className="mx-1 mb-5 border-b border-b-orange-300 py-2 text-center text-base font-semibold tracking-widest text-gray-700 sm:text-lg">
           <h2>{column.title}</h2>
         </div>
 
