@@ -6,15 +6,18 @@ export function getDndConfig() {
     return { backend: HTML5Backend };
   }
 
-  const isTouchDevice =
-    window.matchMedia("(pointer: coarse)").matches ||
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0;
+  const isRealTouchDevice = window.matchMedia(
+    "(hover: none) and (pointer: coarse)"
+  ).matches;
 
-  if (isTouchDevice) {
+  if (isRealTouchDevice) {
     return {
       backend: TouchBackend,
-      options: { enableMouseEvents: true },
+      options: {
+        enableMouseEvents: true,
+        delayTouchStart: 180,
+        touchSlop: 8,
+      },
     };
   }
 

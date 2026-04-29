@@ -10,10 +10,11 @@ function ColumnItem({ column, moveTask }) {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: "TASK",
     drop: (item) => {
+      if (!item?.id) return;
       moveTask(item.id, column.id);
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOver: monitor.isOver({ shallow: true }),
       canDrop: monitor.canDrop(),
     }),
   });
@@ -34,14 +35,14 @@ function ColumnItem({ column, moveTask }) {
         paddingBottom: extendedMargin,
         marginBottom: -extendedMargin,
       }}
-      className="w-[280px] shrink-0 sm:w-[320px] lg:w-auto lg:min-w-0"
+      className="w-[calc(100vw-2rem)] max-w-[360px] shrink-0 lg:w-auto lg:max-w-none lg:min-w-0"
     >
       <div
-        className={`flex min-h-[260px] flex-col rounded-md border p-2.5 lg:min-h-[200px] ${borderColorClass} ${
+        className={`flex min-h-[320px] flex-col rounded-md border p-3 transition-colors ${borderColorClass} ${
           isOver && canDrop ? "bg-white/30" : "bg-transparent"
         }`}
       >
-        <div className="mx-1 mb-5 border-b border-b-orange-300 py-2 text-center text-lg font-semibold tracking-widest text-gray-700">
+        <div className="mx-1 mb-4 select-none border-b border-b-orange-300 py-2 text-center text-lg font-semibold tracking-widest text-gray-700">
           <h2>{column.title}</h2>
         </div>
 

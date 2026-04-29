@@ -45,6 +45,7 @@ const KanbanProvider = ({
   // Move a task from one column to another
   const moveTask = async (taskId, targetStatus) => {
     const fullTask = tasks.find((t) => t.id === taskId);
+
     if (!fullTask || fullTask.status === targetStatus) return;
 
     const previousStatus = fullTask.status;
@@ -57,7 +58,6 @@ const KanbanProvider = ({
 
     try {
       await onMoveTask?.(taskId, {
-        ...fullTask,
         status: targetStatus,
       });
     } catch (error) {

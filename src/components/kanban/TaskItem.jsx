@@ -1,5 +1,6 @@
 import { useDrag } from "react-dnd";
-import { useContext, useState } from "react";
+import { getEmptyImage } from "react-dnd-html5-backend";
+import { useContext, useState, useEffect } from "react";
 
 import ArrowsOutIcon from "./Icons/ArrowsOutIcon";
 import DeleteIcon from "./Icons/DeleteIcon";
@@ -15,7 +16,7 @@ function TaskItem({ task }) {
   // for confirm the delete action
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const [{ isDragging }, drag] = useDrag(
+  const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type: "TASK",
       item: {
@@ -31,6 +32,10 @@ function TaskItem({ task }) {
     }),
     [task]
   );
+
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
 
   const statusBorderMap = {
     new: "#98DC9A",
@@ -87,12 +92,11 @@ function TaskItem({ task }) {
     <>
       <div
         ref={drag}
-        className="mb-2.5 flex min-h-[112px] w-full cursor-pointer flex-col justify-center rounded-md p-2.5"
-        onClick={openHandler}
+        className="mb-2.5 flex min-h-[112px] w-full cursor-grab select-none flex-col justify-center rounded-md p-3 active:cursor-grabbing"
         style={{
-          opacity: isDragging ? 0 : 1,
-          transform: isDragging ? "scale(0.7)" : "scale(1)",
-          transition: "transform 0.25s ease, opacity 0.25s ease",
+          opacity: isDragging ? 0.25 : 1,
+          transform: isDragging ? "scale(0.98)" : "scale(1)",
+          transition: "transform 0.2s ease, opacity 0.2s ease",
           pointerEvents: isDragging ? "none" : "auto",
           border: `1px solid ${borderColor}`,
           touchAction: "none",
