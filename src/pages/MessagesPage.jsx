@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 import Modal from "../components/ui/Modal";
@@ -6,170 +6,296 @@ import DeleteIcon from "../components/kanban/Icons/DeleteIcon";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const FILTERS = [
+  { value: "all", label: "All" },
+  { value: "contact", label: "Contact" },
+  { value: "expert", label: "Expert" },
+];
+
+function formatDate(value) {
+  if (!value) return "Unknown date";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Invalid date";
+  }
+
+  return date.toLocaleString();
+}
+
+function sortNewestFirst(messages) {
+  return [...messages].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+}
+
 function MessagesPage() {
   const [messages, setMessages] = useState([]);
   const [filter, setFilter] = useState("all");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [toDeleteId, setToDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchMessages = async () => {
       setLoading(true);
       setError("");
       try {
         const token = localStorage.getItem("authToken");
+        if (!token) {
+          setError("You are not authorized to view messages.");
+          return;
+        }
+
         const { data } = await axios.get(`${API_URL}/messages`, {
           headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
         });
-        // sort newest first
-        setMessages(
-          data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        );
+        const safeMessages = Array.isArray(data) ? data : [];
+
+        setMessages(sortNewestFirst(safeMessages));
       } catch (err) {
-        console.error(err);
+        if (err.code === "ERR_CANCELED") return;
+
+        console.error("Failed to load messages:", err);
         setError("Failed to load messages.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchMessages();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
+  const filteredMessages = useMemo(() => {
+    if (filter === "all") return messages;
+
+    return messages.filter((message) => message.formType === filter);
+  }, [messages, filter]);
+
   const handleDeleteClick = (id) => {
+    if (!id) return;
+
     setToDeleteId(id);
     setConfirmOpen(true);
   };
 
+  const closeDeleteModal = () => {
+    if (deleting) return;
+
+    setConfirmOpen(false);
+    setToDeleteId(null);
+  };
+
   const confirmDelete = async () => {
+    if (!toDeleteId || deleting) return;
+
+    setDeleting(true);
+    setError("");
+
     try {
       const token = localStorage.getItem("authToken");
+      if (!token) {
+        setError("You are not authorized to delete messages.");
+        return;
+      }
+
       await axios.delete(`${API_URL}/messages/${toDeleteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages((prev) => prev.filter((m) => m._id !== toDeleteId));
+
+      setConfirmOpen(false);
+      setToDeleteId(null);
     } catch (err) {
       console.error("Failed to delete:", err);
       alert("Could not delete message. Please try again.");
+      setError("Could not delete message. Please try again.");
     } finally {
-      setConfirmOpen(false);
-      setToDeleteId(null);
+      setDeleting(false);
     }
   };
 
-  const filtered = messages.filter((msg) =>
-    filter === "all" ? true : msg.formType === filter
-  );
-
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Messages</h1>
+    <div className="max-w-5xl mx-auto w-full px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-red-600">
+            Admin
+          </p>
+          <h1 className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
+            Messages
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Review contact and expert request messages.
+          </p>
+        </div>
 
-      {/* Filter Buttons */}
-      <div className="mb-6 flex gap-4">
-        {["all", "contact", "expert"].map((type) => (
-          <button
-            key={type}
-            onClick={() => setFilter(type)}
-            className={`
-              px-4 py-2 rounded  cursor-pointer
-              ${
-                filter === type
-                  ? "bg-red-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }
-              transition
-            `}
-          >
-            {type === "all" ? "All" : type === "contact" ? "Contact" : "Expert"}
-          </button>
-        ))}
+        <div className="text-sm text-gray-500">
+          {filteredMessages.length} of {messages.length} shown
+        </div>
       </div>
 
-      {/* Loading / Error */}
-      {loading && <p>Loading messages…</p>}
-      {error && <p className="text-red-600">{error}</p>}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {FILTERS.map((item) => {
+          const isActive = filter === item.value;
 
-      {/* Message List */}
-      {!loading && !error && (
-        <ul className="space-y-4 max-h-[60vh] overflow-auto">
-          {filtered.map((msg) => (
-            <li
-              key={msg._id}
-              className="p-4 border border-red-600 rounded hover:shadow transition"
+          return (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => setFilter(item.value)}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                isActive
+                  ? "bg-red-600 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="uppercase text-xs font-semibold bg-gray-200 px-2 py-1 rounded">
-                    {msg.formType}
-                  </span>
-                  <p className="mt-1 text-sm text-gray-600">
-                    {new Date(msg.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p className="text-sm text-gray-800">{msg.email}</p>
-                  <DeleteIcon
-                    onClick={() => handleDeleteClick(msg._id)}
-                    className="w-5 h-5 text-red-500 hover:text-red-700 cursor-pointer"
-                  />
-                </div>
-              </div>
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
 
-              {/* Details */}
-              <div className="mt-3 space-y-1 text-sm">
-                {msg.formType === "contact" ? (
-                  <>
-                    <p>
-                      <strong>
-                        {msg.salutation} {msg.firstName} {msg.lastName}
-                      </strong>{" "}
-                      from {msg.country}
-                    </p>
-                    <p>{msg.phone}</p>
-                    <p className="whitespace-pre-line">{msg.message}</p>
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      <strong>{msg.name}</strong> at {msg.company}
-                    </p>
-                    <p>{msg.phone}</p>
-                    <p className="whitespace-pre-line">{msg.projectDetails}</p>
-                  </>
-                )}
-              </div>
-            </li>
-          ))}
-
-          {filtered.length === 0 && (
-            <li className="text-center text-gray-500 py-4">
-              No messages to display.
-            </li>
-          )}
-        </ul>
+      {loading && (
+        <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600">
+          Loading messages…
+        </div>
       )}
-      <Modal isOpen={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <h3 className="text-xl font-semibold mb-4">Delete Message?</h3>
-        <p className="mb-6">
-          Are you sure you want to permanently delete this message?
-        </p>
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={() => setConfirmOpen(false)}
-            className="px-4 py-2 rounded border cursor-pointer hover:bg-gray-100 transition"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={confirmDelete}
-            className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded hover:bg-red-700 transition"
-          >
-            Yes, delete
-          </button>
+
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="space-y-4">
+          {filteredMessages.length > 0 ? (
+            filteredMessages.map((message) => (
+              <article
+                key={message._id}
+                className="rounded-xl border border-red-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gray-700">
+                        {message.formType || "unknown"}
+                      </span>
+
+                      <time className="text-xs text-gray-500">
+                        {formatDate(message.createdAt)}
+                      </time>
+                    </div>
+
+                    <p className="mt-2 break-words text-sm font-medium text-gray-900">
+                      {message.email || "No email provided"}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteClick(message._id)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center self-start rounded-lg text-red-500 transition hover:bg-red-50 hover:text-red-700"
+                    aria-label="Delete message"
+                  >
+                    <DeleteIcon className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="mt-4 space-y-2 text-sm text-gray-700">
+                  {message.formType === "contact" ? (
+                    <>
+                      <p>
+                        <span className="font-semibold text-gray-900">
+                          {[
+                            message.salutation,
+                            message.firstName,
+                            message.lastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || "Unknown contact"}
+                        </span>
+                        {message.country ? ` from ${message.country}` : ""}
+                      </p>
+
+                      {message.phone && <p>{message.phone}</p>}
+
+                      <p className="whitespace-pre-line break-words">
+                        {message.message || "No message text provided."}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        <span className="font-semibold text-gray-900">
+                          {message.name || "Unknown person"}
+                        </span>
+                        {message.company ? ` at ${message.company}` : ""}
+                      </p>
+
+                      {message.phone && <p>{message.phone}</p>}
+
+                      <p className="whitespace-pre-line break-words">
+                        {message.projectDetails ||
+                          message.message ||
+                          "No project details provided."}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+              No messages to display.
+            </div>
+          )}
+        </div>
+      )}
+      <Modal isOpen={confirmOpen} onClose={closeDeleteModal}>
+        <div className="w-full max-w-md">
+          <h3 className="mb-3 text-xl font-semibold text-gray-900">
+            Delete message?
+          </h3>
+
+          <p className="mb-6 text-sm text-gray-600">
+            Are you sure you want to permanently delete this message?
+          </p>
+
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={closeDeleteModal}
+              disabled={deleting}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              onClick={confirmDelete}
+              disabled={deleting}
+              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {deleting ? "Deleting…" : "Yes, delete"}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
