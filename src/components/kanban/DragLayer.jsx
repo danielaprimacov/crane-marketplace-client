@@ -11,7 +11,7 @@ function getItemStyles(currentOffset) {
     pointerEvents: "none",
     top: 0,
     left: 0,
-    transform: `translate(${x + 14}px, ${y + 14}px) scale(1.03)`,
+    transform: `translate(${x}px, ${y}px) scale(1.02)`,
     zIndex: 1000,
   };
 }
@@ -20,7 +20,7 @@ function DragLayer() {
   const { isDragging, item, currentOffset } = useDragLayer((monitor) => ({
     item: monitor.getItem(),
     isDragging: monitor.isDragging(),
-    currentOffset: monitor.getClientOffset(),
+    currentOffset: monitor.getSourceClientOffset(),
   }));
 
   if (!isDragging || !item || !currentOffset) {

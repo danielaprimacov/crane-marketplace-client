@@ -3,23 +3,28 @@ import { TouchBackend } from "react-dnd-touch-backend";
 
 export function getDndConfig() {
   if (typeof window === "undefined") {
-    return { backend: HTML5Backend };
+    return { name: "html5", backend: HTML5Backend };
   }
 
-  const isRealTouchDevice = window.matchMedia(
-    "(hover: none) and (pointer: coarse)"
-  ).matches;
+  const hasCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  const hasTouchPoints = navigator.maxTouchPoints > 0;
+  const isSmallScreen = window.matchMedia("(max-width: 1024px)").matches;
 
-  if (isRealTouchDevice) {
+  const shouldUseTouchBackend =
+    hasCoarsePointer || (isSmallScreen && hasTouchPoints);
+
+  if (shouldUseTouchBackend) {
     return {
+      name: "touch",
       backend: TouchBackend,
       options: {
         enableMouseEvents: true,
-        delayTouchStart: 180,
-        touchSlop: 8,
+        enableTouchEvents: true,
+        delayTouchStart: 40,
+        touchSlop: 6,
       },
     };
   }
 
-  return { backend: HTML5Backend };
+  return { name: "html5", backend: HTML5Backend };
 }

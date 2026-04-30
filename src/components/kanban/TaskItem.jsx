@@ -92,14 +92,14 @@ function TaskItem({ task }) {
     <>
       <div
         ref={drag}
-        className="mb-2.5 flex min-h-[112px] w-full cursor-grab select-none flex-col justify-center rounded-md p-3 active:cursor-grabbing"
+        className="mb-2.5 flex min-h-[112px] w-full touch-none select-none flex-col justify-center rounded-md p-3 active:cursor-grabbing"
         style={{
-          opacity: isDragging ? 0.25 : 1,
+          opacity: isDragging ? 0 : 1,
           transform: isDragging ? "scale(0.98)" : "scale(1)",
           transition: "transform 0.2s ease, opacity 0.2s ease",
-          pointerEvents: isDragging ? "none" : "auto",
           border: `1px solid ${borderColor}`,
-          touchAction: "none",
+          WebkitUserSelect: "none",
+          WebkitTouchCallout: "none",
         }}
       >
         <h3
@@ -108,7 +108,8 @@ function TaskItem({ task }) {
         >
           <button
             type="button"
-            className="shrink-0 cursor-pointer"
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md"
+            aria-label="Open inquiry details"
             onClick={openHandler}
           >
             <ArrowsOutIcon className="transition duration-300 ease-out hover:stroke-[#f9572a]" />
@@ -118,7 +119,7 @@ function TaskItem({ task }) {
 
           <button
             type="button"
-            className="shrink-0 cursor-pointer"
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md"
             onClick={openDeleteConfirm}
           >
             <DeleteIcon className="transition duration-300 ease-out hover:stroke-[#F72929]" />
