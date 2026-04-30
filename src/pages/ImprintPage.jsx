@@ -1,10 +1,10 @@
 import {
-  MailIcon,
+  EnvelopeIcon,
   PhoneIcon,
   IdentificationIcon,
-  OfficeBuildingIcon,
-  BadgeCheckIcon,
-} from "@heroicons/react/outline";
+  BuildingOfficeIcon,
+  CheckBadgeIcon,
+} from "@heroicons/react/24/outline";
 
 const companyDetails = {
   companyName: "KranHub GmbH",
@@ -61,7 +61,7 @@ function ImprintPage() {
             <div className="space-y-5 rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
               <SectionTitle>Company</SectionTitle>
 
-              <InfoRow icon={OfficeBuildingIcon} alignStart>
+              <InfoRow icon={BuildingOfficeIcon} alignStart>
                 <div>
                   <p className="font-medium text-gray-900">
                     {companyDetails.companyName}
@@ -105,7 +105,7 @@ function ImprintPage() {
                 </a>
               </InfoRow>
 
-              <InfoRow icon={MailIcon}>
+              <InfoRow icon={EnvelopeIcon}>
                 <a
                   href={companyDetails.emailHref}
                   className="break-all text-gray-800 transition hover:text-red-600"
@@ -148,7 +148,7 @@ function ImprintPage() {
               .
             </p>
 
-            <InfoRow icon={BadgeCheckIcon} alignStart>
+            <InfoRow icon={CheckBadgeIcon} alignStart>
               <p className="leading-7 text-gray-700">
                 KranHub GmbH is willing to participate in dispute resolution
                 proceedings before the Berlin Consumer Arbitration Board.

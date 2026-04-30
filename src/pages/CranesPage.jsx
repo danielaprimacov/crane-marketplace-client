@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { CheckCircleIcon } from "@heroicons/react/solid";
-import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 import VideoComponent from "../components/home/VideoComponent";
 import ArrowDownIcon from "../components/ui/ArrowDownIcon";
