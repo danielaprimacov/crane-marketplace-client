@@ -1,20 +1,21 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/auth.context";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+
+import RouteLoading from "./RouteLoading";
 
 function IsPrivate({ children }) {
   const { isLoggedIn, isLoading } = useContext(AuthContext);
+  const location = useLocation();
 
   // If the authentication is still loading
-  if (isLoading) return <p>Loading ...</p>;
+  if (isLoading) return <RouteLoading />;
 
   if (!isLoggedIn) {
-    // If the user is not logged in
-    return <Navigate to="/login" />;
-  } else {
-    // If the user is logged in, allow to see the page
-    return children;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
+
+  return children ?? <Outlet />;
 }
 
 export default IsPrivate;

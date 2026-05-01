@@ -1,20 +1,27 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useContext } from "react";
 
 import { AuthContext } from "../../context/auth.context";
 
+import RouteLoading from "./RouteLoading";
+
 function AdminRoute({ redirectTo = "/login" }) {
   const { isLoggedIn, user, isLoading } = useContext(AuthContext);
+  const location = useLocation();
 
   if (isLoading) {
-    return <div>Loading…</div>; 
+    return <RouteLoading />;
   }
 
   if (!isLoggedIn) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 
-  if (user?.role !== "admin") {
+  if (!user) {
+    return <RouteLoading />;
+  }
+
+  if (user.role !== "admin") {
     return <Navigate to="/" replace />;
   }
 

@@ -74,6 +74,12 @@ function PrivacyPolicyPage() {
         </header>
 
         <div className="space-y-10 px-5 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:px-10">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900">
+            <strong>Important:</strong> This page is a template. It must be
+            adapted to the real KranHub business model, especially if the
+            platform offers paid listings, crane rental, crane sales, transport,
+            installation, brokerage, B2B-only services, or consumer contracts.
+          </div>
           <Section icon={ShieldCheckIcon} title="Data Controller">
             <address className="not-italic">
               <p className="font-semibold text-gray-900">{COMPANY.name}</p>
