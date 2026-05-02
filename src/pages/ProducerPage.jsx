@@ -23,6 +23,145 @@ const INITIAL_FILTERS = {
   search: "",
 };
 
+function getCranePrice(crane) {
+  if (crane.status === "for sale") {
+    return Number(crane.salePrice) || 0;
+  }
+
+  if (crane.status === "for rent") {
+    return Number(crane.rentPrice?.amount) || 0;
+  }
+
+  return 0;
+}
+
+function getCraneModel(crane) {
+  return [
+    crane.seriesCode,
+    crane.capacityClassNumber ? `${crane.capacityClassNumber}t` : "",
+    crane.variantRevision?.trim(),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getImageUrl(crane) {
+  if (!Array.isArray(crane.images) || crane.images.length === 0) {
+    return null;
+  }
+
+  const firstImage = crane.images[0];
+
+  if (typeof firstImage === "string") {
+    return firstImage;
+  }
+
+  return firstImage?.url || firstImage?.secure_url || null;
+}
+
+function formatStatus(status) {
+  if (!status) return "Unknown";
+
+  if (status === "for sale") return "For Sale";
+  if (status === "for rent") return "For Rent";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function matchesRange(value, min, max) {
+  const hasMin = min !== "";
+  const hasMax = max !== "";
+
+  if (!hasMin && !hasMax) return true;
+  if (value == null || Number.isNaN(Number(value))) return false;
+
+  const numericValue = Number(value);
+
+  return (
+    numericValue >= (hasMin ? Number(min) : -Infinity) &&
+    numericValue <= (hasMax ? Number(max) : Infinity)
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="mx-auto w-full max-w-screen-2xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
+        Loading cranes…
+      </div>
+    </div>
+  );
+}
+
+function ErrorState({ message }) {
+  return (
+    <div className="mx-auto w-full max-w-screen-2xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm">
+        {message}
+      </div>
+    </div>
+  );
+}
+
+function StaticFilterValue({ label, value, suffix = "" }) {
+  return (
+    <div className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700">
+      {label}: {value}
+      {suffix}
+    </div>
+  );
+}
+
+function CraneCard({ crane }) {
+  const model = getCraneModel(crane);
+  const imageUrl = getImageUrl(crane);
+
+  return (
+    <Link
+      to={`/cranes/${crane._id}`}
+      className="group overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
+    >
+      <div className="h-52 w-full overflow-hidden bg-gray-100">
+        {imageUrl ? (
+          <img
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            src={imageUrl}
+            alt={crane.title || model || "Crane"}
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gray-100 text-sm text-gray-400">
+            No image
+          </div>
+        )}
+      </div>
+
+      <div className="p-4">
+        <h2 className="line-clamp-2 font-medium text-black">
+          {crane.title || "Untitled crane"}
+        </h2>
+
+        <p className="mt-1 min-h-[2.5rem] text-sm text-gray-500">
+          {model || "Model details not available"}
+        </p>
+
+        <div className="mt-4 flex items-start justify-between gap-3">
+          <span className="text-sm font-bold uppercase tracking-wide text-black">
+            {formatStatus(crane.status)}
+          </span>
+
+          <span className="text-right text-sm font-semibold text-red-600">
+            {formatPrice(crane.price)}
+            {crane.status === "for rent" && crane.rentPrice?.interval
+              ? ` / ${crane.rentPrice.interval}`
+              : ""}
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function ProducerPage() {
   const { producerSlug } = useParams();
   const [cranes, setCranes] = useState([]);
@@ -33,51 +172,77 @@ function ProducerPage() {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
 
   useEffect(() => {
-    (async () => {
+    const controller = new AbortController();
+
+    const fetchCranes = async () => {
+      setLoading(true);
+      setError("");
+
       try {
-        const { data } = await axios.get(`${API_URL}/cranes`);
-        const withPrice = data.map((c) => ({
-          ...c,
-          price:
-            c.status === "for sale"
-              ? c.salePrice ?? 0
-              : c.rentPrice?.amount ?? 0,
+        const { data } = await axios.get(`${API_URL}/cranes`, {
+          signal: controller.signal,
+        });
+
+        const safeData = Array.isArray(data) ? data : [];
+
+        const normalizedCranes = safeData.map((crane) => ({
+          ...crane,
+          price: getCranePrice(crane),
         }));
-        setCranes(withPrice);
+
+        setCranes(normalizedCranes);
       } catch (err) {
-        console.error(err);
+        if (err.code === "ERR_CANCELED") return;
+
+        console.error("Unable to load cranes:", err);
         setError("Unable to load cranes.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
-    })();
+    };
+
+    fetchCranes();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // group all cranes by producer for the sidebar
-  const groupCranes = useMemo(() => {
-    const byProducer = {};
-    cranes.forEach((c) => {
-      if (!c.producer) return;
-      byProducer[c.producer] = byProducer[c.producer] || [];
-      byProducer[c.producer].push(c);
-    });
-    return Object.entries(byProducer).map(([name, list]) => {
-      const slug = slugify(name);
-      const models = list.map((c) => {
-        const label = [
-          c.seriesCode,
-          c.capacityClassNumber ? `${c.capacityClassNumber}t` : "",
-          c.variantRevision?.trim(),
-        ]
-          .filter(Boolean)
-          .join(" ");
-        return { id: c._id, label };
-      });
-      return { name, slug, models };
-    });
+  const groupedProducers = useMemo(() => {
+    const byProducer = cranes.reduce((acc, crane) => {
+      if (!crane.producer) return acc;
+
+      acc[crane.producer] = acc[crane.producer] || [];
+      acc[crane.producer].push(crane);
+
+      return acc;
+    }, {});
+
+    return Object.entries(byProducer)
+      .map(([name, list]) => {
+        const models = list.map((crane, index) => {
+          const label =
+            getCraneModel(crane) || crane.title || `Model ${index + 1}`;
+
+          return { id: crane._id, label };
+        });
+        return { name, slug: slugify(name), models };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [cranes]);
 
-  const activeGroup = groupCranes.find((g) => g.slug === producerSlug);
+  const activeGroup = useMemo(() => {
+    return groupedProducers.find((group) => group.slug === producerSlug);
+  }, [groupedProducers, producerSlug]);
+
+  const producerCranes = useMemo(() => {
+    if (!activeGroup) return [];
+
+    return cranes.filter((crane) => crane.producer === activeGroup.name);
+  }, [cranes, activeGroup]);
 
   const myCranes = useMemo(() => {
     if (!activeGroup) return [];
@@ -85,23 +250,23 @@ function ProducerPage() {
   }, [cranes, activeGroup]);
 
   const [minCap, maxCap] = useMemo(
-    () => getMinMax(myCranes, (c) => c.capacity ?? 0),
-    [myCranes]
+    () => getMinMax(producerCranes, (c) => c.capacity ?? 0),
+    [producerCranes]
   );
 
   const [minH, maxH] = useMemo(
-    () => getMinMax(myCranes, (c) => c.height ?? 0),
-    [myCranes]
+    () => getMinMax(producerCranes, (c) => c.height ?? 0),
+    [producerCranes]
   );
 
   const [minR, maxR] = useMemo(
-    () => getMinMax(myCranes, (c) => c.radius ?? 0),
-    [myCranes]
+    () => getMinMax(producerCranes, (c) => c.radius ?? 0),
+    [producerCranes]
   );
 
   const [minP, maxP] = useMemo(
-    () => getMinMax(myCranes, (c) => c.price ?? 0),
-    [myCranes]
+    () => getMinMax(producerCranes, (c) => c.price ?? 0),
+    [producerCranes]
   );
 
   const [capRange, setCapRange] = useState([minCap, maxCap]);
@@ -116,79 +281,58 @@ function ProducerPage() {
     setPRange([minP, maxP]);
   }, [producerSlug, minCap, maxCap, minH, maxH, minR, maxR, minP, maxP]);
 
-  const applyCapacity = ([a, b]) =>
-    setFilters((f) => ({ ...f, capacityMin: a, capacityMax: b }));
-  const applyHeight = ([a, b]) =>
-    setFilters((f) => ({ ...f, heightMin: a, heightMax: b }));
-  const applyRadius = ([a, b]) =>
-    setFilters((f) => ({ ...f, radiusMin: a, radiusMax: b }));
-  const applyPrice = ([a, b]) =>
-    setFilters((f) => ({ ...f, priceMin: a, priceMax: b }));
-
   const statusOptions = useMemo(() => {
     return Array.from(
-      new Set(myCranes.map((c) => c.status).filter(Boolean))
+      new Set(producerCranes.map((c) => c.status).filter(Boolean))
     ).map((value) => ({
       value,
-      label: value.charAt(0).toUpperCase() + value.slice(1),
+      label: formatStatus(value),
     }));
-  }, [myCranes]);
+  }, [producerCranes]);
 
   const filteredCranes = useMemo(() => {
     const searchTerm = filters.search.trim().toLowerCase();
 
-    const matchesRange = (value, min, max) => {
-      const hasMin = min !== "";
-      const hasMax = max !== "";
-
-      if (!hasMin && !hasMax) return true;
-      if (value == null || Number.isNaN(Number(value))) return false;
-
-      const numericValue = Number(value);
-
-      return (
-        numericValue >= (hasMin ? Number(min) : -Infinity) &&
-        numericValue <= (hasMax ? Number(max) : Infinity)
-      );
-    };
-
-    return myCranes.filter((c) => {
-      const modelText = [
-        c.seriesCode,
-        c.capacityClassNumber ? `${c.capacityClassNumber}t` : "",
-        c.variantRevision,
-        c.producer,
-        c.location,
+    return producerCranes.filter((crane) => {
+      const searchableText = [
+        crane.title,
+        crane.description,
+        crane.seriesCode,
+        crane.capacityClassNumber ? `${crane.capacityClassNumber}t` : "",
+        crane.variantRevision,
+        crane.producer,
+        crane.location,
+        crane.status,
       ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
 
-      const textOk =
-        !searchTerm ||
-        (c.title || "").toLowerCase().includes(searchTerm) ||
-        (c.description || "").toLowerCase().includes(searchTerm) ||
-        modelText.includes(searchTerm);
+      if (searchTerm && !searchableText.includes(searchTerm)) {
+        return false;
+      }
 
-      if (!matchesRange(c.capacity, filters.capacityMin, filters.capacityMax))
+      if (
+        !matchesRange(crane.capacity, filters.capacityMin, filters.capacityMax)
+      )
         return false;
 
-      if (!matchesRange(c.height, filters.heightMin, filters.heightMax))
+      if (!matchesRange(crane.height, filters.heightMin, filters.heightMax))
         return false;
 
-      if (!matchesRange(c.radius, filters.radiusMin, filters.radiusMax))
+      if (!matchesRange(crane.radius, filters.radiusMin, filters.radiusMax))
         return false;
 
-      if (!matchesRange(c.price, filters.priceMin, filters.priceMax))
+      if (!matchesRange(crane.price, filters.priceMin, filters.priceMax))
         return false;
 
-      if (filters.status && c.status !== filters.status) return false;
+      if (filters.status && crane.status !== filters.status) return false;
 
-      return textOk;
+      return true;
     });
-  }, [myCranes, filters]);
-  const hasAny = Object.values(filters).some((v) => v !== "");
-  const displayList = filteredCranes;
+  }, [producerCranes, filters]);
+
+  const hasActiveFilters = Object.values(filters).some((v) => v !== "");
 
   // Reset all filters
   const resetAllFilters = () => {
@@ -203,48 +347,71 @@ function ProducerPage() {
     setFilters(INITIAL_FILTERS);
   }, [producerSlug]);
 
+  const applyCapacity = ([min, max]) => {
+    setFilters((prev) => ({
+      ...prev,
+      capacityMin: min,
+      capacityMax: max,
+    }));
+  };
+
+  const applyHeight = ([min, max]) => {
+    setFilters((prev) => ({
+      ...prev,
+      heightMin: min,
+      heightMax: max,
+    }));
+  };
+
+  const applyRadius = ([min, max]) => {
+    setFilters((prev) => ({
+      ...prev,
+      radiusMin: min,
+      radiusMax: max,
+    }));
+  };
+
+  const applyPrice = ([min, max]) => {
+    setFilters((prev) => ({
+      ...prev,
+      priceMin: min,
+      priceMax: max,
+    }));
+  };
+
   if (loading) {
-    return (
-      <div className="mx-auto w-full max-w-7xl px-4 pt-20 pb-10 sm:px-6 lg:px-8">
-        <p>Loading…</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <div className="mx-auto w-full max-w-7xl px-4 pt-20 pb-10 sm:px-6 lg:px-8">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
+    return <ErrorState message={error} />;
   }
 
   if (!activeGroup) {
-    return (
-      <div className="mx-auto w-full max-w-screen-2xl px-4 pt-20 pb-10 sm:px-6 lg:px-8">
-        <p className="text-red-600">Unknown producer “{producerSlug}”.</p>
-      </div>
-    );
+    return <ErrorState message={`Unknown producer "${producerSlug}".`} />;
   }
 
   return (
-    <div className="mx-auto w-full max-w-screen-2xl px-4 pt-20 pb-10 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-screen-2xl px-4 pt-24 pb-10 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
         {/* navigation panel */}
-        <div className="self-start lg:sticky lg:top-10">
-          <ProducersSidebar producers={groupCranes} activeSlug={producerSlug} />
+        <div className="self-start lg:sticky lg:top-24">
+          <ProducersSidebar
+            producers={groupedProducers}
+            activeSlug={producerSlug}
+          />
         </div>
 
         {/* content section */}
         <main className="min-w-0">
-          {myCranes.length === 0 ? (
-            <div className="bg-white p-6 sm:p-8">
+          {producerCranes.length === 0 ? (
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
               <p className="text-sm text-gray-600 sm:text-base">
-                No cranes found for “{producerSlug}”.
+                No cranes found for “{activeGroup.name}”.
               </p>
             </div>
           ) : (
-            <div className="bg-white p-4 sm:p-6 lg:p-8">
+            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
               {/* SECTION HEADER */}
               <div className="flex flex-col gap-4 border-b border-black/10 pb-5 sm:pb-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
@@ -256,7 +423,8 @@ function ProducerPage() {
                   </h1>
                   <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
                     <span>
-                      {myCranes.length} crane{myCranes.length !== 1 ? "s" : ""}
+                      {producerCranes.length} crane
+                      {producerCranes.length !== 1 ? "s" : ""}
                     </span>
                     {statusOptions.length > 0 && (
                       <span>
@@ -269,6 +437,7 @@ function ProducerPage() {
                 <button
                   type="button"
                   onClick={resetAllFilters}
+                  disabled={!hasActiveFilters}
                   className="inline-flex w-full items-center justify-center rounded-lg border border-red-600 px-4 py-2 text-sm font-medium text-red-600 cursor-pointer transition hover:bg-red-50 sm:w-auto"
                 >
                   Reset all filters
@@ -288,9 +457,11 @@ function ProducerPage() {
                     onApply={applyCapacity}
                   />
                 ) : (
-                  <div className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700">
-                    Capacity: {minCap} t
-                  </div>
+                  <StaticFilterValue
+                    label="Capacity"
+                    value={minCap}
+                    suffix=" t"
+                  />
                 )}
 
                 {minH < maxH ? (
@@ -304,9 +475,7 @@ function ProducerPage() {
                     onApply={applyHeight}
                   />
                 ) : (
-                  <div className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700">
-                    Height: {minH} m
-                  </div>
+                  <StaticFilterValue label="Height" value={minH} suffix=" m" />
                 )}
 
                 {minR < maxR ? (
@@ -320,9 +489,7 @@ function ProducerPage() {
                     onApply={applyRadius}
                   />
                 ) : (
-                  <div className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700">
-                    Radius: {minR} m
-                  </div>
+                  <StaticFilterValue label="Radius" value={minR} suffix=" m" />
                 )}
 
                 {minP < maxP ? (
@@ -336,9 +503,7 @@ function ProducerPage() {
                     onApply={applyPrice}
                   />
                 ) : (
-                  <div className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700">
-                    Price: €{minP}
-                  </div>
+                  <StaticFilterValue label="Price" value={formatPrice(minP)} />
                 )}
 
                 <FilterDropDown
@@ -370,74 +535,17 @@ function ProducerPage() {
               </div>
 
               {/* CONTENT */}
-              {displayList.length === 0 ? (
+              {filteredCranes.length === 0 ? (
                 <p className="mt-8 text-center text-sm text-gray-600 sm:text-base">
-                  {hasAny
+                  {hasActiveFilters
                     ? "No cranes match those filters."
                     : "No cranes available."}
                 </p>
               ) : (
                 <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {displayList.map((c) => {
-                    const model = [
-                      c.seriesCode,
-                      c.capacityClassNumber,
-                      c.variantRevision,
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
-
-                    const bgUrl =
-                      Array.isArray(c.images) && c.images.length > 0
-                        ? c.images[0]
-                        : null;
-
-                    return (
-                      <Link
-                        to={`/cranes/${c._id}`}
-                        key={c._id}
-                        className="group overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                      >
-                        <div className="h-52 w-full overflow-hidden bg-gray-100">
-                          {bgUrl ? (
-                            <img
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              src={bgUrl}
-                              alt={c.title}
-                            />
-                          ) : (
-                            <div className="h-full w-full bg-gray-100" />
-                          )}
-                        </div>
-
-                        <div className="p-4">
-                          <div className="font-medium text-black">
-                            {c.title}
-                          </div>
-                          <p className="mt-1 min-h-[2.5rem] text-sm text-gray-500">
-                            {model}
-                          </p>
-
-                          <div className="mt-4 flex items-start justify-between gap-3">
-                            <span className="text-sm font-bold uppercase tracking-wide text-black">
-                              {c.status === "for sale"
-                                ? "For Sale"
-                                : c.status === "for rent"
-                                ? "For Rent"
-                                : c.status}
-                            </span>
-
-                            <span className="text-right text-sm font-semibold text-red-600">
-                              {formatPrice(c.price)}
-                              {c.status === "for rent" && c.rentPrice?.interval
-                                ? ` / ${c.rentPrice.interval}`
-                                : ""}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                  {filteredCranes.map((crane) => (
+                    <CraneCard key={crane._id} crane={crane} />
+                  ))}
                 </div>
               )}
             </div>
