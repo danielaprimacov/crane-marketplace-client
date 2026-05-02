@@ -1,7 +1,9 @@
-import { useContext, useEffect, useCallback } from "react";
+import { useContext, useEffect, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { AuthContext } from "../../../context/auth.context";
+
+import { useProducers } from "../../../hooks/useProducers";
 
 import NavbarBrandArea from "./NavbarBrandArea";
 import NavbarActions from "./NavbarActions";
@@ -20,6 +22,17 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
 
   const location = useLocation();
+  const { producers } = useProducers();
+
+  const firstProducerSlug = useMemo(() => {
+    if (!Array.isArray(producers) || !producers.length) return null;
+
+    return producers[0]?.slug || null;
+  }, [producers]);
+
+  const cranesTargetPath = firstProducerSlug
+    ? `/cranes/producers/${firstProducerSlug}`
+    : "/cranes";
 
   const isHome = location.pathname === "/";
   const isCranes = location.pathname.startsWith("/cranes");
@@ -93,7 +106,8 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
             isNewCrane={isNewCrane}
             myCranesCount={myCranesCount}
             inquiriesCount={inquiriesCount}
-            messageCount={messageCount}
+            messagesCount={messageCount}
+            cranesTargetPath={cranesTargetPath}
           />
         </div>
       </nav>
