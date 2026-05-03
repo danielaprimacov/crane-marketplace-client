@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from "react";
+import { Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Popover, Transition } from "@headlessui/react";
 
@@ -128,10 +128,6 @@ function NavbarActions({
   if (!isLoggedIn) {
     return (
       <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
-        <IconLink to="/cranes" label="View all cranes">
-          <img src={craneIcon} alt="" className="h-5 w-5 sm:h-6 sm:w-6" />
-        </IconLink>
-
         <IconButton label="Login" onClick={openLogin}>
           <img src={userIcon} alt="" className="h-6 w-6 sm:h-7 sm:w-7" />
         </IconButton>
