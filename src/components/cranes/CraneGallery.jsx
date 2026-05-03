@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { getContainedImageBounds } from "../../utils/helpers";
 
+import { NO_IMAGE_URL } from "../../utils/imageHelpers";
+import { useAvailableImageUrls } from "../../hooks/useAvailableImageUrls";
+
 const LENS_SIZE = 140;
 const HOVER_PREVIEW_SCALE = 2;
 
@@ -20,8 +23,20 @@ function CraneGallery({
 
   const imageAreaRef = useRef(null);
 
-  const selectedImage = crane?.images?.[selectedImageIndex];
+  const { imageUrls, loading: loadingImages } = useAvailableImageUrls(
+    crane?.images
+  );
+
+  const selectedImage = imageUrls[selectedImageIndex];
   const hasSelectedImage = Boolean(selectedImage);
+
+  useEffect(() => {
+    if (!imageUrls.length) return;
+
+    if (selectedImageIndex >= imageUrls.length) {
+      setSelectedImageIndex(0);
+    }
+  }, [imageUrls.length, selectedImageIndex, setSelectedImageIndex]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -122,10 +137,27 @@ function CraneGallery({
     setIsPointerOnImage(false);
   };
 
-  if (!crane?.images?.length) {
+  if (loadingImages) {
     return (
       <div className="flex min-h-[320px] items-center justify-center bg-white text-gray-400">
-        No image available
+        Loading images…
+      </div>
+    );
+  }
+
+  if (!hasSelectedImage) {
+    return (
+      <div className="relative min-h-[320px] bg-white xl:row-span-2 xl:min-h-0">
+        <div className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 px-4 py-8 text-center">
+          <img
+            src={NO_IMAGE_URL}
+            alt="No image available"
+            className="h-40 w-40 object-contain opacity-60"
+            draggable="false"
+          />
+
+          <p className="text-sm text-gray-400">No image available</p>
+        </div>
       </div>
     );
   }
@@ -135,35 +167,37 @@ function CraneGallery({
       <div className="h-full flex flex-col gap-4 px-3 pt-3 pb-4 xl:flex-row xl:gap-8 xl:px-6 xl:pb-0">
         {/* Thumbnails */}
         <div className="order-2 flex w-full gap-3 overflow-x-auto px-1 pb-1 xl:order-1 xl:w-[62px] xl:flex-col xl:overflow-y-auto xl:overflow-x-hidden">
-          {crane.images.slice(0, 5).map((image, i) => (
-            <button
-              key={`${image}-${i}`}
-              type="button"
-              onMouseEnter={() => handleThumbnailHover(i)}
-              onClick={() => handleThumbnailHover(i)}
-              className={`relative h-[56px] w-[56px] shrink-0 overflow-hidden rounded-lg border transition ${
-                selectedImageIndex === i
-                  ? "border-blue-500 ring-1 ring-blue-300"
-                  : "border-black/10 hover:border-black/30"
-              }`}
-            >
-              <img
-                src={image}
-                alt={`${crane.title} ${i + 1}`}
-                className="h-full w-full object-cover"
-                draggable="false"
-              />
-            </button>
-          ))}
+          {imageUrls.slice(0, 5).map((image, i) => {
+            return (
+              <button
+                key={`${image}-${i}`}
+                type="button"
+                onMouseEnter={() => handleThumbnailHover(i)}
+                onClick={() => handleThumbnailHover(i)}
+                className={`relative h-[56px] w-[56px] shrink-0 overflow-hidden rounded-lg border transition ${
+                  selectedImageIndex === i
+                    ? "border-blue-500 ring-1 ring-blue-300"
+                    : "border-black/10 hover:border-black/30"
+                }`}
+              >
+                <img
+                  src={image}
+                  alt={`${crane.title} ${i + 1}`}
+                  className="h-full w-full object-cover"
+                  draggable="false"
+                />
+              </button>
+            );
+          })}
 
-          {crane.images.length > 5 && (
+          {imageUrls.length > 5 && (
             <button
               type="button"
               onClick={onOpenFullView}
               className="h-[56px] w-[56px] shrink-0 rounded-lg border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
             >
               {" "}
-              +{crane.images.length - 5}
+              +{imageUrls.length - 5}
             </button>
           )}
         </div>

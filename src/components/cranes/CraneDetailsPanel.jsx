@@ -39,7 +39,7 @@ function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
             <h2 className="text-gray-500 mt-1">{crane.producer}</h2>
           </div>
 
-          <div className="text-left sm:text-right space-y-2">
+          <div className="flex flex-wrap items-center gap-2 text-left sm:justify-end sm:text-right">
             <span
               className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mr-0 sm:mr-3 ${
                 crane.status === "for sale"

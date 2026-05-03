@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import {
+  getImageUrl,
+  getValidImages,
+  NO_IMAGE_URL,
+} from "../../utils/imageHelpers";
+
 function Crane({
   title,
   images,
@@ -11,11 +17,15 @@ function Crane({
   status,
   _id,
 }) {
-  const noImage =
-    "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg";
+  const validImages = getValidImages(images);
 
-  const imageUrl = images[0] || noImage;
-  const hoverImage = images[1] || imageUrl;
+  const firstImageUrl = getImageUrl(validImages[0]);
+  const secondImageUrl = getImageUrl(validImages[1]);
+
+  const hasRealImage = Boolean(firstImageUrl);
+
+  const imageUrl = firstImageUrl || NO_IMAGE_URL;
+  const hoverImage = secondImageUrl || imageUrl;
 
   const [backgroundImage, setBackgroundImage] = useState(imageUrl);
 
@@ -41,10 +51,14 @@ function Crane({
       </div>
       <div
         className="w-full h-64 bg-cover bg-center transition-[background-image] duration-500"
-        onMouseEnter={() => images[1] && setBackgroundImage(hoverImage)}
+        onMouseEnter={() => {
+          if (hasRealImage && secondImageUrl) {
+            setBackgroundImage(hoverImage);
+          }
+        }}
         onMouseLeave={() => setBackgroundImage(imageUrl)}
         style={{
-          backgroundImage: `url("${backgroundImage}"), url(${noImage})`,
+          backgroundImage: `url("${backgroundImage}")`,
         }}
       ></div>
       <p className="px-4 mt-2 text-sm text-gray-700 h-16 text-center overflow-hidden line-clamp-3">

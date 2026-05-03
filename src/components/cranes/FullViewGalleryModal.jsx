@@ -4,6 +4,8 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import Modal from "../ui/Modal";
 import { getContainedImageBounds } from "../../utils/helpers";
 
+import { useAvailableImageUrls } from "../../hooks/useAvailableImageUrls";
+
 const FULL_VIEW_ZOOM_SCALE = 2;
 
 function FullViewGalleryModal({
@@ -20,9 +22,11 @@ function FullViewGalleryModal({
   const [imageMeta, setImageMeta] = useState({ width: 0, height: 0 });
 
   const fullViewStageRef = useRef(null);
-
-  const selectedImage = crane?.images?.[selectedImageIndex];
   const isFullViewZoomActive = fullViewZoom > 1;
+
+  const { imageUrls } = useAvailableImageUrls(crane?.images);
+
+  const selectedImage = imageUrls[selectedImageIndex];
 
   useEffect(() => {
     setFullViewZoom(1);
@@ -93,6 +97,10 @@ function FullViewGalleryModal({
 
     setFullViewOrigin(pointer);
   };
+
+  if (!selectedImage) {
+    return null;
+  }
 
   return (
     <Modal
@@ -178,25 +186,27 @@ function FullViewGalleryModal({
           </div>
 
           <div className="mt-4 grid grid-cols-4 gap-3 content-start overflow-y-auto sm:grid-cols-5 lg:mt-6 lg:grid-cols-4">
-            {crane.images?.map((image, i) => (
-              <button
-                key={`${image}-${i}`}
-                type="button"
-                onClick={() => setSelectedImageIndex(i)}
-                className={`relative aspect-square overflow-hidden cursor-pointer rounded border transition ${
-                  selectedImageIndex === i
-                    ? "border-sky-500 ring-1 ring-sky-300"
-                    : "border-black/10 hover:border-black/30"
-                }`}
-              >
-                <img
-                  src={image}
-                  alt={`${crane.title} ${i + 1}`}
-                  className="h-full w-full object-cover"
-                  draggable="false"
-                />
-              </button>
-            ))}
+            {imageUrls.map((image, i) => {
+              return (
+                <button
+                  key={`${image}-${i}`}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(i)}
+                  className={`relative aspect-square overflow-hidden cursor-pointer rounded border transition ${
+                    selectedImageIndex === i
+                      ? "border-sky-500 ring-1 ring-sky-300"
+                      : "border-black/10 hover:border-black/30"
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={`${crane.title} ${i + 1}`}
+                    className="h-full w-full object-cover"
+                    draggable="false"
+                  />
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
