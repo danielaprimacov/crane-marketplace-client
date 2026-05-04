@@ -191,7 +191,14 @@ function Footer() {
         contentClass="p-0"
       >
         {modalMode === "contact" && <ContactForm onClose={closeModal} />}
-        {modalMode === "cookies" && <CookieForm onClose={closeModal} />}
+        {modalMode === "cookies" && (
+          <CookieForm
+            onClose={closeModal}
+            onSave={(preferences) => {
+              console.log("Cookie preferences:", preferences);
+            }}
+          />
+        )}
         {modalMode === "newsletter" && <NewsletterForm onClose={closeModal} />}
       </Modal>
     </>
