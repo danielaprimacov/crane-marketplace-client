@@ -184,7 +184,7 @@ function Footer() {
         onClose={closeModal}
         widthClass={
           modalMode === "newsletter"
-            ? "w-[92vw] max-w-[60rem]"
+            ? "w-[92vw] max-w-[56rem]"
             : "w-[92vw] max-w-[38rem]"
         }
         panelClass="max-h-[92dvh] overflow-y-auto"
