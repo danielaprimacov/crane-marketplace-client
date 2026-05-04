@@ -20,13 +20,114 @@ import towerCrane from "../assets/images/tower-crane.webp";
 import mobileCrane from "../assets/images/mobile-crane.jpg";
 import crawlerCrane from "../assets/images/crawler-crane.png";
 
+const jobNeeds = [
+  {
+    question: "What are you lifting?",
+    answer: (
+      <>
+        Check the <strong>load capacity in tonnes</strong>.
+      </>
+    ),
+  },
+  {
+    question: "How high or how far?",
+    answer: (
+      <>
+        Look at the <strong>lift height</strong> and <strong>radius</strong>{" "}
+        specs.
+      </>
+    ),
+  },
+  {
+    question: "Where is the site?",
+    answer: (
+      <>
+        Note your <strong>location</strong> — some cranes will not fit narrow
+        streets or soft ground.
+      </>
+    ),
+  },
+];
+
+const craneTypes = [
+  {
+    title: "Tower",
+    text: "Tall-building projects, compact footprint on tight city sites.",
+    image: towerCrane,
+  },
+  {
+    title: "Mobile",
+    text: "Quick setup, short-term jobs, and moving between multiple locations.",
+    image: mobileCrane,
+  },
+  {
+    title: "Crawler",
+    text: "Very heavy loads on uneven or soft ground, usually for long-term installations.",
+    image: crawlerCrane,
+  },
+];
+
+const filterItems = [
+  {
+    title: "Capacity",
+    text: "enter the minimum tonnage you require.",
+  },
+  {
+    title: "Lift Height / Radius",
+    text: "specify the height or boom reach you need.",
+  },
+  {
+    title: "Rental Dates",
+    text: "pick your start and end dates if renting.",
+  },
+  {
+    title: "Location & Budget",
+    text: "set your site location and maximum spend.",
+  },
+];
+
+const cardIncludes = [
+  "High-resolution photos",
+  "Key specs: capacity, lift height, crane type",
+  "Transparent pricing: purchase price or rental rate",
+];
+
+function Section({ title, subtitle, children }) {
+  return (
+    <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto max-w-3xl text-center">
+        <h2 className="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+          {title}
+        </h2>
+
+        {subtitle && (
+          <p className="mt-4 text-base leading-7 text-gray-600 sm:text-lg">
+            {subtitle}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-10">{children}</div>
+    </section>
+  );
+}
+
+function Tip({ children }) {
+  return (
+    <p className="mx-auto mt-8 max-w-4xl text-sm leading-6 text-gray-600 sm:text-base">
+      <span className="font-semibold text-gray-900">Tip: </span>
+      {children}
+    </p>
+  );
+}
+
 function CranesPage() {
   const [videoMuted, setVideoMuted] = useState(true);
   const [isAdviceOpen, setAdviceOpen] = useState(false);
 
   return (
     <>
-      <div className="relative w-full h-screen overflow-hidden">
+      <section className="relative w-full h-screen overflow-hidden">
         <VideoComponent
           introWebm={videoWebm}
           introMp4={videoMp4}
@@ -36,225 +137,196 @@ function CranesPage() {
           interactive={true}
           blurred={false}
         />
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 pointer-events-none">
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
           <div
-            className={`flex-1 flex flex-col justify-center items-center transition-opacity duration-700 ${
+            className={`flex flex-1 flex-col items-center justify-center transition-opacity duration-700 ${
               videoMuted ? "opacity-100" : "opacity-0"
             }`}
           >
-            <p className="mt-2 text-red-600 uppercase text-center text-4xl md:text-6xl lg:text-7xl [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] tracking-wide">
-              To get crane choosing advice
+            <p className="max-w-5xl text-4xl font-semibold uppercase tracking-wide text-red-600 [text-shadow:2px_2px_4px_rgba(0,0,0,0.65)] sm:text-5xl md:text-6xl lg:text-7xl">
+              Get crane choosing advice
             </p>
-            <p className="mt-2 text-white uppercase text-xl md:text-2xl lg:text-3xl tracking-tighter [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
+
+            <p className="mt-4 text-lg uppercase tracking-tight text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.65)] sm:text-xl md:text-2xl lg:text-3xl">
               Click on the video to unmute
             </p>
           </div>
-          <div className="pb-15">
-            <div
-              aria-label="Scroll down to guide"
-              className="absolute bottom-6 left-1/2 "
-            >
-              <ArrowDownIcon className="h-15 w-15 text-red-600 animate-bounce" />
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div id="guide">
-        <div className="pt-13 pb-5 flex flex-col items-center justify-center">
-          <h1 className="py-5 mb-10 text-5xl font-semibold tracking-widest">
-            Define Your Job Needs
-          </h1>
-          <div className="flex p-5 gap-20">
-            <ul className="flex flex-col gap-10 text-lg pt-4">
-              <li className="flex flex-col justify-center items-center mb-4">
-                <p>What are you lifting?</p>
-                <img src={downArrow} alt="Down Arrow GIF" className="w-6" />
-                <span>
-                  Check the <strong>load capacity (in tonnes).</strong>
-                </span>
-              </li>
-              <li className="flex flex-col items-center mr-auto mb-4">
-                <p>How high or how far?</p>
-                <img src={downArrow} alt="Down Arrow GIF" className="w-6" />
-                <span>
-                  Look at the <strong>lift height</strong> and{" "}
-                  <strong>radius</strong> specs.
-                </span>
-              </li>
-              <li className="flex flex-col items-center">
-                <p>Where is the site?</p>
-                <img src={downArrow} alt="Down Arrow GIF" className="w-6" />
-                <span className="flex flex-col items-center">
-                  <span>
-                    Note your <strong>location</strong>
-                  </span>
-                  <span>
-                    — some cranes won't fit narrow streets or soft ground.
-                  </span>
-                </span>
-              </li>
+          <a
+            href="#guide"
+            aria-label="Scroll down to guide"
+            className="pointer-events-auto absolute bottom-6 left-1/2 -translate-x-1/2 text-red-600"
+          >
+            <ArrowDownIcon className="h-12 w-12 animate-bounce sm:h-14 sm:w-14" />
+          </a>
+        </div>
+      </section>
+
+      <main id="guide" className="bg-white">
+        {/* Define Your Job Needs */}
+        <Section title="Define Your Job Needs">
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] lg:gap-16">
+            <ul className="space-y-8">
+              {jobNeeds.map((item) => (
+                <li
+                  key={item.question}
+                  className="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm sm:p-6"
+                >
+                  <p className="text-lg font-medium text-gray-900">
+                    {item.question}
+                  </p>
+
+                  <img
+                    src={downArrow}
+                    alt=""
+                    className="mx-auto my-3 h-6 w-6"
+                    aria-hidden="true"
+                  />
+
+                  <p className="text-base leading-7 text-gray-600">
+                    {item.answer}
+                  </p>
+                </li>
+              ))}
             </ul>
-            <div>
+
+            <div className="overflow-hidden rounded-2xl shadow-lg">
               <img
                 src={cranePhoto}
-                alt="Construction Crane on sunset"
-                className="w-120 rounded-md"
+                alt="Construction crane at sunset"
+                className="h-72 w-full object-cover sm:h-96 lg:h-[28rem]"
               />
             </div>
           </div>
-          <p className="pt-5 text-sm">
-            <span className="font-semibold pr-2">Tip:</span>
-            <span>
-              If you need to place materials on upper floors of a building, pick
-              a crane with a tall maximum height. For heavy loads near the
-              ground, capacity matters more than height.
-            </span>
-          </p>
-        </div>
 
-        <div className="pt-13 pb-5 flex flex-col items-center justify-center">
-          <h1 className="py-5 mb-10 text-5xl font-semibold tracking-widest">
-            Pick the Crane Type
-          </h1>
-          <h3 className="text-lg tracking-wider pb-8">
-            On KranHub you'll see three main categories — click each for photos
-            and specs:{" "}
-          </h3>
-          <div className="flex justify-evenly w-full py-8">
-            {[
-              {
-                title: "Tower",
-                text: "Tall-building projects, compact footprint on tight city sites",
-                image: towerCrane,
-              },
-              {
-                title: "Mobile",
-                text: "Quick setup, short-term jobs, moving between multiple locations",
-                image: mobileCrane,
-              },
-              {
-                title: "Crawler",
-                text: "Very heavy loads on uneven or soft ground, long-term installations",
-                image: crawlerCrane,
-              },
-            ].map(({ title, text, image }) => (
-              <div key={title} className="group [perspective:1000px] w-64 h-80">
-                {/* card inner */}
-                <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                  {/* front face */}
-                  <div
-                    className="absolute inset-0 bg-cover bg-center rounded-lg shadow-md p-4 flex items-center justify-center [backface-visibility:hidden]"
-                    style={{ backgroundImage: `url(${image})` }}
-                  >
-                    <p className="text-2xl py-2 px-4 font-semibold text-white bg-black/50 px-2 rounded">
-                      {title}
-                    </p>
-                  </div>
-                  {/* back face */}
-                  <div className="absolute inset-0 bg-white rounded-lg shadow-md p-4 flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                    <span className="text-center text-gray-700">{text}</span>
-                  </div>
+          <Tip>
+            If you need to place materials on upper floors of a building, pick a
+            crane with a tall maximum height. For heavy loads near the ground,
+            capacity matters more than height.
+          </Tip>
+        </Section>
+
+        {/* Pick the Crane Type */}
+        <Section
+          title="Pick the Crane Type"
+          subtitle="On KranHub you will see three main categories. Use the crane type as the first practical filter before comparing exact models."
+        >
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {craneTypes.map(({ title, text, image }) => (
+              <article
+                key={title}
+                className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="relative h-56 overflow-hidden sm:h-64">
+                  <img
+                    src={image}
+                    alt={`${title} crane`}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                  <h3 className="absolute bottom-4 left-4 rounded-lg bg-black/60 px-4 py-2 text-2xl font-semibold text-white">
+                    {title}
+                  </h3>
                 </div>
-              </div>
+
+                <div className="p-5">
+                  <p className="text-center text-base leading-7 text-gray-700 sm:text-left">
+                    {text}
+                  </p>
+                </div>
+              </article>
             ))}
           </div>
-          <p className="pt-5 text-sm">
-            <span className="font-semibold pr-2">Tip:</span>
-            <span>Hover over the “Type” filter to see a description.</span>
-          </p>
-        </div>
 
-        <div className="pt-13 pb-5 flex flex-col items-center justify-center">
-          <h1 className="py-5 mb-10 text-5xl font-semibold tracking-widest">
-            Filter & Compare Listings
-          </h1>
-          <p className="text-lg text-black/70 tracking-wider pb-8">
-            Once you’ve chosen a manufacturer, fine-tune your results with our
-            integrated filters:
-          </p>
-          <section className="max-w-7xl mx-auto p-8 bg-white rounded-xl shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <Tip>
+            Start with the crane type, then compare capacity, height, radius,
+            ground conditions, and transport requirements.
+          </Tip>
+        </Section>
+
+        {/* Filter & Compare Listings */}
+        <Section
+          title="Filter & Compare Listings"
+          subtitle="Once you have chosen a manufacturer, fine-tune your results with integrated filters."
+        >
+          <div className="mx-auto max-w-6xl rounded-2xl border border-gray-200 bg-white p-5 shadow-lg sm:p-8">
+            <div className="grid gap-10 lg:grid-cols-2">
               <div>
-                <h3 className="text-xl font-medium mb-4">Filter by:</h3>
+                <h3 className="mb-5 text-xl font-semibold text-gray-900">
+                  Filter by:
+                </h3>
+
                 <ul className="space-y-4">
-                  <li>
-                    <span className="font-semibold">Capacity —</span>
-                    <span className="ml-2 text-gray-600">
-                      enter the minimum tonnage you require.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="font-semibold">Lift Height/Radius —</span>
-                    <span className="ml-2 text-gray-600">
-                      specify the height or boom reach you need.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="font-semibold">Rental Dates —</span>
-                    <span className="ml-2 text-gray-600">
-                      pick your start and end dates if renting.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="font-semibold">Location & Budget —</span>
-                    <span className="ml-2 text-gray-600">
-                      set your site location and maximum spend.
-                    </span>
-                  </li>
+                  {filterItems.map((item) => (
+                    <li key={item.title} className="leading-7">
+                      <span className="font-semibold text-gray-900">
+                        {item.title} —
+                      </span>
+                      <span className="ml-2 text-gray-600">{item.text}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-xl font-medium mb-4">
+                <h3 className="mb-5 text-xl font-semibold text-gray-900">
                   Each crane card includes:
                 </h3>
+
                 <ul className="space-y-4">
-                  {[
-                    "High-resolution photos",
-                    "Key specs (capacity, lift height, crane type)",
-                    "Transparent pricing (purchase price or daily rental rate)",
-                  ].map((item) => (
+                  {cardIncludes.map((item) => (
                     <li key={item} className="flex items-start">
-                      <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
-                      <span className="ml-3">{item}</span>
+                      <CheckCircleIcon className="mt-1 h-5 w-5 shrink-0 text-green-500" />
+                      <span className="ml-3 leading-7 text-gray-700">
+                        {item}
+                      </span>
                     </li>
                   ))}
 
                   <li className="flex items-start">
-                    <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
-                    <span className="ml-3">
-                      <span className="font-semibold">Send Inquiry</span> button
-                      — directs your request straight to our admin team for fast
+                    <CheckCircleIcon className="mt-1 h-5 w-5 shrink-0 text-green-500" />
+                    <span className="ml-3 leading-7 text-gray-700">
+                      <span className="font-semibold text-gray-900">
+                        Send Inquiry
+                      </span>{" "}
+                      button — sends your request directly to the admin team for
                       follow-up.
                     </span>
                   </li>
                 </ul>
               </div>
             </div>
-          </section>
-        </div>
-
-        <div className="max-w-full mx-auto bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-lg text-center mt-8">
-          <div className="flex justify-center items-center gap-5 mb-4">
-            <QuestionMarkCircleIcon className="h-12 w-12 text-red-500" />
-            <h2 className="text-3xl font-semibold text-gray-800 mb-2">
-              Need Help?
-            </h2>
           </div>
-          <p className="text-gray-600 mb-6">
-            Click{" "}
+        </Section>
+
+        {/* Help CTA */}
+        <section className="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+          <div className="rounded-2xl bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-lg sm:p-8">
+            <div className="mb-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <QuestionMarkCircleIcon className="h-12 w-12 text-red-500" />
+
+              <h2 className="text-2xl font-semibold text-gray-900 sm:text-3xl">
+                Need Help?
+              </h2>
+            </div>
+
+            <p className="mx-auto max-w-4xl text-base leading-7 text-gray-600">
+              Send us your lifting requirements and our team will help you
+              choose a suitable crane without technical jargon.
+            </p>
+
             <button
+              type="button"
               onClick={() => setAdviceOpen(true)}
-              className="inline-block bg-red-600 cursor-pointer text-white px-4 py-1 mx-3 rounded-full font-medium transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="mt-6 inline-flex items-center justify-center rounded-full bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             >
               Get Expert Advice
-            </button>{" "}
-            at the top of any page. Our team will review your requirements and
-            recommend the perfect crane—no technical jargon, guaranteed!
-          </p>
-        </div>
-      </div>
+            </button>
+          </div>
+        </section>
+      </main>
 
       <Modal isOpen={isAdviceOpen} onClose={() => setAdviceOpen(false)}>
         <ExpertForm onClose={() => setAdviceOpen(false)} />
