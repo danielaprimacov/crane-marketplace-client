@@ -54,7 +54,7 @@ function Modal({
           type="button"
           onClick={onClose}
           aria-label="Close modal"
-          className="absolute h-10 w-10 top-3 right-3 z-10 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0 sm:top-4 sm:right-4"
+          className="absolute h-10 w-10 top-3 right-3 z-[100] text-2xl hover:text-gray-500 focus:outline-none focus:ring-0 sm:top-4 sm:right-4"
         >
           &times;
         </button>

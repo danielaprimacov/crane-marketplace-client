@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -7,6 +8,8 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [name, setName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,14 +117,14 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
 
         <div className="relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             id="signup-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder=" "
             autoComplete="new-password"
-            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent focus:border-black focus:outline-none"
+            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent pr-16 focus:border-black focus:outline-none"
           />
 
           <label
@@ -130,18 +133,30 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
           >
             Your password*
           </label>
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-0 top-0 h-10 w-10 text-sm text-gray-500 transition hover:text-black"
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
         </div>
 
         <div className="relative">
           <input
-            type="password"
+            type={showRepeatPassword ? "text" : "password"}
             name="repeat-password"
             id="repeat-password"
             value={repeatPassword}
             onChange={(event) => setRepeatPassword(event.target.value)}
             placeholder=" "
             autoComplete="new-password"
-            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent focus:border-black focus:outline-none"
+            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent pr-16 focus:border-black focus:outline-none"
           />
 
           <label
@@ -150,6 +165,18 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
           >
             Repeat your password*
           </label>
+          <button
+            type="button"
+            aria-label={showRepeatPassword ? "Hide password" : "Show password"}
+            onClick={() => setShowRepeatPassword((prev) => !prev)}
+            className="absolute right-0 top-0 h-10 w-10 text-sm text-gray-500 transition hover:text-black"
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
         </div>
         <button
           type="submit"
