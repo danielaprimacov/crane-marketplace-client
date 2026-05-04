@@ -216,10 +216,7 @@ function App() {
             }
           >
             <div ref={signupPanelRef}>
-              <SignupForm
-                onSuccess={close}
-                onSwitchToLogin={() => setModalMode("login")}
-              />
+              <SignupForm onSwitchToLogin={() => setModalMode("login")} />
             </div>
           </div>
         </div>

@@ -53,7 +53,6 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
       };
 
       await axios.post(`${API_URL}/auth/signup`, requestBody);
-      onSuccess?.();
       onSwitchToLogin?.();
     } catch (error) {
       // Safely grab the API’s error message, or fall back to a generic one
