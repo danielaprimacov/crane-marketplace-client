@@ -328,7 +328,13 @@ function CranesPage() {
         </section>
       </main>
 
-      <Modal isOpen={isAdviceOpen} onClose={() => setAdviceOpen(false)}>
+      <Modal
+        isOpen={isAdviceOpen}
+        onClose={() => setAdviceOpen(false)}
+        widthClass="w-[92vw] max-w-[38rem]"
+        panelClass="max-h-[92dvh] overflow-y-auto"
+        contentClass="p-0"
+      >
         <ExpertForm onClose={() => setAdviceOpen(false)} />
       </Modal>
     </>

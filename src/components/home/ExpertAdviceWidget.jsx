@@ -25,7 +25,13 @@ function ExpertAdviceWidget() {
       </div>
 
       {/* The modal */}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        widthClass="w-[92vw] max-w-[38rem]"
+        panelClass="max-h-[92dvh] overflow-y-auto"
+        contentClass="p-0"
+      >
         <ExpertForm onClose={() => setIsOpen(false)} />
       </Modal>
     </>
