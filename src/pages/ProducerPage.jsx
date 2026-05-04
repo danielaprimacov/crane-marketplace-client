@@ -128,6 +128,10 @@ function CraneCard({ crane }) {
             src={imageUrl}
             alt={crane.title || model || "Crane"}
             loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={(event) => {
+              console.log("Image failed:", event.currentTarget.src);
+            }}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100 text-sm text-gray-400">
