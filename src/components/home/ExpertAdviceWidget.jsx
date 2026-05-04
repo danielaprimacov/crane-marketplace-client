@@ -13,7 +13,7 @@ function ExpertAdviceWidget() {
   return (
     <>
       {/* The little pill */}
-      <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-5 sm:left-auto lg:bottom-8">
+      <div className="fixed bottom-4 right-4 z-30 sm:bottom-6 sm:right-5 sm:left-auto lg:bottom-8">
         <button
           type="button"
           onClick={() => setIsOpen(true)}

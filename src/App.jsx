@@ -1,6 +1,6 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
 import HomePage from "./pages/HomePage";
@@ -39,16 +39,31 @@ function App() {
   const openSignup = () => setModalMode("signup");
   const close = () => setModalMode("none");
 
-  const [height, setHeight] = useState(0);
-  const loginFormRef = useRef(null);
-  const signupFormRef = useRef(null);
+  const [authModalHeight, setAuthModalHeight] = useState(0);
 
-  useEffect(() => {
-    const ref = modalMode === "signup" ? signupFormRef : loginFormRef;
-    if (ref.current) {
-      // scrollHeight will give you the full “natural” height of the form
-      setHeight(ref.current.scrollHeight);
-    }
+  const loginPanelRef = useRef(null);
+  const signupPanelRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (modalMode === "none") return;
+
+    const activePanel =
+      modalMode === "signup" ? signupPanelRef.current : loginPanelRef.current;
+
+    if (!activePanel) return;
+
+    const updateHeight = () => {
+      setAuthModalHeight(activePanel.scrollHeight);
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(activePanel);
+
+    return () => {
+      observer.disconnect();
+    };
   }, [modalMode]);
 
   return (
@@ -156,41 +171,56 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      <Modal isOpen={modalMode !== "none"} onClose={close}>
+      <Modal
+        isOpen={modalMode !== "none"}
+        onClose={close}
+        widthClass="w-[92w] max-w-[34rem]"
+        panelClass="max-h-[92dvh] overflow-hidden hide-scrollbar"
+        contentClass="p-0"
+        style={{
+          height: authModalHeight ? `${authModalHeight}px` : "auto",
+          maxHeight: "88dvh",
+        }}
+      >
         <div
-          className={
-            `relative overflow-hidden transition-[height] duration-300 ease-in-out ` +
-            (modalMode === "signup" ? "h-[35rem]" : "h-[25rem]")
-          }
+          className="relative overflow-hidden transition-[height] duration-300 ease-in-out"
+          style={{
+            height: authModalHeight ? `${authModalHeight}px` : "auto",
+            maxHeight: "90vh",
+          }}
         >
           {/* LOGIN */}
           <div
             className={
-              "absolute inset-0 transition-opacity duration-300 " +
+              "absolute inset-0 overflow-y-auto transition-opacity duration-300 " +
               (modalMode === "login"
                 ? "opacity-100 pointer-events-auto z-20"
                 : "opacity-0 pointer-events-none z-10")
             }
           >
-            <LoginForm
-              onSuccess={close}
-              onSwitchToSignup={() => setModalMode("signup")}
-            />
+            <div ref={loginPanelRef}>
+              <LoginForm
+                onSuccess={close}
+                onSwitchToSignup={() => setModalMode("signup")}
+              />
+            </div>
           </div>
 
           {/* SIGNUP */}
           <div
             className={
-              "absolute inset-0 transition-opacity duration-300 " +
+              "absolute inset-0 overflow-y-auto transition-opacity duration-300 " +
               (modalMode === "signup"
                 ? "opacity-100 pointer-events-auto z-20"
                 : "opacity-0 pointer-events-none z-10")
             }
           >
-            <SignupForm
-              onSuccess={close}
-              onSwitchToLogin={() => setModalMode("login")}
-            />
+            <div ref={signupPanelRef}>
+              <SignupForm
+                onSuccess={close}
+                onSwitchToLogin={() => setModalMode("login")}
+              />
+            </div>
           </div>
         </div>
       </Modal>
