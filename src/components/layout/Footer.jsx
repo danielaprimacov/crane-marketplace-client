@@ -139,7 +139,7 @@ function Footer() {
                 now!
               </p>
               <button
-                className="px-8 py-2 w-full w-auto rounded-md bg-black text-white cursor-pointer hover:bg-red-700 transform transition duration-300 ease-out"
+                className="px-8 py-2 w-full rounded-md bg-black text-white hover:bg-red-700 transform transition duration-300 ease-out"
                 onClick={() => setModalMode("newsletter")}
               >
                 Newsletter
@@ -184,9 +184,11 @@ function Footer() {
         onClose={closeModal}
         widthClass={
           modalMode === "newsletter"
-            ? "w-[60rem] max-w-full"
-            : "w-[45rem] max-w-full"
+            ? "w-[92vw] max-w-[60rem]"
+            : "w-[92vw] max-w-[38rem]"
         }
+        panelClass="max-h-[92dvh] overflow-y-auto"
+        contentClass="p-0"
       >
         {modalMode === "contact" && <ContactForm onClose={closeModal} />}
         {modalMode === "cookies" && <CookieForm onClose={closeModal} />}

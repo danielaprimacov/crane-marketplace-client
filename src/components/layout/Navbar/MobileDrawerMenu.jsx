@@ -31,6 +31,7 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
       >
         {/* Close button inside too */}
         <button
+          type="button"
           onClick={() => setMenuOpen(false)}
           className="
                 absolute top-4 right-4
@@ -78,6 +79,7 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
           </Link>
 
           <button
+            type="button"
             onClick={() => setModalOpen(true)}
             className="block text-xl sm:text-2xl font-medium hover:text-red-600 cursor-pointer"
           >
@@ -90,7 +92,13 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
           />
         </nav>
       </aside>
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        widthClass="w-[92vw] max-w-[38rem]"
+        panelClass="max-h-[92dvh] overflow-y-auto"
+        contentClass="p-0"
+      >
         <ContactForm onClose={() => setModalOpen(false)} />
       </Modal>
     </>

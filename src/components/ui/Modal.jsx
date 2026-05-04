@@ -41,7 +41,7 @@ function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-[90] bg-black/50 flex items-center justify-center p-4 sm:p-6"
       onClick={onClose}
     >
       <div
@@ -59,7 +59,9 @@ function Modal({
           &times;
         </button>
 
-        <div className={`max-h-[90vh] overflow-y-auto ${contentClass}`}>{children}</div>
+        <div className={`max-h-[90vh] overflow-y-auto ${contentClass}`}>
+          {children}
+        </div>
       </div>
     </div>
   );

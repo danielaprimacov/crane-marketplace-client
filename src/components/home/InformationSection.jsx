@@ -32,6 +32,7 @@ function InformationSection() {
               Ready to discuss your next project?
             </p>
             <button
+              type="button"
               onClick={() => setModalOpen(true)}
               className="px-8 py-4 mt-2 bg-black text-white cursor-pointer rounded-lg transition duration-300 ease-out hover:bg-red-700"
             >
@@ -40,7 +41,13 @@ function InformationSection() {
           </div>
         </div>
       </section>
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        widthClass="w-[92vw] max-w-[38rem]"
+        panelClass="max-h-[92dvh] overflow-y-auto"
+        contentClass="p-0"
+      >
         <ContactForm onClose={() => setModalOpen(false)} />
       </Modal>
     </>
