@@ -20,7 +20,7 @@ function Footer() {
     <>
       <footer
         id="footer"
-        className="mt-10 px-4 py-10 sm:px-6 lg:px-12 bg-black/20"
+        className="mt-10 bg-gradient-to-b from-transparent via-gray-300/40 to-gray-500 px-4 py-10 sm:px-6 lg:px-12"
       >
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_2fr_1.2fr]">
           {/* Company Information */}
