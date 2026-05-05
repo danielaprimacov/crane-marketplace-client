@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import AddInquiryForm from "../components/forms/inquiry/AddInquiryForm";
+import LoadingState from "../components/ui/LoadingState";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -51,9 +52,7 @@ function NewInquiryPage() {
   if (loading) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
-          Loading crane details…
-        </div>
+        <LoadingState />
       </main>
     );
   }

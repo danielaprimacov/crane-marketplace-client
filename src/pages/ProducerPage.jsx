@@ -5,6 +5,8 @@ import axios from "axios";
 import ProducersSidebar from "../components/cranes/ProducersSidebar";
 import FilterDropDown from "../components/ui/FilterDropDown";
 import RangeDropDown from "../components/ui/RangeDropDown";
+import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
 
 import { slugify, formatPrice, getMinMax } from "../utils/helpers";
 
@@ -80,26 +82,6 @@ function matchesRange(value, min, max) {
   return (
     numericValue >= (hasMin ? Number(min) : -Infinity) &&
     numericValue <= (hasMax ? Number(max) : Infinity)
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className="mx-auto w-full max-w-screen-2xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-      <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
-        Loading cranes…
-      </div>
-    </div>
-  );
-}
-
-function ErrorState({ message }) {
-  return (
-    <div className="mx-auto w-full max-w-screen-2xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm">
-        {message}
-      </div>
-    </div>
   );
 }
 
@@ -248,11 +230,6 @@ function ProducerPage() {
     return cranes.filter((crane) => crane.producer === activeGroup.name);
   }, [cranes, activeGroup]);
 
-  const myCranes = useMemo(() => {
-    if (!activeGroup) return [];
-    return cranes.filter((c) => c.producer === activeGroup.name);
-  }, [cranes, activeGroup]);
-
   const [minCap, maxCap] = useMemo(
     () => getMinMax(producerCranes, (c) => c.capacity ?? 0),
     [producerCranes]
@@ -384,15 +361,31 @@ function ProducerPage() {
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <LoadingState type="cranes" title="Loading cranes..." />;
   }
 
   if (error) {
-    return <ErrorState message={error} />;
+    return (
+      <ErrorState
+        title="Unable to load cranes"
+        message={error}
+        fullPage
+        onRetry={() => window.location.reload()}
+        actionLabel="Reload page"
+      />
+    );
   }
 
   if (!activeGroup) {
-    return <ErrorState message={`Unknown producer "${producerSlug}".`} />;
+    return (
+      <ErrorState
+        title="Producer not found"
+        message={`Unknown producer "${producerSlug}".`}
+        fullPage
+        actionTo="/cranes"
+        actionLabel="Back to cranes"
+      />
+    );
   }
 
   return (

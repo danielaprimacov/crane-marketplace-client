@@ -5,6 +5,7 @@ import axios from "axios";
 import { AuthContext } from "../context/auth.context";
 
 import ArrowIcon from "../components/ui/ArrowIcon";
+import LoadingState from "../components/ui/LoadingState";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,16 +41,6 @@ function getImageUrl(crane) {
   }
 
   return firstImage?.url || firstImage?.secure_url || null;
-}
-
-function LoadingState() {
-  return (
-    <main className="mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-      <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
-        Loading your cranes…
-      </div>
-    </main>
-  );
 }
 
 function ErrorState({ message }) {
@@ -194,7 +185,7 @@ function UserCranesPage() {
   }, [cranes, userId]);
 
   if (isLoading || loading) {
-    return <LoadingState />;
+    return <LoadingState type="cranes" title="Loading cranes..." />;
   }
 
   if (error) {

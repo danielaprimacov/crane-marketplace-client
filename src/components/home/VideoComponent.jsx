@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 
 import play from "../../assets/icons/play.png";
 import stop from "../../assets/icons/stop-circle.png";

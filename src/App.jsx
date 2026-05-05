@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useState, useRef, useLayoutEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
@@ -32,6 +32,7 @@ import RevocationPage from "./pages/RevocationPage";
 import TermsPage from "./pages/TermsPage";
 import ImprintPage from "./pages/ImprintPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   const [modalMode, setModalMode] = useState("none");
@@ -168,7 +169,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       <Modal

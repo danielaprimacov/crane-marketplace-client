@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
+import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -70,6 +72,7 @@ function CraneCard({ crane }) {
               src={imageUrl}
               alt={crane.title || model || "Crane"}
               loading="lazy"
+              referrerPolicy="no-referrer"
               className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
             />
           ) : (
@@ -173,21 +176,24 @@ function ProfilePage() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto w-full max-w-5xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
-          Loading profile…
-        </div>
-      </main>
+      <LoadingState
+        type="profile"
+        title="Loading profile..."
+        message="We are loading your account information."
+        fullPage
+      />
     );
   }
 
   if (!user) {
     return (
-      <main className="mx-auto w-full max-w-5xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm">
-          You must be logged in to view your profile.
-        </div>
-      </main>
+      <ErrorState
+        title="Profile not available"
+        message="You need to log in to view this page."
+        actionTo="/login"
+        actionLabel="Go to login"
+        fullPage
+      />
     );
   }
 
@@ -234,11 +240,20 @@ function ProfilePage() {
         </div>
         {loadingCranes ? (
           <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
-            Loading your cranes…
+            <LoadingState
+              type="cranes"
+              title="Loading your cranes..."
+              message="We are loading the cranes connected to your account."
+            />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm">
-            {error}
+            <ErrorState
+              title="Could not load your cranes"
+              message={error}
+              onRetry={() => window.location.reload()}
+              actionLabel="Reload page"
+            />
           </div>
         ) : myCranes.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">

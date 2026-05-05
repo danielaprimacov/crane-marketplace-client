@@ -7,6 +7,7 @@ import { getDndConfig } from "../utils/getDndConfig";
 import KanbanProvider from "../components/kanban/KanbanProvider";
 import Columns from "../components/kanban/Columns";
 import DragLayer from "../components/kanban/DragLayer";
+import LoadingState from "../components/ui/LoadingState";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -94,7 +95,13 @@ function InquiriesListPage() {
   };
 
   if (loading) {
-    return <div className="py-8 text-gray-600">Loading inquiries...</div>;
+    return (
+      <LoadingState
+        title="Loading inquiries..."
+        message="We are loading incoming requests."
+        fullPage
+      />
+    );
   }
 
   if (error) {
