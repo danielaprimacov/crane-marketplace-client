@@ -21,6 +21,10 @@ export const initialCraneState = {
 };
 
 export function buildCraneRequestBody(form) {
+  const normalizedStatus = String(form.status || "")
+    .trim()
+    .toLowerCase();
+
   const requestBody = {
     producer: form.producer,
     seriesCode: form.seriesCode,
@@ -32,30 +36,33 @@ export function buildCraneRequestBody(form) {
     images: form.images,
     description: form.description,
     location: form.location,
-    status: form.status,
+    status: normalizedStatus,
   };
 
   if (
-    form.availability.availabilityStart &&
-    form.availability.availabilityEnd
+    form.availability?.availabilityStart &&
+    form.availability?.availabilityEnd
   ) {
     requestBody.availability = {
       from: new Date(form.availability.availabilityStart),
       to: new Date(form.availability.availabilityEnd),
     };
+  } else {
+    requestBody.availability = null;
   }
 
-  if (form.status === "for sale") {
+  if (normalizedStatus === "for sale") {
     requestBody.salePrice = Number(form.salePrice);
+    requestBody.rentPrice = undefined;
   }
 
-  if (form.status === "for rent") {
+  if (normalizedStatus === "for rent") {
     requestBody.rentPrice = {
       amount: Number(form.rentAmount),
-      interval: form.rentInterval,
+      interval: form.rentInterval || "day",
     };
+    requestBody.salePrice = undefined;
   }
-
   return requestBody;
 }
 

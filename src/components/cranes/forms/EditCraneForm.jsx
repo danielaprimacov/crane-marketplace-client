@@ -4,6 +4,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 import BackButton from "../../ui/BackButton";
+import LoadingState from "../../ui/LoadingState";
+import ErrorState from "../../ui/ErrorState";
+
 import CraneMetaFields from "./CraneMetaFields";
 import CraneReadonlySpecs from "./CraneReadonlySpecs";
 import CranePricingFields from "./CranePricingFields";
@@ -25,6 +28,7 @@ function EditCraneForm() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState(initialCraneState);
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -33,6 +37,52 @@ function EditCraneForm() {
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const getCraneData = async () => {
+      const storedToken = localStorage.getItem("authToken");
+
+      if (!storedToken) {
+        setError("You are not authorized to edit this crane.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await axios.get(`${API_URL}/cranes/${craneId}`, {
+          headers: { Authorization: `Bearer ${storedToken}` },
+          signal: controller.signal,
+        });
+
+        const crane = response.data;
+        setForm(mapCraneToForm(crane));
+      } catch (error) {
+        if (error.code === "ERR_CANCELED") return;
+
+        console.error("Failed to fetch crane:", error);
+
+        setError(
+          error?.response?.data?.message ||
+            "Could not load the crane data. Please try again."
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    getCraneData();
+
+    return () => {
+      controller.abort();
+    };
+  }, [craneId]);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -56,29 +106,6 @@ function EditCraneForm() {
     }
   };
 
-  const getCraneData = async () => {
-    const storedToken = localStorage.getItem("authToken");
-
-    try {
-      setLoading(true);
-
-      const response = await axios.get(`${API_URL}/cranes/${craneId}`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
-
-      const crane = response.data;
-      setForm(mapCraneToForm(crane));
-    } catch (error) {
-      console.error("Failed to fetch crane:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getCraneData();
-  }, [craneId]);
-
   const handleRemoveImage = (index) => {
     setForm((prev) => ({
       ...prev,
@@ -90,6 +117,11 @@ function EditCraneForm() {
     event.preventDefault();
 
     const storedToken = localStorage.getItem("authToken");
+    if (!storedToken) {
+      toast.error("You are not authorized to update this crane.");
+      return;
+    }
+
     const requestBody = buildCraneRequestBody(form);
 
     try {
@@ -102,7 +134,7 @@ function EditCraneForm() {
       navigate(`/cranes/${craneId}`, { replace: true });
     } catch (error) {
       console.error("Failed to update crane:", error);
-      toast.error("Failed to update crane!");
+      toast.error(error?.response?.data?.message || "Failed to update crane!");
     } finally {
       setSaving(false);
     }
@@ -110,9 +142,24 @@ function EditCraneForm() {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-0 py-10">
-        <p className="text-gray-500">Loading crane data…</p>
-      </div>
+      <LoadingState
+        type="cranes"
+        title="Loading crane data..."
+        message="We are loading the crane details for editing."
+        fullPage
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        title="Could not load crane"
+        message={error}
+        actionTo="/cranes"
+        actionLabel="Back to cranes"
+        fullPage
+      />
     );
   }
 

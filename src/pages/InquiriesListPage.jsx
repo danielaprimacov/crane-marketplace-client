@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { DndProvider } from "react-dnd";
 
@@ -8,6 +8,7 @@ import KanbanProvider from "../components/kanban/KanbanProvider";
 import Columns from "../components/kanban/Columns";
 import DragLayer from "../components/kanban/DragLayer";
 import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,8 +19,9 @@ function InquiriesListPage() {
 
   const dndConfig = useMemo(() => getDndConfig(), []);
 
-  const getAllInquiries = async () => {
+  const getAllInquiries = useCallback(async (signal) => {
     const storedToken = localStorage.getItem("authToken");
+
     if (!storedToken) {
       setError("Missing auth token.");
       setLoading(false);
@@ -29,21 +31,40 @@ function InquiriesListPage() {
     try {
       setLoading(true);
       setError("");
+
       const response = await axios.get(`${API_URL}/inquiries`, {
         headers: { Authorization: `Bearer ${storedToken}` },
+        signal,
       });
-      setInquiries(response.data);
+
+      const safeInquiries = Array.isArray(response.data) ? response.data : [];
+
+      setInquiries(safeInquiries);
     } catch (error) {
-      console.log("Failed to fetch inquiries", error);
-      setError("Failed to load inquiries!");
+      if (error.code === "ERR_CANCELED") return;
+
+      console.error("Failed to fetch inquiries:", error);
+
+      setError(
+        error?.response?.data?.message ||
+          "Failed to load inquiries. Please try again."
+      );
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
-    getAllInquiries();
-  }, []);
+    const controller = new AbortController();
+
+    getAllInquiries(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, [getAllInquiries]);
 
   const handleUpdate = async (id, updatedFields) => {
     const token = localStorage.getItem("authToken");
@@ -105,7 +126,15 @@ function InquiriesListPage() {
   }
 
   if (error) {
-    return <div className="py-8 text-red-600">{error}</div>;
+    return (
+      <ErrorState
+        title="Could not load inquiries"
+        message={error}
+        onRetry={() => getAllInquiries()}
+        actionLabel="Reload inquiries"
+        fullPage
+      />
+    );
   }
 
   return (

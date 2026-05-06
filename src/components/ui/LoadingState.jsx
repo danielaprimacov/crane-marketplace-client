@@ -18,11 +18,6 @@ function LoadingState({
 }) {
   const animationData = animationMap[type] || animationMap.default;
 
-  console.log("Loading animation:", {
-    type,
-    animationData,
-  });
-
   return (
     <div
       className={

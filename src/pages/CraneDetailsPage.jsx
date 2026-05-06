@@ -6,11 +6,13 @@ import { toast } from "react-hot-toast";
 import { AuthContext } from "../context/auth.context";
 
 import Modal from "../components/ui/Modal";
+import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
+import BackButton from "../components/ui/BackButton";
+
 import CraneGallery from "../components/cranes/CraneGallery";
 import FullViewGalleryModal from "../components/cranes/FullViewGalleryModal";
 import CraneDetailsPanel from "../components/cranes/CraneDetailsPanel";
-
-import BackButton from "../components/ui/BackButton";
 
 import useCraneDetails from "../hooks/useCraneDetails";
 
@@ -49,7 +51,7 @@ function CraneDetailsPage() {
       console.error("Failed to delete crane:", error);
 
       const message =
-        err?.response?.data?.message ||
+        error?.response?.data?.message ||
         "Failed to delete crane. Please try again.";
 
       toast.error(message);
@@ -58,18 +60,24 @@ function CraneDetailsPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto mt-20 mb-8 max-w-screen-2xl px-4 sm:px-6 lg:px-8">
-        <p>Loading…</p>
-      </div>
+      <LoadingState
+        type="cranes"
+        title="Loading cranes details..."
+        message="We are loading the crane information."
+        fullPage
+      />
     );
   }
 
   if (error || !crane) {
     return (
-      <div className="mx-auto mt-20 mb-8 max-w-screen-2xl px-4 sm:px-6 lg:px-8">
-        <BackButton />
-        <p className="mt-6 text-red-600">{error || "Crane not found."}</p>
-      </div>
+      <ErrorState
+        title="Crane not found"
+        message={error || "The crane could not be loaded or does not exist."}
+        actionTo="/cranes"
+        actionLabel="Back to cranes"
+        fullPage
+      />
     );
   }
 

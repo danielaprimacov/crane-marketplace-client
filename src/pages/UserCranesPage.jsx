@@ -6,6 +6,7 @@ import { AuthContext } from "../context/auth.context";
 
 import ArrowIcon from "../components/ui/ArrowIcon";
 import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,16 +42,6 @@ function getImageUrl(crane) {
   }
 
   return firstImage?.url || firstImage?.secure_url || null;
-}
-
-function ErrorState({ message }) {
-  return (
-    <main className="mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm">
-        {message}
-      </div>
-    </main>
-  );
 }
 
 function EmptyState() {
@@ -185,15 +176,29 @@ function UserCranesPage() {
   }, [cranes, userId]);
 
   if (isLoading || loading) {
-    return <LoadingState type="cranes" title="Loading cranes..." />;
+    return (
+      <LoadingState
+        type="cranes"
+        title="Loading cranes..."
+        message="We are loading the cranes connected to your account."
+        fullPage
+      />
+    );
   }
 
   if (error) {
-    return <ErrorState message={error} />;
+    return <ErrorState message={error} fullPage />;
   }
 
   if (!isLoggedIn) {
-    return <ErrorState message="You must be logged in to view your cranes." />;
+    return (
+      <ErrorState
+        message="You must be logged in to view your cranes."
+        actionTo="/login"
+        actionLabel="Go to login"
+        fullPage
+      />
+    );
   }
 
   return (

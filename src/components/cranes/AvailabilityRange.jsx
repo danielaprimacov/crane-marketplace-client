@@ -1,11 +1,22 @@
 function AvailabilityRange({ field, values, setValues, label }) {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value }));
-  };
-
   const startKey = `${field}Start`;
   const endKey = `${field}End`;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prev) => {
+      const next = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (name === startKey && prev[endKey] && value > prev[endKey]) {
+        next[endKey] = "";
+      }
+
+      return next;
+    });
+  };
 
   return (
     <div className="flex gap-6 my-8 flex-col sm:flex-row">

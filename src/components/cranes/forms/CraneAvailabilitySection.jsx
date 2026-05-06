@@ -32,8 +32,14 @@ function CraneAvailabilitySection({ form, setForm }) {
           <AvailabilityRange
             field="availability"
             values={form.availability}
-            setValues={(value) =>
-              setForm((prev) => ({ ...prev, availability: value }))
+            setValues={(updater) =>
+              setForm((prev) => ({
+                ...prev,
+                availability:
+                  typeof updater === "function"
+                    ? updater(prev.availability)
+                    : updater,
+              }))
             }
             label="Available"
           />

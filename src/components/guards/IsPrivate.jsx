@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/auth.context";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import RouteLoading from "./RouteLoading";
 

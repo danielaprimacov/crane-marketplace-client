@@ -3,6 +3,7 @@ import { getContainedImageBounds } from "../../utils/helpers";
 
 import { NO_IMAGE_URL } from "../../utils/imageHelpers";
 import { useAvailableImageUrls } from "../../hooks/useAvailableImageUrls";
+import LoadingState from "../ui/LoadingState";
 
 const LENS_SIZE = 140;
 const HOVER_PREVIEW_SCALE = 2;
@@ -27,7 +28,10 @@ function CraneGallery({
     crane?.images
   );
 
-  const selectedImage = imageUrls[selectedImageIndex];
+  const safeSelectedImageIndex =
+    selectedImageIndex < imageUrls.length ? selectedImageIndex : 0;
+
+  const selectedImage = imageUrls[safeSelectedImageIndex];
   const hasSelectedImage = Boolean(selectedImage);
 
   useEffect(() => {
@@ -139,8 +143,11 @@ function CraneGallery({
 
   if (loadingImages) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center bg-white text-gray-400">
-        Loading images…
+      <div className="relative flex min-h-[320px] items-center justify-center bg-white xl:row-span-2 xl:min-h-[520px]">
+        <LoadingState
+          title="Loading images..."
+          message="We are checking the available crane images."
+        />
       </div>
     );
   }
@@ -175,7 +182,7 @@ function CraneGallery({
                 onMouseEnter={() => handleThumbnailHover(i)}
                 onClick={() => handleThumbnailHover(i)}
                 className={`relative h-[56px] w-[56px] shrink-0 overflow-hidden rounded-lg border transition ${
-                  selectedImageIndex === i
+                  safeSelectedImageIndex === i
                     ? "border-blue-500 ring-1 ring-blue-300"
                     : "border-black/10 hover:border-black/30"
                 }`}
