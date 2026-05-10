@@ -17,108 +17,11 @@ const SALUTATION_OPTIONS = ["Mr.", "Ms.", "Dr."];
 
 const COUNTRY_OPTIONS = ["USA", "Germany", "Poland"];
 
-function FloatingInput({
-  id,
-  name,
-  label,
-  type = "text",
-  value,
-  onChange,
-  required = false,
-  autoComplete,
-}) {
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        autoComplete={autoComplete}
-        className="peer block h-6 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
-
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-0 flex h-6 items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
-}
-
-function FloatingSelect({
-  id,
-  name,
-  label,
-  value,
-  onChange,
-  options,
-  required = false,
-}) {
-  const hasValue = Boolean(value);
-
-  return (
-    <div className="relative">
-      <label htmlFor={id} className="mb-1 block text-sm text-black/50">
-        {label}
-      </label>
-      <select
-        id={id}
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className="block h-6 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      >
-        <option value="" disabled>
-          Select...
-        </option>
-
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function FloatingTextarea({
-  id,
-  name,
-  label,
-  value,
-  onChange,
-  required = false,
-}) {
-  return (
-    <div className="relative">
-      <textarea
-        id={id}
-        name={name}
-        rows={3}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        className="peer block min-h-5 w-full resize-none border-b border-b-black/20 bg-transparent pt-2 text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
-
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-2 flex items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
-}
+import {
+  FloatingInput,
+  FloatingSelect,
+  FloatingTextarea,
+} from "../../ui/form/FloatingFields";
 
 function ContactForm({ onClose }) {
   const [form, setForm] = useState(INITIAL_FORM);
@@ -138,7 +41,7 @@ function ContactForm({ onClose }) {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = event.target;
+    const { name, value } = e.target;
 
     setForm((currentForm) => ({
       ...currentForm,
@@ -217,7 +120,7 @@ function ContactForm({ onClose }) {
       // on success, close the modal
       setSuccess("✅ Your message was sent successfully!");
       setForm(INITIAL_FORM);
-      if (autoCloseOnSuccess && onClose) {
+      if (onClose) {
         closeTimerRef.current = setTimeout(() => {
           onClose();
         }, 2000);
@@ -225,7 +128,7 @@ function ContactForm({ onClose }) {
     } catch (error) {
       console.error("Failed to send message:", error);
       setError(
-        err.response?.data?.message ||
+        error.response?.data?.message ||
           "There was an error submitting the form. Please try again."
       );
     } finally {
@@ -239,7 +142,7 @@ function ContactForm({ onClose }) {
       className="flex flex-col w-full max-w-xl mx-auto px-5 py-7 sm:px-8"
     >
       <div className="mb-8 text-center">
-        <h2 className="text-2xl semifont-bold tracking-tight text-gray-900 sm:text-3xl">
+        <h2 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
           Contact Us
         </h2>
         <p className="mt-2 text-sm leading-6 text-gray-500">
