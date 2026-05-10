@@ -12,7 +12,11 @@ import BackButton from "../../ui/BackButton";
 import { craneApi } from "../../../services/craneApi";
 
 import { slugify } from "../../../utils/helpers";
-import { initialCraneState, buildCraneRequestBody } from "./craneFormHelpers";
+import {
+  initialCraneState,
+  buildCraneRequestBody,
+} from "../../../utils/craneHelpers";
+
 import useCloudinaryUpload from "../../../hooks/useCloudinaryUpload";
 
 function AddCraneForm() {

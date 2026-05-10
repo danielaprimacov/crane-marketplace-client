@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-import { getAvailabilityStatus } from "../../../utils/helpers";
 
-import { getCraneId, getImageUrl } from "../../../utils/craneHelpers";
+import {
+  getCraneId,
+  getImageUrl,
+  getAvailabilityStatus,
+} from "../../../utils/craneHelpers";
 
 function CranePromoCard({ crane }) {
   const craneId = getCraneId(crane);
