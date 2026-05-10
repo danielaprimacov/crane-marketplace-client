@@ -8,6 +8,10 @@ export function FloatingInput({
   required = false,
   autoComplete,
   disabled = false,
+  maxLength,
+  min,
+  max,
+  step,
   inputClassName = "",
   labelClassName = "",
 }) {
@@ -24,6 +28,9 @@ export function FloatingInput({
         autoComplete={autoComplete}
         disabled={disabled}
         maxLength={maxLength}
+        min={min}
+        max={max}
+        step={step}
         className={`peer block h-10 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${inputClassName}`}
       />
 
