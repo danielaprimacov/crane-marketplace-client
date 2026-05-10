@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { messageApi } from "../../../services/messageApi";
+
+import {
+  FloatingInput,
+  FloatingSelect,
+  FloatingTextarea,
+} from "../../ui/form/FloatingFields";
 
 const INITIAL_FORM = {
   salutation: "",
@@ -17,11 +22,23 @@ const SALUTATION_OPTIONS = ["Mr.", "Ms.", "Dr."];
 
 const COUNTRY_OPTIONS = ["USA", "Germany", "Poland"];
 
-import {
-  FloatingInput,
-  FloatingSelect,
-  FloatingTextarea,
-} from "../../ui/form/FloatingFields";
+function getErrorMessage(error) {
+  const responseData = error?.response?.data;
+
+  if (responseData?.message) {
+    return responseData.message;
+  }
+
+  if (responseData?.details) {
+    const firstDetail = Object.values(responseData.details)[0];
+
+    if (firstDetail) {
+      return firstDetail;
+    }
+  }
+
+  return "There was an error submitting the form. Please try again.";
+}
 
 function ContactForm({ onClose }) {
   const [form, setForm] = useState(INITIAL_FORM);
@@ -115,7 +132,7 @@ function ContactForm({ onClose }) {
 
     try {
       // send to backend
-      await axios.post(`${API_URL}/messages`, payload);
+      await messageApi.create(payload);
 
       // on success, close the modal
       setSuccess("✅ Your message was sent successfully!");
@@ -127,10 +144,7 @@ function ContactForm({ onClose }) {
       }
     } catch (error) {
       console.error("Failed to send message:", error);
-      setError(
-        error.response?.data?.message ||
-          "There was an error submitting the form. Please try again."
-      );
+      setError(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -161,6 +175,17 @@ function ContactForm({ onClose }) {
           {error}
         </div>
       )}
+
+      <input
+        type="text"
+        name="website"
+        value={form.website}
+        onChange={handleChange}
+        tabIndex="-1"
+        autoComplete="off"
+        className="hidden"
+        aria-hidden="true"
+      />
 
       <div className="space-y-8">
         <FloatingSelect
@@ -233,6 +258,8 @@ function ContactForm({ onClose }) {
           value={form.message}
           onChange={handleChange}
           required
+          rows={3}
+          maxLength={3000}
         />
       </div>
 

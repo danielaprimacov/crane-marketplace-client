@@ -8,6 +8,8 @@ export function FloatingInput({
   required = false,
   autoComplete,
   disabled = false,
+  inputClassName = "",
+  labelClassName = "",
 }) {
   return (
     <div className="relative">
@@ -21,12 +23,13 @@ export function FloatingInput({
         placeholder=" "
         autoComplete={autoComplete}
         disabled={disabled}
-        className="peer block h-6 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+        maxLength={maxLength}
+        className={`peer block h-10 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${inputClassName}`}
       />
 
       <label
         htmlFor={id}
-        className="absolute left-0 top-0 flex h-6 items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
+        className={`absolute left-0 top-0 flex h-10 items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:h-auto peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:h-auto peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50 ${labelClassName}`}
       >
         {label}
       </label>
@@ -44,10 +47,15 @@ export function FloatingSelect({
   required = false,
   disabled = false,
   placeholder = "Select...",
+  selectClassName = "",
+  labelClassName = "",
 }) {
   return (
     <div className="relative">
-      <label htmlFor={id} className="mb-1 block text-sm text-black/50">
+      <label
+        htmlFor={id}
+        className={`absolute left-0 -top-6 text-sm text-gray-500 ${labelClassName}`}
+      >
         {label}
       </label>
 
@@ -58,7 +66,7 @@ export function FloatingSelect({
         onChange={onChange}
         required={required}
         disabled={disabled}
-        className="block h-6 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+        className={`block h-11 w-full appearance-none border-b border-b-black/20 bg-transparent pr-10 text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${selectClassName}`}
       >
         <option value="" disabled>
           {placeholder}
@@ -92,6 +100,8 @@ export function FloatingTextarea({
   rows = 3,
   maxLength,
   disabled = false,
+  textareaClassName = "",
+  labelClassName = "",
 }) {
   return (
     <div className="relative">
@@ -105,12 +115,12 @@ export function FloatingTextarea({
         placeholder=" "
         maxLength={maxLength}
         disabled={disabled}
-        className="peer block min-h-5 w-full resize-none border-b border-b-black/20 bg-transparent pt-2 text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+        className={`peer block min-h-24 w-full resize-y border-b border-b-black/20 bg-transparent py-2 text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${textareaClassName}`}
       />
 
       <label
         htmlFor={id}
-        className="absolute left-0 top-2 flex items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
+        className={`absolute left-0 top-2 flex items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50 ${labelClassName}`}
       >
         {label}
       </label>
