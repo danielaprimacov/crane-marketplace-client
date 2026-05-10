@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
 
 import BackButton from "../../ui/BackButton";
@@ -13,6 +12,8 @@ import CranePricingFields from "./CranePricingFields";
 import CraneImageUploadField from "./CraneImageUploadField";
 import CraneAvailabilitySection from "./CraneAvailabilitySection";
 
+import { craneApi } from "../../../services/craneApi";
+
 import useCloudinaryUpload from "../../../hooks/useCloudinaryUpload";
 
 import {
@@ -20,8 +21,6 @@ import {
   buildCraneRequestBody,
   mapCraneToForm,
 } from "./craneFormHelpers";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function EditCraneForm() {
   const { craneId } = useParams();
@@ -42,24 +41,14 @@ function EditCraneForm() {
     const controller = new AbortController();
 
     const getCraneData = async () => {
-      const storedToken = localStorage.getItem("authToken");
-
-      if (!storedToken) {
-        setError("You are not authorized to edit this crane.");
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError("");
 
-        const response = await axios.get(`${API_URL}/cranes/${craneId}`, {
-          headers: { Authorization: `Bearer ${storedToken}` },
+        const crane = await craneApi.getById(craneId, {
           signal: controller.signal,
         });
 
-        const crane = response.data;
         setForm(mapCraneToForm(crane));
       } catch (error) {
         if (error.code === "ERR_CANCELED") return;
@@ -116,21 +105,15 @@ function EditCraneForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const storedToken = localStorage.getItem("authToken");
-    if (!storedToken) {
-      toast.error("You are not authorized to update this crane.");
-      return;
-    }
-
     const requestBody = buildCraneRequestBody(form);
 
     try {
       setSaving(true);
 
-      await axios.put(`${API_URL}/cranes/${craneId}`, requestBody, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
+      await craneApi.update(craneId, requestBody);
+
       toast.success("Crane updated successfully!");
+
       navigate(`/cranes/${craneId}`, { replace: true });
     } catch (error) {
       console.error("Failed to update crane:", error);

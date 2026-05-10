@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
 
 import CraneSpecsFields from "./CraneSpecsFields";
@@ -10,11 +9,11 @@ import CraneImageUploadField from "./CraneImageUploadField";
 import CraneAvailabilitySection from "./CraneAvailabilitySection";
 import BackButton from "../../ui/BackButton";
 
+import { craneApi } from "../../../services/craneApi";
+
 import { slugify } from "../../../utils/helpers";
 import { initialCraneState, buildCraneRequestBody } from "./craneFormHelpers";
 import useCloudinaryUpload from "../../../hooks/useCloudinaryUpload";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function AddCraneForm() {
   const [form, setForm] = useState(initialCraneState);
@@ -52,22 +51,20 @@ function AddCraneForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const storedToken = localStorage.getItem("authToken");
-
     if (form.status === "for sale" && form.salePrice === "") {
       toast.error("Please enter a sale price!");
+      return;
     }
     if (form.status === "for rent" && form.rentAmount === "") {
       toast.error("Please enter a rent amount.");
+      return;
     }
 
     const requestBody = buildCraneRequestBody(form);
 
     try {
       // Send POST and await response
-      await axios.post(`${API_URL}/cranes`, requestBody, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
+      await craneApi.create(requestBody);
 
       setNewProducerSlug(slugify(form.producer));
 
