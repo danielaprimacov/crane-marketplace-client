@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 
-import LoadingState from "../ui/LoadingState";
-
+import { NO_IMAGE_URL } from "../../utils/imageHelpers";
 import useCraneGalleryZoom from "../../hooks/usCraneGalleryZoom";
 import { useAvailableImageUrls } from "../../hooks/useAvailableImageUrls";
-import { NO_IMAGE_URL } from "../../utils/imageHelpers";
 
-import { MAX_VISIBLE_THUMBNAILS } from "../../constants/craneGallery.constants";
+import {
+  LENS_SIZE,
+  HOVER_PREVIEW_SCALE,
+} from "../../constants/craneGallery.constants";
+
+import LoadingState from "../ui/LoadingState";
+import CraneThumbnails from "./gallery/CraneThumbnails";
 
 function CraneGallery({
   crane,
@@ -14,6 +18,16 @@ function CraneGallery({
   setSelectedImageIndex,
   onOpenFullView,
 }) {
+  const { imageUrls, loading: loadingImages } = useAvailableImageUrls(
+    crane?.images
+  );
+
+  const safeSelectedImageIndex =
+    selectedImageIndex < imageUrls.length ? selectedImageIndex : 0;
+
+  const selectedImage = imageUrls[safeSelectedImageIndex];
+  const hasSelectedImage = Boolean(selectedImage);
+
   const {
     imageAreaRef,
     isZoomed,
@@ -31,16 +45,6 @@ function CraneGallery({
     hasSelectedImage,
   });
 
-  const { imageUrls, loading: loadingImages } = useAvailableImageUrls(
-    crane?.images
-  );
-
-  const safeSelectedImageIndex =
-    selectedImageIndex < imageUrls.length ? selectedImageIndex : 0;
-
-  const selectedImage = imageUrls[safeSelectedImageIndex];
-  const hasSelectedImage = Boolean(selectedImage);
-
   useEffect(() => {
     if (!imageUrls.length) return;
 
@@ -49,7 +53,7 @@ function CraneGallery({
     }
   }, [imageUrls.length, selectedImageIndex, setSelectedImageIndex]);
 
-  const handleThumbnailHover = (index) => {
+  const handleThumbnailSelect = (index) => {
     setSelectedImageIndex(index);
     resetZoom();
   };
@@ -86,40 +90,13 @@ function CraneGallery({
     <div className="relative bg-white xl:row-span-2 min-h-[320px] xl:min-h-0">
       <div className="h-full flex flex-col gap-4 px-3 pt-3 pb-4 xl:flex-row xl:gap-8 xl:px-6 xl:pb-0">
         {/* Thumbnails */}
-        <div className="order-2 flex w-full gap-3 overflow-x-auto px-1 pb-1 xl:order-1 xl:w-[62px] xl:flex-col xl:overflow-y-auto xl:overflow-x-hidden">
-          {imageUrls.slice(0, MAX_VISIBLE_THUMBNAILS).map((image, i) => {
-            return (
-              <button
-                key={`${image}-${i}`}
-                type="button"
-                onMouseEnter={() => handleThumbnailHover(i)}
-                onClick={() => handleThumbnailHover(i)}
-                className={`relative h-[56px] w-[56px] shrink-0 overflow-hidden rounded-lg border transition ${
-                  safeSelectedImageIndex === i
-                    ? "border-blue-500 ring-1 ring-blue-300"
-                    : "border-black/10 hover:border-black/30"
-                }`}
-              >
-                <img
-                  src={image}
-                  alt={`${crane.title || "Crane image"} ${i + 1}`}
-                  className="h-full w-full object-cover"
-                  draggable="false"
-                />
-              </button>
-            );
-          })}
-
-          {imageUrls.length > MAX_VISIBLE_THUMBNAILS && (
-            <button
-              type="button"
-              onClick={onOpenFullView}
-              className="h-[56px] w-[56px] shrink-0 rounded-lg border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
-            >
-              <span>+{imageUrls.length - MAX_VISIBLE_THUMBNAILS}</span>
-            </button>
-          )}
-        </div>
+        <CraneThumbnails
+          imageUrls={imageUrls}
+          selectedImageIndex={safeSelectedImageIndex}
+          craneTitle={crane?.title || "Crane image"}
+          onSelect={handleThumbnailSelect}
+          onOpenFullView={onOpenFullView}
+        />
         <div className="order-1 min-w-0 flex-1 flex flex-col xl:order-2 xl:justify-center">
           <div
             ref={imageAreaRef}
