@@ -1,9 +1,9 @@
 import apiClient from "./apiClient";
 
 export const authApi = {
-  getProfile: async () => {
-    const response = await apiClient.get("/users/profile");
-    return response.data;
+  verify: async () => {
+    const response = await apiClient.get("/auth/verify");
+    return response.data.user;
   },
 
   login: async (credentials) => {

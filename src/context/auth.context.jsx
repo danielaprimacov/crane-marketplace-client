@@ -3,15 +3,6 @@ import { authApi } from "../services/authApi";
 
 const AuthContext = createContext();
 
-function normalizeUser(user) {
-  if (!user) return null;
-
-  return {
-    ...user,
-    id: user.id || user._id,
-  };
-}
-
 function AuthProviderWrapper(props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,11 +30,11 @@ function AuthProviderWrapper(props) {
 
     try {
       // Attempt verification
-      const profile = await authApi.getProfile();
+      const profile = await authApi.verify();
 
       // On success, update state
       setIsLoggedIn(true);
-      setUser(normalizeUser(profile));
+      setUser(profile);
     } catch (error) {
       // On any error, treat as unauthenticated
       console.error("Token verification failed:", error);
