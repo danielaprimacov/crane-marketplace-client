@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { getContainedImageBounds } from "../../utils/helpers";
+import { useEffect } from "react";
 
-import { NO_IMAGE_URL } from "../../utils/imageHelpers";
-import { useAvailableImageUrls } from "../../hooks/useAvailableImageUrls";
 import LoadingState from "../ui/LoadingState";
 
-const LENS_SIZE = 140;
-const HOVER_PREVIEW_SCALE = 2;
+import useCraneGalleryZoom from "../../hooks/usCraneGalleryZoom";
+import { useAvailableImageUrls } from "../../hooks/useAvailableImageUrls";
+import { NO_IMAGE_URL } from "../../utils/imageHelpers";
+
+import { MAX_VISIBLE_THUMBNAILS } from "../../constants/craneGallery.constants";
 
 function CraneGallery({
   crane,
@@ -14,15 +14,22 @@ function CraneGallery({
   setSelectedImageIndex,
   onOpenFullView,
 }) {
-  // zoom states
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
-  const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
-  const [imageMeta, setImageMeta] = useState({ width: 0, height: 0 });
-  const [isPointerOnImage, setIsPointerOnImage] = useState(false);
-  const [canHoverZoom, setCanHoverZoom] = useState(false);
-
-  const imageAreaRef = useRef(null);
+  const {
+    imageAreaRef,
+    isZoomed,
+    zoomPosition,
+    lensPosition,
+    isPointerOnImage,
+    canHoverZoom,
+    handleImageLoad,
+    handleImageMouseEnter,
+    handleImageMouseLeave,
+    handleImageMouseMove,
+    resetZoom,
+  } = useCraneGalleryZoom({
+    selectedImageIndex,
+    hasSelectedImage,
+  });
 
   const { imageUrls, loading: loadingImages } = useAvailableImageUrls(
     crane?.images
@@ -42,103 +49,9 @@ function CraneGallery({
     }
   }, [imageUrls.length, selectedImageIndex, setSelectedImageIndex]);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
-
-    const handler = (event) => setCanHoverZoom(event.matches);
-
-    setCanHoverZoom(mediaQuery.matches);
-    mediaQuery.addEventListener("change", handler);
-
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
-
-  useEffect(() => {
-    setZoomPosition({ x: 50, y: 50 });
-    setLensPosition({ x: 0, y: 0 });
-    setIsZoomed(false);
-    setIsPointerOnImage(false);
-  }, [selectedImageIndex]);
-
-  const handleImageLoad = (event) => {
-    setImageMeta({
-      width: event.currentTarget.naturalWidth,
-      height: event.currentTarget.naturalHeight,
-    });
-  };
-
-  const handleImageMouseEnter = () => {
-    if (!canHoverZoom || !hasSelectedImage) return;
-    setIsZoomed(true);
-    setIsPointerOnImage(false);
-  };
-
-  const handleImageMouseLeave = () => {
-    if (!canHoverZoom) return;
-    setIsZoomed(false);
-    setIsPointerOnImage(false);
-  };
-
-  const handleImageMouseMove = (event) => {
-    if (!canHoverZoom || !hasSelectedImage) return;
-    if (!imageAreaRef.current) return;
-    if (!imageMeta.width || !imageMeta.height) return;
-
-    const containerRect = imageAreaRef.current.getBoundingClientRect();
-
-    const bounds = getContainedImageBounds(
-      containerRect,
-      imageMeta.width,
-      imageMeta.height
-    );
-
-    if (!bounds) return;
-
-    const { visibleWidth, visibleHeight, offsetX, offsetY } = bounds;
-
-    const rawX = event.clientX - containerRect.left;
-    const rawY = event.clientY - containerRect.top;
-
-    const isInsideVisibleImage =
-      rawX >= offsetX &&
-      rawX <= offsetX + visibleWidth &&
-      rawY >= offsetY &&
-      rawY <= offsetY + visibleHeight;
-
-    setIsPointerOnImage(isInsideVisibleImage);
-
-    if (!isInsideVisibleImage) return;
-
-    const percentX = ((rawX - offsetX) / visibleWidth) * 100;
-    const percentY = ((rawY - offsetY) / visibleHeight) * 100;
-
-    const halfLens = LENS_SIZE / 2;
-
-    const lensCenterX = Math.max(
-      offsetX + halfLens,
-      Math.min(offsetX + visibleWidth - halfLens, rawX)
-    );
-
-    const lensCenterY = Math.max(
-      offsetY + halfLens,
-      Math.min(offsetY + visibleHeight - halfLens, rawY)
-    );
-
-    setZoomPosition({
-      x: Math.max(0, Math.min(100, percentX)),
-      y: Math.max(0, Math.min(100, percentY)),
-    });
-
-    setLensPosition({
-      x: lensCenterX - halfLens,
-      y: lensCenterY - halfLens,
-    });
-  };
-
   const handleThumbnailHover = (index) => {
     setSelectedImageIndex(index);
-    setIsZoomed(false);
-    setIsPointerOnImage(false);
+    resetZoom();
   };
 
   if (loadingImages) {
@@ -174,7 +87,7 @@ function CraneGallery({
       <div className="h-full flex flex-col gap-4 px-3 pt-3 pb-4 xl:flex-row xl:gap-8 xl:px-6 xl:pb-0">
         {/* Thumbnails */}
         <div className="order-2 flex w-full gap-3 overflow-x-auto px-1 pb-1 xl:order-1 xl:w-[62px] xl:flex-col xl:overflow-y-auto xl:overflow-x-hidden">
-          {imageUrls.slice(0, 5).map((image, i) => {
+          {imageUrls.slice(0, MAX_VISIBLE_THUMBNAILS).map((image, i) => {
             return (
               <button
                 key={`${image}-${i}`}
@@ -189,7 +102,7 @@ function CraneGallery({
               >
                 <img
                   src={image}
-                  alt={`${crane.title} ${i + 1}`}
+                  alt={`${crane.title || "Crane image"} ${i + 1}`}
                   className="h-full w-full object-cover"
                   draggable="false"
                 />
@@ -197,14 +110,13 @@ function CraneGallery({
             );
           })}
 
-          {imageUrls.length > 5 && (
+          {imageUrls.length > MAX_VISIBLE_THUMBNAILS && (
             <button
               type="button"
               onClick={onOpenFullView}
               className="h-[56px] w-[56px] shrink-0 rounded-lg border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
             >
-              {" "}
-              +{imageUrls.length - 5}
+              <span>+{imageUrls.length - MAX_VISIBLE_THUMBNAILS}</span>
             </button>
           )}
         </div>
@@ -219,7 +131,7 @@ function CraneGallery({
             {hasSelectedImage ? (
               <img
                 src={selectedImage}
-                alt={crane.title}
+                alt={crane.title || "Crane image"}
                 onClick={onOpenFullView}
                 onLoad={handleImageLoad}
                 draggable="false"
