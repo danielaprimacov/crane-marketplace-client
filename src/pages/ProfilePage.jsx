@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
 import { craneApi } from "../services/craneApi";
@@ -8,33 +7,7 @@ import { craneApi } from "../services/craneApi";
 import LoadingState from "../components/ui/LoadingState";
 import ErrorState from "../components/ui/ErrorState";
 
-function getCraneId(crane) {
-  return crane?.id || crane?._id;
-}
-
-function getImageUrl(crane) {
-  if (!Array.isArray(crane.images) || crane.images.length === 0) {
-    return null;
-  }
-
-  const firstImage = crane.images[0];
-
-  if (typeof firstImage === "string") {
-    return firstImage;
-  }
-
-  return firstImage?.url || firstImage?.secure_url || null;
-}
-
-function getCraneModel(crane) {
-  return [
-    crane.seriesCode,
-    crane.capacityClassNumber ? `${crane.capacityClassNumber}t` : "",
-    crane.variantRevision?.trim(),
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
+import { getCraneId, getCraneModel, getImageUrl } from "../utils/craneHelpers";
 
 function InitialsBadge({ name = "" }) {
   const initials =

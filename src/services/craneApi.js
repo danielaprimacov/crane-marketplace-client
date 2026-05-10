@@ -12,7 +12,7 @@ export const craneApi = {
   },
 
   getMine: async () => {
-    const response = await apiClient.get("/cranes/my");
+    const response = await apiClient.get("/cranes/my", config);
     return response.data;
   },
 

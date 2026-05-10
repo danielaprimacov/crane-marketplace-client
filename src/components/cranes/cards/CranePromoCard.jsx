@@ -1,23 +1,7 @@
 import { Link } from "react-router-dom";
 import { getAvailabilityStatus } from "../../../utils/helpers";
 
-function getCraneId(crane) {
-  return crane?.id || crane?._id;
-}
-
-function getImageUrl(crane) {
-  if (!Array.isArray(crane?.images) || crane.images.length === 0) {
-    return null;
-  }
-
-  const firstImage = crane.images[0];
-
-  if (typeof firstImage === "string") {
-    return firstImage;
-  }
-
-  return firstImage?.url || firstImage?.secure_url || null;
-}
+import { getCraneId, getImageUrl } from "../../../utils/craneHelpers";
 
 function CranePromoCard({ crane }) {
   const craneId = getCraneId(crane);
