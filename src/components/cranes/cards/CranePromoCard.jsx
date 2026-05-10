@@ -1,8 +1,27 @@
 import { Link } from "react-router-dom";
 import { getAvailabilityStatus } from "../../../utils/helpers";
 
+function getCraneId(crane) {
+  return crane?.id || crane?._id;
+}
+
+function getImageUrl(crane) {
+  if (!Array.isArray(crane?.images) || crane.images.length === 0) {
+    return null;
+  }
+
+  const firstImage = crane.images[0];
+
+  if (typeof firstImage === "string") {
+    return firstImage;
+  }
+
+  return firstImage?.url || firstImage?.secure_url || null;
+}
+
 function CranePromoCard({ crane }) {
-  const imageUrl = crane.images?.[0];
+  const craneId = getCraneId(crane);
+  const imageUrl = getImageUrl(crane);
   const availabilityStatus = getAvailabilityStatus(crane.availability);
 
   const isUnavailable = availabilityStatus === "expired";
@@ -18,7 +37,7 @@ function CranePromoCard({ crane }) {
 
   return (
     <div className="group relative h-[20rem] overflow-hidden rounded bg-gray-100 shadow-sm transition duration-300 hover:shadow-md">
-      <Link to={`/cranes/${crane._id}`} className="absolute inset-0 z-10">
+      <Link to={`/cranes/${craneId}`} className="absolute inset-0 z-10">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -31,7 +50,9 @@ function CranePromoCard({ crane }) {
           <div className="h-full w-full bg-gray-200" />
         )}
         <div
-          className={`absolute inset-0 ${isUnavailable} ? "bg-black/40" : "bg-black/25"`}
+          className={`absolute inset-0 ${
+            isUnavailable ? "bg-black/40" : "bg-black/25"
+          }`}
         />
       </Link>
 
@@ -62,7 +83,7 @@ function CranePromoCard({ crane }) {
           </span>
         ) : (
           <Link
-            to={`/cranes/${crane._id}/new-inquiry`}
+            to={`/cranes/${craneId}/new-inquiry`}
             className="pointer-events-auto rounded-lg bg-green-300 px-4 py-2 text-sm transition hover:scale-105 hover:text-black/80 sm:text-base"
           >
             Send an inquiry
