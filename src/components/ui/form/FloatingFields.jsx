@@ -134,3 +134,41 @@ export function FloatingTextarea({
     </div>
   );
 }
+
+export function FloatingDateInput({
+  id,
+  name,
+  label,
+  value = "",
+  onChange,
+  required = false,
+  disabled = false,
+  min,
+  max,
+  inputClassName = "",
+  labelClassName = "",
+}) {
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        name={name}
+        type="date"
+        value={value}
+        onChange={onChange}
+        required={required}
+        disabled={disabled}
+        min={min}
+        max={max}
+        className={`block h-10 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${inputClassName}`}
+      />
+
+      <label
+        htmlFor={id}
+        className={`absolute left-0 -top-6 text-sm text-gray-500 ${labelClassName}`}
+      >
+        {label}
+      </label>
+    </div>
+  );
+}
