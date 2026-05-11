@@ -5,7 +5,7 @@ import { slugify } from "../../utils/helpers";
 const SCROLL_STEP = 2;
 const EDGE_ZONE = 0.28; // 28% left and right zones, middle stays still
 
-function AllProducers({ allProducers }) {
+function AllProducers({ allProducers = [] }) {
   const scrollRef = useRef(null);
   const animationRef = useRef(null);
   const directionRef = useRef(0); // -1 = left, 1 = right, 0 = stop
@@ -68,15 +68,18 @@ function AllProducers({ allProducers }) {
     }
 
     const nextScrollLeft = el.scrollLeft + direction * SCROLL_STEP;
-    const clamped = Math.max(0, Math.min(nextScrollLeft, maxScrollLeft));
+    const clampedScrollLeft = Math.max(
+      0,
+      Math.min(nextScrollLeft, maxScrollLeft)
+    );
 
-    el.scrollLeft = clamped;
+    element.scrollLeft = clampedScrollLeft;
 
-    // stop only if is reached one end and keep trying to go further
-    if (
-      (clamped === 0 && direction < 0) ||
-      (clamped === maxScrollLeft && direction > 0)
-    ) {
+    const reachedLeftEnd = clampedScrollLeft === 0 && direction < 0;
+    const reachedRightEnd =
+      clampedScrollLeft === maxScrollLeft && direction > 0;
+
+    if (reachedLeftEnd || reachedRightEnd) {
       animationRef.current = null;
       return;
     }
@@ -118,6 +121,12 @@ function AllProducers({ allProducers }) {
     return () => stopScroll();
   }, [stopScroll]);
 
+  const safeProducers = Array.isArray(allProducers) ? allProducers : [];
+
+  if (safeProducers.length === 0) {
+    return null;
+  }
+
   return (
     <section className="relative z-30 py-8 sm:py-10">
       <div
@@ -133,14 +142,18 @@ function AllProducers({ allProducers }) {
           touchAction: "pan-x",
         }}
       >
-        {allProducers.map((prod) => {
-          const slug = encodeURIComponent(slugify(prod));
+        {safeProducers.map((prod) => {
+          const producerName = String(prod || "").trim();
+
+          if (!producerName) return null;
+
+          const slug = encodeURIComponent(slugify(producerName));
 
           return (
             <Link
               key={prod}
               to={`/cranes/producers/${slug}`}
-              className="flex-none rounded px-4 py-4 text-sm rounded bg-white uppercase text-center font-bold tracking-widest transition hover:shadow-lg sm:w-[18rem] sm:text-base lg:w-[20rem]"
+              className="flex-none rounded px-4 py-4 text-sm bg-white uppercase text-center font-bold tracking-widest transition hover:shadow-lg sm:w-[18rem] sm:text-base lg:w-[20rem]"
             >
               {prod}
             </Link>
