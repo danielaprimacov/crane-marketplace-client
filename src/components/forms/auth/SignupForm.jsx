@@ -1,16 +1,37 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { authApi } from "../../../services/authApi";
+import { FloatingInput } from "../../ui/form/FloatingFields";
+
+function getErrorMessage(error) {
+  const responseData = error?.response?.data;
+
+  if (responseData?.message) {
+    return responseData.message;
+  }
+
+  if (responseData?.details) {
+    const firstDetail = Object.values(responseData.details)[0];
+
+    if (firstDetail) {
+      return firstDetail;
+    }
+  }
+
+  return error?.message || "Signup failed. Please try again.";
+}
 
 function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-  const [name, setName] = useState("");
+
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,7 +42,7 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
     setErrorMessage("");
 
     const trimmedName = name.trim();
-    const trimmedEmail = email.trim();
+    const trimmedEmail = email.trim().toLocaleLowerCase();
 
     if (!trimmedName) {
       setErrorMessage("Name is required.");
@@ -47,18 +68,18 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
 
     try {
       const requestBody = {
+        name: trimmedName,
         email: trimmedEmail,
         password,
-        name: trimmedName,
       };
 
-      await axios.post(`${API_URL}/auth/signup`, requestBody);
+      await authApi.signup(requestBody);
+      onSuccess?.();
       onSwitchToLogin?.();
     } catch (error) {
       // Safely grab the API’s error message, or fall back to a generic one
-      const errorDescription =
-        error?.response?.data?.message || "Signup failed. Please try again.";
-      setErrorMessage(errorDescription);
+      console.error("Signup failed:", error);
+      setErrorMessage(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -74,44 +95,30 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
         onSubmit={handleSignupSubmit}
         className="flex flex-col"
       >
-        <div className="relative">
-          <input
-            type="text"
-            name="name"
+        <div className="relativ mb-7">
+          <FloatingInput
             id="name"
+            name="name"
+            type="text"
+            label="Your name*"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder=" "
             autoComplete="name"
-            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent focus:border-black focus:outline-none"
+            required
           />
-
-          <label
-            htmlFor="name"
-            className="absolute left-0 top-0 flex h-10 items-center text-sm text-black/50 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:-top-6"
-          >
-            Your name*
-          </label>
         </div>
 
-        <div className="relative">
-          <input
-            type="email"
-            name="email"
+        <div className="mb-7">
+          <FloatingInput
             id="signup-email"
+            name="email"
+            type="email"
+            label="Your email address*"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder=" "
             autoComplete="email"
-            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent focus:border-black focus:outline-none"
+            required
           />
-
-          <label
-            htmlFor="signup-email"
-            className="absolute left-0 top-0 flex h-10 items-center text-sm text-black/50 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:-top-6"
-          >
-            Your email address*
-          </label>
         </div>
 
         <div className="relative">
@@ -170,7 +177,7 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
             onClick={() => setShowRepeatPassword((prev) => !prev)}
             className="absolute right-0 top-0 h-10 w-10 text-sm text-gray-500 transition hover:text-black"
           >
-            {showPassword ? (
+            {showRepeatPassword ? (
               <EyeOff className="h-5 w-5" />
             ) : (
               <Eye className="h-5 w-5" />
