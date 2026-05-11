@@ -9,6 +9,7 @@ export function FloatingInput({
   autoComplete,
   disabled = false,
   maxLength,
+  minLength,
   min,
   max,
   step,
@@ -28,6 +29,7 @@ export function FloatingInput({
         autoComplete={autoComplete}
         disabled={disabled}
         maxLength={maxLength}
+        minLength={minLength}
         min={min}
         max={max}
         step={step}
@@ -106,6 +108,7 @@ export function FloatingTextarea({
   required = false,
   rows = 3,
   maxLength,
+  minLength,
   disabled = false,
   textareaClassName = "",
   labelClassName = "",
@@ -121,6 +124,7 @@ export function FloatingTextarea({
         required={required}
         placeholder=" "
         maxLength={maxLength}
+        minLength={minLength}
         disabled={disabled}
         className={`peer block min-h-24 w-full resize-y border-b border-b-black/20 bg-transparent py-2 text-sm text-gray-900 transition focus:border-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${textareaClassName}`}
       />

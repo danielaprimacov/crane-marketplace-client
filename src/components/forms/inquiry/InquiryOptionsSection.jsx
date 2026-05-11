@@ -1,17 +1,29 @@
 import AvailabilityRange from "../../cranes/AvailabilityRange";
 
 function InquiryOptionsSection({ form, setForm }) {
+  const needsTransport = Boolean(form.needsTransport);
+  const needsInstallation = Boolean(form.needsInstallation);
+
+  const updateCheckbox = (field, checked) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: checked,
+    }));
+  };
+
   return (
     <>
       <div className="mb-6">
         <AvailabilityRange
           field="period"
-          values={form.period}
+          values={form.period || {}}
           setValues={(updater) =>
             setForm((prev) => ({
               ...prev,
               period:
-                typeof updater === "function" ? updater(prev.period) : updater,
+                typeof updater === "function"
+                  ? updater(prev.period || {})
+                  : updater,
             }))
           }
           label="Period"
@@ -23,11 +35,8 @@ function InquiryOptionsSection({ form, setForm }) {
           <input
             type="checkbox"
             checked={form.needsTransport}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                needsTransport: e.target.checked,
-              }))
+            onChange={(event) =>
+              updateCheckbox("needsTransport", event.target.checked)
             }
             className="mt-0.5 h-5 w-5 shrink-0 text-blue-600"
           />
@@ -40,11 +49,8 @@ function InquiryOptionsSection({ form, setForm }) {
           <input
             type="checkbox"
             checked={form.needsInstallation}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                needsInstallation: e.target.checked,
-              }))
+            onChange={(event) =>
+              updateCheckbox("needsTransport", event.target.checked)
             }
             className="mt-0.5 h-5 w-5 shrink-0 text-blue-600"
           />
