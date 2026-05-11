@@ -14,17 +14,19 @@ const textVariants = {
   exit: { opacity: 0, transition: { duration: 1 } },
 };
 
-function HeroSection({ producers }) {
+function HeroSection({ producers = [] }) {
   const [muted, setMuted] = useState(true);
   const [showAlternate, setShowAlternate] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowAlternate((prev) => !prev), 8000);
+    const timer = setInterval(() => {
+      setShowAlternate((prev) => !prev);
+    }, 8000);
     return () => clearTimeout(timer);
   }, [showAlternate]);
 
   const firstProducerSlug = useMemo(() => {
-    if (!producers.length) return null;
+    if (!Array.isArray(producers) || producers.length === 0) return null;
 
     return producers[0]?.slug || null;
   }, [producers]);
@@ -40,9 +42,9 @@ function HeroSection({ producers }) {
         introMp4={introMp4}
         poster={videoPoster}
         muted={muted}
-        setMuted={setMuted}
-        interactive={true}
-        blurred={true}
+        onMuteChange={setMuted}
+        interactive
+        blurred
       />
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <AnimatePresence mode="wait">
@@ -71,16 +73,17 @@ function HeroSection({ producers }) {
               exit="exit"
               className="max-w-4xl px-2 text-center text-lg uppercase tracking-wide text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)] sm:text-xl md:text-2xl lg:text-3xl"
             >
-              If you have your own crane and want to sell or to give it to rent,
-              then register and add it on our marketplace.
+              If you own a crane and want to sell it or offer it for rent,
+              register and add it to our marketplace.
             </motion.p>
           )}
         </AnimatePresence>
 
-        <Link to={targetPath} className="mt-6 sm:mt-8">
-          <button className="inline-flex h-12 w-44 items-center justify-center rounded bg-white text-base uppercase transition duration-300 ease-in-out hover:bg-red-700 hover:text-white sm:h-14 sm:w-52 sm:text-lg">
-            Discover more
-          </button>
+        <Link
+          to={targetPath}
+          className="mt-6 inline-flex h-12 w-44 items-center justify-center rounded bg-white text-base uppercase transition duration-300 ease-in-out hover:bg-red-700 hover:text-white sm:mt-8 sm:h-14 sm:w-52 sm:text-lg"
+        >
+          Discover more
         </Link>
       </div>
     </div>
