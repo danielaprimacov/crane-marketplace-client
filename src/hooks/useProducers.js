@@ -1,9 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
 
+import { craneApi } from "../services/craneApi";
 import { slugify } from "../utils/helpers";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export function useProducers() {
   const [cranes, setCranes] = useState([]);
@@ -18,7 +16,7 @@ export function useProducers() {
       setError("");
 
       try {
-        const { data } = await axios.get(`${API_URL}/cranes`, {
+        const data = awaitcraneApi.getAll({
           signal: controller.signal,
         });
 
@@ -45,19 +43,19 @@ export function useProducers() {
   }, []);
 
   const producers = useMemo(() => {
-    const map = {};
+    const producersMap = {};
 
-    cranes.forEach((c) => {
-      if (!c.producer) return;
+    cranes.forEach((crane) => {
+      if (!crane.producer) return;
 
-      const name = c.producer.trim();
+      const name = crane.producer.trim();
       const slug = slugify(name);
 
-      if (!map[slug]) map[slug] = { name, slug, models: [] };
-      map[slug].models.push(c);
+      if (!producersMap[slug]) producersMap[slug] = { name, slug, models: [] };
+      producersMap[slug].models.push(c);
     });
     // single, consistent sort:
-    return Object.values(map).sort((a, b) =>
+    return Object.values(producersMap).sort((a, b) =>
       a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
     );
   }, [cranes]);

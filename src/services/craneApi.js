@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 
 export const craneApi = {
   getAll: async () => {
-    const response = await apiClient.get("/cranes");
+    const response = await apiClient.get("/cranes", config);
     return response.data;
   },
 
