@@ -1,57 +1,15 @@
+import { defaultValueTypes } from "framer-motion";
 import { useState, useMemo } from "react";
 
-const STORAGE_KEY = "kranhub_cookie_preferences";
+import {
+  COOKIE_CATEGORIES,
+  DEFAULT_COOKIE_OPTIONS,
+} from "../../../constants/cookiePreferences";
 
-const DEFAULT_OPTIONS = {
-  required: true,
-  statistics: false,
-  career: false,
-  googleMaps: false,
-};
-
-const COOKIE_CATEGORIES = [
-  {
-    key: "required",
-    title: "Required Cookies",
-    description:
-      "Necessary for basic website functions such as security, page navigation, forms, and session handling.",
-    required: true,
-  },
-  {
-    key: "statistics",
-    title: "Statistics",
-    description:
-      "Helps us understand how visitors use the website so we can improve performance and usability.",
-  },
-  {
-    key: "career",
-    title: "Career & Recruiting",
-    description:
-      "Allows career-related integrations or tools to work correctly when they are used on the website.",
-  },
-  {
-    key: "googleMaps",
-    title: "Google Maps",
-    description:
-      "Allows embedded map content and location-related features to be loaded.",
-  },
-];
-
-function saveCookiePreferences(preferences) {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      ...preferences,
-      savedAt: new Date().toISOString(),
-    })
-  );
-
-  window.dispatchEvent(
-    new CustomEvent("cookie-preferences-updated", {
-      detail: preferences,
-    })
-  );
-}
+import {
+  loadCookiePreferences,
+  saveCookiePreferences,
+} from "../../../utils/cookiePreferences";
 
 function ToggleSwitch({ checked, disabled, onChange, label }) {
   return (
@@ -76,29 +34,12 @@ function ToggleSwitch({ checked, disabled, onChange, label }) {
 }
 
 function CookieForm({ onClose, onSave }) {
-  const [options, setOptions] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) return DEFAULT_OPTIONS;
-
-      const parsed = JSON.parse(stored);
-
-      return {
-        ...DEFAULT_OPTIONS,
-        statistics: Boolean(parsed.statistics),
-        career: Boolean(parsed.career),
-        googleMaps: Boolean(parsed.googleMaps),
-      };
-    } catch {
-      return DEFAULT_OPTIONS;
-    }
-  });
+  const [options, setOptions] = useState(() => loadCookiePreferences());
 
   const allOptionalAccepted = useMemo(() => {
-    return COOKIE_CATEGORIES.every((category) => {
-      if (category.required) return true;
-      return options[category.key];
-    });
+    return COOKIE_CATEGORIES.filter((category) => !category.required).every(
+      (category) => Boolean(options[category.key])
+    );
   }, [options]);
 
   const toggle = (key) => {
@@ -110,14 +51,9 @@ function CookieForm({ onClose, onSave }) {
   };
 
   const finish = (preferences) => {
-    const finalPreferences = {
-      ...DEFAULT_OPTIONS,
-      ...preferences,
-      required: true,
-    };
+    const savedPreferences = saveCookiePreferences(preferences);
 
-    saveCookiePreferences(finalPreferences);
-    onSave?.(finalPreferences);
+    onSave?.(savedPreferences);
     onClose?.();
   };
 
@@ -136,7 +72,7 @@ function CookieForm({ onClose, onSave }) {
   };
 
   const handleRejectOptional = () => {
-    finish(DEFAULT_OPTIONS);
+    finish(defaultValueTypes);
   };
   return (
     <form
@@ -197,15 +133,6 @@ function CookieForm({ onClose, onSave }) {
                   onChange={() => toggle(category.key)}
                 />
               </div>
-
-              <input
-                id={`cookie-${category.key}`}
-                type="checkbox"
-                checked={checked}
-                disabled={category.required}
-                onChange={() => toggle(category.key)}
-                className="sr-only"
-              />
             </div>
           );
         })}
