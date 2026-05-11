@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
 export const craneApi = {
-  getAll: async () => {
+  getAll: async (config = {}) => {
     const response = await apiClient.get("/cranes", config);
     return response.data;
   },
@@ -11,7 +11,7 @@ export const craneApi = {
     return response.data;
   },
 
-  getMine: async () => {
+  getMine: async (config = {}) => {
     const response = await apiClient.get("/cranes/my", config);
     return response.data;
   },

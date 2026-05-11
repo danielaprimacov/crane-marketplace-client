@@ -16,7 +16,7 @@ export function useProducers() {
       setError("");
 
       try {
-        const data = awaitcraneApi.getAll({
+        const data = await craneApi.getAll({
           signal: controller.signal,
         });
 
@@ -52,7 +52,7 @@ export function useProducers() {
       const slug = slugify(name);
 
       if (!producersMap[slug]) producersMap[slug] = { name, slug, models: [] };
-      producersMap[slug].models.push(c);
+      producersMap[slug].models.push(crane);
     });
     // single, consistent sort:
     return Object.values(producersMap).sort((a, b) =>

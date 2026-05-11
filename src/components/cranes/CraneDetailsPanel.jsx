@@ -3,7 +3,7 @@ import CraneSpecsGrid from "./CraneSpecsGrid";
 import CraneInquiryButton from "./CraneInquiryButton";
 import CraneManageButtons from "./CraneManageButtons";
 
-import { getAvailabilityStatus } from "../../utils/helpers";
+import { getAvailabilityStatus } from "../../utils/craneHelpers";
 
 function CraneDetailsPanel({ crane, user, isOwner, craneId, onDeleteClick }) {
   const availabilityStatus = getAvailabilityStatus(crane.availability);

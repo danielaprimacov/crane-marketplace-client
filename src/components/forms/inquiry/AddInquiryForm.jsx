@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 
 import { AuthContext } from "../../../context/auth.context";
+import { inquiryApi } from "../../../services/inquiriApi";
 
 import InquiryContactFields from "./InquiryContactFields";
 import InquiryOptionsSection from "./InquiryOptionsSection";
@@ -12,9 +12,25 @@ import InquiryAddressField from "./InquiryAddressField";
 import {
   initialInquiryState,
   buildInquiryRequestBody,
-} from "./inquiryFormHelpers";
+} from "../../../utils/inquiryHelpers";
 
-const API_URL = import.meta.env.VITE_API_URL;
+function getErrorMessage(error) {
+  const responseData = error?.response?.data;
+
+  if (responseData?.message) {
+    return responseData.message;
+  }
+
+  if (responseData?.details) {
+    const firstDetail = Object.values(responseData.details)[0];
+
+    if (firstDetail) {
+      return firstDetail;
+    }
+  }
+
+  return "Something went wrong. Please try again.";
+}
 
 function AddInquiryForm({ craneId, crane }) {
   const { user } = useContext(AuthContext);
@@ -43,33 +59,20 @@ function AddInquiryForm({ craneId, crane }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const storedToken = localStorage.getItem("authToken");
+    if (submitting) return;
 
     const requestBody = buildInquiryRequestBody(form, craneId);
-
-    const config = storedToken
-      ? {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        }
-      : {};
 
     try {
       setSubmitting(true);
 
-      await axios.post(`${API_URL}/inquiries`, requestBody, config);
+      await inquiryApi.create(requestBody);
 
       toast.success("Inquiry sent successfully.");
       navigate(`/cranes/${craneId}`, { replace: true });
     } catch (error) {
       console.error("Failed to create inquiry:", error);
-
-      const message =
-        error?.response?.data?.message ||
-        "Something went wrong. Please try again.";
-
-      toast.error(message);
+      toast.error(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -111,7 +114,7 @@ function AddInquiryForm({ craneId, crane }) {
           className="inline-flex max-w-full items-center justify-center text-sm transition text-red-600 hover:underline sm:text-base"
         >
           <span className="truncate">
-            ← Back to {crane && crane.title} Details
+            ← Back to {(crane && crane.title) || "crane"} Details
           </span>
         </Link>
       </div>
