@@ -6,8 +6,8 @@ export const messageApi = {
     return response.data;
   },
 
-  getAllAdmin: async () => {
-    const response = await apiClient.get("/messages");
+  getAllAdmin: async (config = {}) => {
+    const response = await apiClient.get("/messages", config);
     return response.data;
   },
 

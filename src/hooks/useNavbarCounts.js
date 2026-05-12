@@ -1,67 +1,84 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
-export default function useNavbarCounts({
-  apiUrl,
-  isLoggedIn,
-  user,
-  pathname,
-}) {
+import { ROLES } from "../constants/roles";
+import { craneApi } from "../services/craneApi";
+import { inquiryApi } from "../services/inquiriApi";
+import { messageApi } from "../services/messageApi";
+
+function getArrayCount(value) {
+  return Array.isArray(value) ? value.length : 0;
+}
+
+export default function useNavbarCounts({ isLoggedIn, user, pathname }) {
   const [myCranesCount, setMyCranesCount] = useState(0);
   const [inquiriesCount, setInquiriesCount] = useState(0);
   const [messagesCount, setMessagesCount] = useState(0);
 
   useEffect(() => {
-    if (!isLoggedIn || !user?._id) {
+    if (!isLoggedIn || !user || user.role === ROLES.ADMIN) {
       setMyCranesCount(0);
       return;
     }
 
-    if (user.role === "admin") return;
+    let ignore = false;
 
     const fetchMyCranesCount = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        const { data: allCranes } = await axios.get(`${apiUrl}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const mine = allCranes.filter((c) => c.owner === user._id);
-        setMyCranesCount(mine.length);
+        const myCranes = await craneApi.getMine();
+
+        if (!ignore) {
+          setMyCranesCount(getArrayCount(myCranes));
+        }
       } catch (err) {
         console.log("Could not fetch cranes:", err);
+
+        if (!ignore) {
+          setMyCranesCount(0);
+        }
       }
     };
     fetchMyCranesCount();
-  }, [apiUrl, isLoggedIn, user?._id, user?.role, pathname]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [isLoggedIn, user?.id, user?._id, user?.role, pathname]);
 
   useEffect(() => {
-    if (!isLoggedIn || user?.role !== "admin") {
+    if (!isLoggedIn || !user || user.role !== ROLES.ADMIN) {
       setInquiriesCount(0);
       setMessagesCount(0);
       return;
     }
 
+    let ignore = false;
+
     const fetchAdminCounts = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-
-        const [inquiriesRes, messagesRes] = await Promise.all([
-          axios.get(`${apiUrl}/inquiries`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${apiUrl}/messages`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+        const [inquiries, messages] = await Promise.all([
+          inquiryApi.getAllAdmin(),
+          messageApi.getAllAdmin(),
         ]);
 
-        setInquiriesCount(inquiriesRes.data.length);
-        setMessagesCount(messagesRes.data.length);
+        if (!ignore) {
+          setInquiriesCount(getArrayCount(inquiries));
+          setMessagesCount(getArrayCount(messages));
+        }
       } catch (err) {
         console.log("Could not fetch admin counts:", err);
+
+        if (!ignore) {
+          setInquiriesCount(0);
+          setMessagesCount(0);
+        }
       }
     };
     fetchAdminCounts();
-  }, [apiUrl, isLoggedIn, user?.role, pathname]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [isLoggedIn, user?.id, user?._id, user?.role, pathname]);
 
   return { myCranesCount, inquiriesCount, messagesCount };
 }

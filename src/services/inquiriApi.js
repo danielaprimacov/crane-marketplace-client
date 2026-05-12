@@ -6,8 +6,8 @@ export const inquiryApi = {
     return response.data;
   },
 
-  getAllAdmin: async () => {
-    const response = await apiClient.get("/inquiries");
+  getAllAdmin: async (config = {}) => {
+    const response = await apiClient.get("/inquiries", config);
     return response.data;
   },
 
