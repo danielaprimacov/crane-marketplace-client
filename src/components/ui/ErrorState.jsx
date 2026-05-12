@@ -9,17 +9,23 @@ function ErrorState({
   onRetry,
   fullPage = false,
 }) {
+  const wrapperClassName = fullPage
+    ? "flex min-h-[70vh] items-center justify-center px-4 py-16"
+    : "flex w-full items-center justify-center px-4 py-12";
+
+  const hasAction = Boolean(actionTo || onRetry);
+
   return (
-    <div
-      className={
-        fullPage
-          ? "flex min-h-[70vh] items-center justify-center px-4 py-16"
-          : "flex w-full items-center justify-center px-4 py-12"
-      }
-    >
-      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-red-50 p-6 text-center shadow-sm">
+    <div className={wrapperClassName}>
+      <div
+        role="alert"
+        className="w-full max-w-md rounded-2xl border border-red-100 bg-red-50 p-6 text-center shadow-sm"
+      >
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-          <ExclamationTriangleIcon className="h-7 w-7 text-red-600" />
+          <ExclamationTriangleIcon
+            className="h-7 w-7 text-red-600"
+            aria-hidden="true"
+          />
         </div>
 
         <h2 className="mt-4 text-xl font-semibold text-gray-900">{title}</h2>
