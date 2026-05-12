@@ -9,12 +9,18 @@ import InquiryCard from "../cranes/InquiryCard";
 import Modal from "../ui/Modal";
 import KanbanContext from "./KanbanContext";
 
+import {
+  INQURIY_STATUS_BORDER_COLORS,
+  INQURIY_STATUS_TEXT_COLORS,
+} from "../../constants/inquiryStatus";
+
 function TaskItem({ task }) {
   const { deleteTask, updateTask, markRead } = useContext(KanbanContext);
   const [showDetails, setShowDetails] = useState(false);
 
   // for confirm the delete action
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
@@ -37,20 +43,8 @@ function TaskItem({ task }) {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  const statusBorderMap = {
-    new: "#98DC9A",
-    in_progress: "#FF975B",
-    resolved: "#FF754F",
-  };
-
-  const statusTextMap = {
-    new: "#1B5E20",
-    in_progress: "#BF360C",
-    resolved: "#B71C1C",
-  };
-
-  const borderColor = statusBorderMap[task.status] || "#f8f9fa";
-  const titleColor = statusTextMap[task.status] || "#343a40";
+  const borderColor = INQUIRY_STATUS_BORDER_COLORS[task.status] || "#f8f9fa";
+  const titleColor = INQUIRY_STATUS_TEXT_COLORS[task.status] || "#343a40";
 
   const openDeleteConfirm = (event) => {
     event.stopPropagation();
@@ -58,12 +52,17 @@ function TaskItem({ task }) {
   };
 
   const confirmDelete = async () => {
+    if (deleting) return;
+
     try {
+      setDeleting(true);
       await deleteTask(task.id);
       setConfirmOpen(false);
       setShowDetails(false);
     } catch (error) {
       console.error("Failed to delete inquiry:", error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -115,10 +114,13 @@ function TaskItem({ task }) {
             <ArrowsOutIcon className="transition duration-300 ease-out hover:stroke-[#f9572a]" />
           </button>
 
-          <span className="truncate text-sm font-medium">{task.message}</span>
+          <span className="truncate text-sm font-medium">
+            {task.message || "No message"}
+          </span>
 
           <button
             type="button"
+            aria-label="Delete Inquiry"
             className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md"
             onClick={openDeleteConfirm}
           >
@@ -127,15 +129,19 @@ function TaskItem({ task }) {
         </h3>
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <p className="truncate text-sm">{task.customerName}</p>
-          <p className="truncate text-xs text-gray-700">{task.email}</p>
+          <p className="truncate text-sm">
+            {task.customerName || "Unknown customer"}
+          </p>
+          <p className="truncate text-xs text-gray-700">
+            {task.email || "No email"}
+          </p>
         </div>
       </div>
 
       <Modal isOpen={showDetails} onClose={closeHandler}>
         <InquiryCard
           key={task.id}
-          _id={task.id}
+          id={task.id}
           customerName={task.customerName}
           email={task.email}
           message={task.message}
@@ -169,10 +175,11 @@ function TaskItem({ task }) {
           </button>
           <button
             type="button"
+            disabled={deleting}
             onClick={confirmDelete}
             className="rounded bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
           >
-            Yes, delete
+            {deleting ? "Deleting..." : "Yes, delete"}
           </button>
         </div>
       </Modal>

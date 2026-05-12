@@ -1,5 +1,10 @@
 import { useDragLayer } from "react-dnd";
 
+import {
+  INQUIRY_STATUS_BORDER_CLASS,
+  INQUIRY_STATUS_TEXT_COLORS,
+} from "../../constants/inquiryStatus";
+
 function getItemStyles(currentOffset) {
   if (!currentOffset) {
     return { display: "none" };
@@ -27,20 +32,8 @@ function DragLayer() {
     return null;
   }
 
-  const statusBorderMap = {
-    new: "#98DC9A",
-    in_progress: "#FF975B",
-    resolved: "#FF754F",
-  };
-
-  const statusTextMap = {
-    new: "#1B5E20",
-    in_progress: "#BF360C",
-    resolved: "#B71C1C",
-  };
-
-  const borderColor = statusBorderMap[item.status] || "#ced4da";
-  const titleColor = statusTextMap[item.status] || "#343a40";
+  const borderColor = INQUIRY_STATUS_BORDER_COLORS[item.status] || "#ced4da";
+  const titleColor = INQUIRY_STATUS_TEXT_COLORS[item.status] || "#343a40";
 
   return (
     <div style={getItemStyles(currentOffset)}>
@@ -52,12 +45,16 @@ function DragLayer() {
           className="mb-2 line-clamp-2 text-center text-sm font-semibold"
           style={{ color: titleColor }}
         >
-          {item.title}
+          {item.title || "Untitled inquiry"}
         </h3>
 
         <div className="mt-3 flex items-center justify-between gap-4">
-          <p className="truncate text-sm">{item.customerName}</p>
-          <p className="truncate text-xs text-gray-700">{item.email}</p>
+          <p className="truncate text-sm">
+            {item.customerName || "Unknown customer"}
+          </p>
+          <p className="truncate text-xs text-gray-700">
+            {item.email || "No email"}
+          </p>
         </div>
       </div>
     </div>

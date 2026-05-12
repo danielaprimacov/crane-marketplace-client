@@ -1,16 +1,16 @@
 import { useState, useEffect, useMemo } from "react";
+
 import KanbanContext from "./KanbanContext";
+import { INQUIRY_COLUMNS } from "../../constants/inquiryStatus";
 
-const columnsConfig = [
-  { id: "new", title: "New" },
-  { id: "in_progress", title: "In Progress" },
-  { id: "resolved", title: "Resolved" },
-];
+function normalizeTask(task) {
+  if (!task) return null;
 
-const normalizeTask = ({ _id, ...rest }) => ({
-  id: _id,
-  ...rest,
-});
+  return {
+    ...task,
+    id: task.id || task._id,
+  };
+}
 
 const KanbanProvider = ({
   initialTasks = [],
@@ -23,17 +23,23 @@ const KanbanProvider = ({
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    setTasks(initialTasks.map(normalizeTask));
+    const normalizedTasks = Array.isArray(initialTasks)
+      ? initialTasks.map(normalizeTask).filter((task) => task?.id)
+      : [];
+
+    setTasks(normalizedTasks);
   }, [initialTasks]);
 
   const columns = useMemo(() => {
     const grouped = tasks.reduce((acc, task) => {
+      const status = task.status || "new";
+
       acc[task.status] = acc[task.status] || [];
       acc[task.status].push(task);
       return acc;
     }, {});
 
-    return columnsConfig.map(({ id, title }) => ({
+    return INQUIRY_COLUMNS.map(({ id, title }) => ({
       id,
       title,
       tasks: (grouped[id] || []).sort(

@@ -2,10 +2,12 @@ import { useRef } from "react";
 import { useDrop } from "react-dnd";
 
 import Tasks from "./Tasks";
+import { INQUIRY_COLUMN_BORDER_CLASSES } from "../../constants/inquiryStatus";
+
+const EXTENDED_DROP_MARGIN = 40;
 
 function ColumnItem({ column, moveTask }) {
   const dropZoneRef = useRef(null);
-  const extendedMargin = 40;
 
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: "TASK",
@@ -22,18 +24,14 @@ function ColumnItem({ column, moveTask }) {
   drop(dropZoneRef);
 
   const borderColorClass =
-    {
-      new: "border-green-600",
-      in_progress: "border-orange-400",
-      resolved: "border-red-600",
-    }[column.id] || "border-gray-300";
+    INQUIRY_COLUMN_BORDER_CLASSES[column.id] || "border-gray-300";
 
   return (
     <div
       ref={dropZoneRef}
       style={{
-        paddingBottom: extendedMargin,
-        marginBottom: -extendedMargin,
+        paddingBottom: EXTENDED_DROP_MARGIN,
+        marginBottom: -EXTENDED_DROP_MARGIN,
       }}
       className="w-[calc(100vw-2rem)] max-w-[360px] shrink-0 lg:w-auto lg:max-w-none lg:min-w-0"
     >

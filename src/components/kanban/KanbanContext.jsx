@@ -1,3 +1,3 @@
 import { createContext } from "react";
-const KanbanContext = createContext();
+const KanbanContext = createContext(null);
 export default KanbanContext;
