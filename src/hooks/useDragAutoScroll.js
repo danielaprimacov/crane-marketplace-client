@@ -4,6 +4,28 @@ import { useDragLayer } from "react-dnd";
 const EDGE_SIZE = 70;
 const SCROLL_SPEED = 14;
 
+function getScrollDirection(pointer) {
+  let scrollX = 0;
+  let scrollY = 0;
+
+  if (pointer.x < EDGE_SIZE) {
+    scrollX = -SCROLL_SPEED;
+  } else if (window.innerWidth - pointer.x < EDGE_SIZE) {
+    scrollX = SCROLL_SPEED;
+  }
+
+  if (pointer.y < EDGE_SIZE) {
+    scrollY = -SCROLL_SPEED;
+  } else if (window.innerHeight - pointer.y < EDGE_SIZE) {
+    scrollY = SCROLL_SPEED;
+  }
+
+  return {
+    scrollX,
+    scrollY,
+  };
+}
+
 function useDragAutoScroll(scrollContainerRef) {
   const pointerRef = useRef(null);
   const frameRef = useRef(null);
@@ -18,11 +40,15 @@ function useDragAutoScroll(scrollContainerRef) {
   }, [clientOffset]);
 
   useEffect(() => {
-    if (!isDragging) {
+    const stopAnimation = () => {
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
         frameRef.current = null;
       }
+    };
+
+    if (!isDragging) {
+      stopAnimation();
       return;
     }
 
@@ -35,27 +61,18 @@ function useDragAutoScroll(scrollContainerRef) {
         return;
       }
 
-      let scrollX = 0;
-      let scrollY = 0;
-
-      if (pointer.x < EDGE_SIZE) {
-        scrollX = -SCROLL_SPEED;
-      } else if (window.innerWidth - pointer.x < EDGE_SIZE) {
-        scrollX = SCROLL_SPEED;
-      }
-
-      if (pointer.y < EDGE_SIZE) {
-        scrollY = -SCROLL_SPEED;
-      } else if (window.innerHeight - pointer.y < EDGE_SIZE) {
-        scrollY = SCROLL_SPEED;
-      }
+      const { scrollX, scrollY } = getScrollDirection(pointer);
 
       if (scrollX !== 0) {
         container.scrollLeft += scrollX;
       }
 
       if (scrollY !== 0) {
-        window.scrollBy(0, scrollY);
+        window.scrollBy({
+          top: scrollY,
+          left: 0,
+          behavior: "auto",
+        });
       }
 
       frameRef.current = requestAnimationFrame(tick);
@@ -63,12 +80,7 @@ function useDragAutoScroll(scrollContainerRef) {
 
     frameRef.current = requestAnimationFrame(tick);
 
-    return () => {
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current);
-        frameRef.current = null;
-      }
-    };
+    return stopAnimation;
   }, [isDragging, scrollContainerRef]);
 }
 
