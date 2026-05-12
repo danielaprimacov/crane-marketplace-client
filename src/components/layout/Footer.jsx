@@ -6,15 +6,50 @@ import ContactForm from "../forms/contact/ContactForm";
 import CookieForm from "../forms/contact/CookieForm";
 import NewsletterForm from "../forms/contact/NewsletterForm";
 
-import instagramIcon from "../../assets/icons/instagram.png";
-import whatsappIcon from "../../assets/icons/whatsapp.png";
-import facebookIcon from "../../assets/icons/facebook.png";
-import xIcon from "../../assets/icons/twitter-alt-circle.png";
+import {
+  MODAL_MODE,
+  DISCOVER_LINKS,
+  INFO_LINKS,
+  SOCIAL_LINKS,
+  footerLinkClass,
+} from "../../constants/footer";
+
+function FooterLinkList({ title, links }) {
+  return (
+    <div>
+      <h3 className="mb-3 uppercase text-black/40">{title}</h3>
+
+      <ul>
+        {links.map((link) => (
+          <li key={link.to} className="mb-2">
+            <Link to={link.to} className={footerLinkClass}>
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function Footer() {
   const [modalMode, setModalMode] = useState(null);
 
   const closeModal = () => setModalMode(null);
+
+  const openContactModal = () => {
+    setModalMode(MODAL_MODE.CONTACT);
+  };
+
+  const openCookieModal = () => {
+    setModalMode(MODAL_MODE.COOKIES);
+  };
+
+  const openNewsletterModal = () => {
+    setModalMode(MODAL_MODE.NEWSLETTER);
+  };
+
+  const isNewsletterModal = modalMode === MODAL_MODE.NEWSLETTER;
 
   return (
     <>
@@ -24,114 +59,54 @@ function Footer() {
       >
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_2fr_1.2fr]">
           {/* Company Information */}
-          <div>
+          <section>
             <h3 className="text-black/40 uppercase mb-3">Address</h3>
-            <p>123456, Muster</p>
-            <p>Musterstrasse 12</p>
-            <p>+49 123 456789</p>
-          </div>
+            <address className="not-italic">
+              <p>123456, Muster</p>
+              <p>Musterstrasse 12</p>
+              <p>+49 123 456789</p>
+            </address>
+          </section>
           {/* Links */}
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <ul>
-              <h3 className="text-black/40 uppercase mb-3">Discover</h3>
-              <li className="mb-2">
-                <Link
-                  to="/services#transport"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Transporting Cranes
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/services#sale-rent"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Crane Sales / Rent
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/services#installation-disassembly"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Instaling <br />& disassembling Cranes
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/cranes"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Advices
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/about"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Who we are
-                </Link>
-              </li>
-            </ul>
-            <ul>
+          <section className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+            <FooterLinkList title="Discover" links={DISCOVER_LINKS} />
+
+            <div>
               <h3 className="text-black/40 uppercase mb-3">Get in Touch</h3>
-              <li className="mb-2">
-                <button
-                  className="hover:text-red-700 hover:underline cursor-pointer"
-                  onClick={() => setModalMode("contact")}
-                >
-                  Contact
-                </button>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/revocation-claim"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Revocation <br />& Claim
-                </Link>
-              </li>
-            </ul>
-            <ul>
+              <ul>
+                <li className="mb-2">
+                  <button
+                    type="button"
+                    className={footerLinkClass}
+                    onClick={openContactModal}
+                  >
+                    Contact
+                  </button>
+                </li>
+                <li className="mb-2">
+                  <Link to="/revocation-claim" className={footerLinkClass}>
+                    Revocation & Claim
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
               <h3 className="text-black/40 uppercase mb-3">Information</h3>
-              <li className="mb-2">
-                <Link
-                  to="/terms"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Terms
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/imprint"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Imprint
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  to="/privacy-policy"
-                  className="hover:text-red-700 hover:underline"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li className="mb-2">
-                <button
-                  className="hover:text-red-700 hover:underline cursor-pointer"
-                  onClick={() => setModalMode("cookies")}
-                >
-                  Cookies Settings
-                </button>
-              </li>
-            </ul>
-          </div>
+              <FooterLinkList title="Information" links={INFO_LINKS} />
+
+              <button
+                type="button"
+                className={`${footerLinkClass} mt-2`}
+                onClick={openCookieModal}
+              >
+                Cookies Settings
+              </button>
+            </div>
+          </section>
+
           {/* Newsletter and Social Media */}
-          <div>
+          <section>
             <p className="text-black/40 mb-2">Newsletter</p>
             <div className="mb-8 flex flex-col items-center sm:items-start gap-4">
               <p>
@@ -139,59 +114,52 @@ function Footer() {
                 now!
               </p>
               <button
+                type="button"
                 className="px-8 py-2 w-full rounded-md bg-black text-white hover:bg-red-700 transform transition duration-300 ease-out"
-                onClick={() => setModalMode("newsletter")}
+                onClick={openNewsletterModal}
               >
                 Newsletter
               </button>
             </div>
-            <p className="text-black/40 mb-5">Social media</p>
+            <h3 className="text-black/40 mb-5">Social media</h3>
             <div className="flex justify-between gap-4 sm:gap-5">
-              <Link
-                to="https://www.facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={facebookIcon} alt="Facebook Icon" />
-              </Link>
-              <Link
-                to="https://www.instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={instagramIcon} alt="Instagram Icon" />
-              </Link>
-              <Link
-                to="https://x.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={xIcon} alt="X (Twitter) Icon" />
-              </Link>
-              <Link
-                to="https://whatsapp.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={whatsappIcon} alt="WhatsApp Icon" />
-              </Link>
+              {SOCIAL_LINKS.map((social) => (
+                <a
+                  key={social.href}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="transition hover:scale-105"
+                >
+                  <img
+                    src={social.icon}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-8 w-8 object-contain"
+                  />
+                </a>
+              ))}
             </div>
-          </div>
+          </section>
         </div>
       </footer>
+
       <Modal
         isOpen={modalMode !== null}
         onClose={closeModal}
         widthClass={
-          modalMode === "newsletter"
+          isNewsletterModal
             ? "w-[92vw] max-w-[56rem]"
             : "w-[92vw] max-w-[38rem]"
         }
         panelClass="max-h-[92dvh] overflow-y-auto"
         contentClass="p-0"
       >
-        {modalMode === "contact" && <ContactForm onClose={closeModal} />}
-        {modalMode === "cookies" && (
+        {modalMode === MODAL_MODE.CONTACT && (
+          <ContactForm onClose={closeModal} />
+        )}
+        {modalMode === MODAL_MODE.COOKIES && (
           <CookieForm
             onClose={closeModal}
             onSave={(preferences) => {
@@ -199,7 +167,9 @@ function Footer() {
             }}
           />
         )}
-        {modalMode === "newsletter" && <NewsletterForm onClose={closeModal} />}
+        {modalMode === MODAL_MODE.NEWSLETTER && (
+          <NewsletterForm onClose={closeModal} />
+        )}
       </Modal>
     </>
   );
