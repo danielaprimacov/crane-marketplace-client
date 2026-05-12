@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
+const actionClassName =
+  "inline-flex h-11 items-center justify-center rounded-lg bg-black px-5 text-sm font-medium text-white transition hover:bg-red-700";
+
 function ErrorState({
   title = "Something went wrong",
   message = "The requested content could not be loaded.",
@@ -34,20 +37,17 @@ function ErrorState({
           <p className="mt-2 text-sm leading-6 text-red-700">{message}</p>
         )}
 
-        {(actionTo || onRetry) && (
+        {hasAction && (
           <div className="mt-6 flex justify-center">
             {actionTo ? (
-              <Link
-                to={actionTo}
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-black px-5 text-sm font-medium text-white transition hover:bg-red-700"
-              >
+              <Link to={actionTo} className={actionClassName}>
                 {actionLabel || "Go back"}
               </Link>
             ) : (
               <button
                 type="button"
                 onClick={onRetry}
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-black px-5 text-sm font-medium text-white transition hover:bg-red-700"
+                className={actionClassName}
               >
                 {actionLabel || "Try again"}
               </button>
