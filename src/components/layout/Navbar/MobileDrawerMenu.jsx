@@ -11,9 +11,19 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
 
-  const handleClick = () => {
+  const closeMenu = () => {
     setServicesOpen(false);
     setMenuOpen(false);
+  };
+
+  const openContactModal = () => {
+    setServicesOpen(false);
+    setMenuOpen(false);
+    setModalOpen(true);
+  };
+
+  const closeContactModal = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -21,7 +31,8 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
       {/* blurred backdrop */}
       <div
         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
-        onClick={() => setMenuOpen(false)}
+        onClick={closeMenu}
+        aria-hidden="true"
       />
 
       {/* side drawer */}
@@ -32,26 +43,15 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
         {/* Close button inside too */}
         <button
           type="button"
-          onClick={() => setMenuOpen(false)}
-          className="
-                absolute top-4 right-4
-                flex items-center justify-center
-                w-10 h-10 rounded-full cursor-pointer
-                transition-all duration-300 ease-out
-                hover:bg-black/5 hover:scale-110
-                active:scale-95
-                animate-[menuCloseIn_280ms_ease-out]
-              "
+          onClick={closeMenu}
+          className="absolute right-4 top-4 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-all duration-300 ease-out hover:scale-110 hover:bg-black/5 active:scale-95 animate-[menuCloseIn_280ms_ease-out]"
           aria-label="Close menu"
         >
           <img
             src={closeIcon}
-            alt="Close"
-            className="
-                  w-5 h-5
-                  transition-transform duration-300 ease-out
-                  hover:rotate-90
-                  "
+            alt=""
+            aria-hidden="true"
+            className="h-5 w-5 transition-transform duration-300 ease-out hover:rotate-90"
           />
         </button>
 
@@ -59,6 +59,7 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
           {!isHome && (
             <Link
               to="/"
+              onClick={closeMenu}
               className="block text-xl sm:text-2xl font-medium hover:text-red-600"
             >
               Home
@@ -66,6 +67,7 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
           )}
           <Link
             to="/about"
+            onClick={closeMenu}
             className="block text-xl sm:text-2xl font-medium hover:text-red-600"
           >
             About Us
@@ -73,14 +75,15 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
 
           <Link
             to="/cranes"
+            onClick={closeMenu}
             className="block text-xl sm:text-2xl font-medium hover:text-red-600"
           >
-            Advices
+            Crane Guide
           </Link>
 
           <button
             type="button"
-            onClick={() => setModalOpen(true)}
+            onClick={openContactModal}
             className="block text-xl sm:text-2xl font-medium hover:text-red-600 cursor-pointer"
           >
             Contact
@@ -88,18 +91,18 @@ function MobileDrawerMenu({ isHome, setMenuOpen }) {
           <ServicesAccordion
             servicesOpen={servicesOpen}
             setServicesOpen={setServicesOpen}
-            onLinkClick={handleClick}
+            onLinkClick={closeMenu}
           />
         </nav>
       </aside>
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeContactModal}
         widthClass="w-[92vw] max-w-[38rem]"
         panelClass="max-h-[92dvh] overflow-y-auto"
         contentClass="p-0"
       >
-        <ContactForm onClose={() => setModalOpen(false)} />
+        <ContactForm onClose={closeContactModal} />
       </Modal>
     </>
   );
