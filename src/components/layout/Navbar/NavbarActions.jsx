@@ -116,13 +116,13 @@ function NavbarActions({
   isNewCrane,
   myCranesCount,
   inquiriesCount,
-  messagesCount,
+  messageCount,
   cranesTargetPath = "/cranes",
 }) {
   const navigate = useNavigate();
 
   const isAdmin = user?.role === "admin";
-  const adminTotal = (inquiriesCount || 0) + (messagesCount || 0);
+  const adminTotal = (inquiriesCount || 0) + (messageCount || 0);
   const showAddCrane = isCranes && !isNewCrane;
 
   if (!isLoggedIn) {

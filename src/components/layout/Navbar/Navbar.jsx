@@ -2,7 +2,6 @@ import { useContext, useEffect, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { AuthContext } from "../../../context/auth.context";
-
 import { useProducers } from "../../../hooks/useProducers";
 
 import NavbarBrandArea from "./NavbarBrandArea";
@@ -16,13 +15,20 @@ import useNavbarCounts from "../../../hooks/useNavbarCounts";
 
 import logo from "../../../assets/icons/shipping.png";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const DRAWER_ROUTES = [
+  "/",
+  "/about",
+  "/revocation-claim",
+  "/terms",
+  "/imprint",
+  "/privacy-policy",
+];
 
 function Navbar({ openLogin, menuOpen, setMenuOpen }) {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
 
   const location = useLocation();
-  const { producers } = useProducers();
+  const { producers = [] } = useProducers();
 
   const firstProducerSlug = useMemo(() => {
     if (!Array.isArray(producers) || !producers.length) return null;
@@ -40,15 +46,7 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
   const isProfile = location.pathname.startsWith("/profile");
   const isNewCrane = location.pathname === "/cranes/new";
 
-  const drawerRoutes = [
-    "/",
-    "/about",
-    "/revocation-claim",
-    "/terms",
-    "/imprint",
-    "/privacy-policy",
-  ];
-  const shouldShowDrawerMenuButton = drawerRoutes.includes(location.pathname);
+  const shouldShowDrawerMenuButton = DRAWER_ROUTES.includes(location.pathname);
 
   const showNavbar = useNavbarVisibility(isHome);
 
@@ -56,16 +54,15 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
-  }, []);
+  }, [setMenuOpen]);
 
   useEscapeClose(closeMenu);
 
   useEffect(() => {
     setMenuOpen(false);
-  }, [location.pathname, location.hash]);
+  }, [location.pathname, location.hash, setMenuOpen]);
 
   const { myCranesCount, inquiriesCount, messageCount } = useNavbarCounts({
-    apiUrl: API_URL,
     isLoggedIn,
     user,
     pathname: location.pathname,
@@ -106,7 +103,7 @@ function Navbar({ openLogin, menuOpen, setMenuOpen }) {
             isNewCrane={isNewCrane}
             myCranesCount={myCranesCount}
             inquiriesCount={inquiriesCount}
-            messagesCount={messageCount}
+            messageCount={messageCount}
             cranesTargetPath={cranesTargetPath}
           />
         </div>
