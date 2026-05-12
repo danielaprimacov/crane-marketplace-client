@@ -2,16 +2,16 @@ import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useContext, useState, useEffect } from "react";
 
-import ArrowsOutIcon from "./Icons/ArrowsOutIcon";
-import DeleteIcon from "./Icons/DeleteIcon";
+import ArrowsOutIcon from "./icons/ArrowsOutIcon";
+import DeleteIcon from "./icons/DeleteIcon";
 
 import InquiryCard from "../cranes/InquiryCard";
 import Modal from "../ui/Modal";
 import KanbanContext from "./KanbanContext";
 
 import {
-  INQURIY_STATUS_BORDER_COLORS,
-  INQURIY_STATUS_TEXT_COLORS,
+  INQUIRY_STATUS_BORDER_COLORS,
+  INQUIRY_STATUS_TEXT_COLORS,
 } from "../../constants/inquiryStatus";
 
 function TaskItem({ task }) {

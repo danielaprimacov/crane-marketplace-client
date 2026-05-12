@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
-import Navbar from "../layout/Navbar/Navbar";
+import Navbar from "../layout/navbar/Navbar";
 import Footer from "../layout/Footer";
 import ExpertAdviceWidget from "../home/ExpertAdviceWidget";
 

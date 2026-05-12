@@ -1,7 +1,7 @@
 import { useDragLayer } from "react-dnd";
 
 import {
-  INQUIRY_STATUS_BORDER_CLASS,
+  INQUIRY_STATUS_BORDER_COLORS,
   INQUIRY_STATUS_TEXT_COLORS,
 } from "../../constants/inquiryStatus";
 

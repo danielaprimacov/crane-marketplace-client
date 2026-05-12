@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import ProducersNav from "../../cranes/ProducersNav";
@@ -6,6 +6,8 @@ import ProducersNav from "../../cranes/ProducersNav";
 import menuIcon from "../../../assets/icons/menu-burger.png";
 import menuClose from "../../../assets/icons/cross.png";
 import logo from "../../../assets/icons/shipping.png";
+
+const SUBNAV_CLOSE_DELAY = 100;
 
 function NavbarBrandArea({
   shouldShowDrawerMenuButton,
@@ -16,49 +18,56 @@ function NavbarBrandArea({
   isServices,
 }) {
   const [openSubnav, setOpenSubnav] = useState(null);
-  const closeTimer = useRef(null);
+  const closeTimerRef = useRef(null);
 
-  const cancelClose = () => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
+  const cancelClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
     }
-  };
+  }, []);
 
-  const handleMouseEnter = (producer) => {
-    if (menuOpen) return;
-
-    cancelClose();
-
-    if (producer) {
-      setOpenSubnav(producer);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (menuOpen) return;
-
-    closeTimer.current = window.setTimeout(() => {
-      setOpenSubnav(null);
-      closeTimer.current = null;
-    }, 100);
-  };
-
-  const closeSubnav = () => {
+  const closeSubnav = useCallback(() => {
     cancelClose();
     setOpenSubnav(null);
-  };
+  }, [cancelClose]);
+
+  const handleMouseEnter = useCallback(
+    (producer) => {
+      if (menuOpen) return;
+
+      cancelClose();
+
+      if (producer) {
+        setOpenSubnav(producer);
+      }
+    },
+    [menuOpen, cancelClose]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    if (menuOpen) return;
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setOpenSubnav(null);
+      closeTimerRef.current = null;
+    }, SUBNAV_CLOSE_DELAY);
+  }, [menuOpen]);
+
+  const toggleMenu = useCallback(() => {
+    setMenuOpen((prev) => !prev);
+  }, [setMenuOpen]);
 
   useEffect(() => {
     if (menuOpen) {
       closeSubnav();
     }
-  }, [menuOpen]);
+  }, [menuOpen, closeSubnav]);
 
   useEffect(() => {
     return () => {
-      if (closeTimer.current) {
-        clearTimeout(closeTimer.current);
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
       }
     };
   }, []);
@@ -67,7 +76,8 @@ function NavbarBrandArea({
     <div className="flex items-center flex-none">
       {shouldShowDrawerMenuButton && !isCranes && (
         <button
-          onClick={() => setMenuOpen((o) => !o)}
+          type="button"
+          onClick={toggleMenu}
           className="p-2 mr-4 cursor-pointer"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
@@ -75,7 +85,8 @@ function NavbarBrandArea({
         >
           <img
             src={menuOpen ? menuClose : menuIcon}
-            alt={menuOpen ? "Close" : "Menu"}
+            alt=""
+            aria-hidden="true"
             className="w-6 h-6"
           />
         </button>
@@ -84,7 +95,7 @@ function NavbarBrandArea({
         <>
           <div className="flex items-center lg:hidden">
             <Link to="/">
-              <img src={logo} alt="Logo" className="w-[36px]" />
+              <img src={logo} alt="KranHub Logo" className="w-[36px]" />
             </Link>
           </div>
           <div
@@ -94,7 +105,7 @@ function NavbarBrandArea({
           >
             <button
               type="button"
-              onClick={() => setMenuOpen((o) => !o)}
+              onClick={toggleMenu}
               className="py-4 mr-3 cursor-pointer"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
@@ -102,7 +113,8 @@ function NavbarBrandArea({
             >
               <img
                 src={menuOpen ? menuClose : menuIcon}
-                alt={menuOpen ? "Close" : "Menu"}
+                alt=""
+                aria-hidden="true"
                 className="w-[24px]"
               />
             </button>
@@ -117,8 +129,8 @@ function NavbarBrandArea({
         </>
       )}
       {(isProfile || isServices) && (
-        <Link to="/">
-          <img src={logo} alt="Logo" className="w-[36px]" />
+        <Link to="/" aria-label="Go to homepage">
+          <img src={logo} alt="KranHub Logo" className="w-[36px]" />
         </Link>
       )}
     </div>
