@@ -40,7 +40,7 @@ function checkImageUrl(url) {
 }
 
 export function useAvailableImageUrls(images) {
-  const imageUrls = useMemo(() => getUniqueImageUrls, [images]);
+  const imageUrls = useMemo(() => getUniqueImageUrls(images), [images]);
 
   const [availableUrls, setAvailableUrls] = useState([]);
   const [loading, setLoading] = useState(false);

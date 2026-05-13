@@ -92,7 +92,6 @@ function Footer() {
             </div>
 
             <div>
-              <h3 className="text-black/40 uppercase mb-3">Information</h3>
               <FooterLinkList title="Information" links={INFO_LINKS} />
 
               <button

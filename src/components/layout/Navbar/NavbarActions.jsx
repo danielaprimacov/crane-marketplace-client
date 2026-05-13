@@ -1,12 +1,10 @@
-import { Fragment } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Popover, Transition } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
 
 import { ROLES } from "../../../constants/roles.js";
 
-import { Badge } from "../../ui/Badge";
-import { IconButton } from "../../ui/IconButton";
-import { IconLink } from "../../ui/IconLink";
+import Badge from "../../ui/Badge";
+import IconButton from "../../ui/IconButton";
+import IconLink from "../../ui/IconLink";
 
 import userIcon from "../../../assets/icons/circle-user.png";
 import logOutIcon from "../../../assets/icons/leave.png";

@@ -4,13 +4,15 @@ function CraneThumbnails(
   imageUrls = [],
   selectedImageIndex = 0,
   craneTitle = "Crane image",
-  onSelect,
-  onOpenFullView
+  onSelect = () => {},
+  onOpenFullView = () => {}
 ) {
-  const visibleImages = imageUrls.slice(0, MAX_VISIBLE_THUMBNAILS);
+  const safeImageUrls = Array.isArray(imageUrls) ? imageUrls : [];
+
+  const visibleImages = safeImageUrls.slice(0, MAX_VISIBLE_THUMBNAILS);
   const hiddenImagesCount = Math.max(
     0,
-    imageUrls.length - MAX_VISIBLE_THUMBNAILS
+    safeImageUrls.length - MAX_VISIBLE_THUMBNAILS
   );
 
   return (
@@ -46,7 +48,7 @@ function CraneThumbnails(
           onClick={onOpenFullView}
           className="h-[56px] w-[56px] shrink-0 rounded-lg border border-black/10 bg-gray-50 text-xl font-medium text-gray-600 hover:bg-gray-100 transition"
         >
-          <span>{+hiddenImagesCount}</span>
+          <span>+{hiddenImagesCount}</span>
         </button>
       )}
     </div>

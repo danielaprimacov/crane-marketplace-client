@@ -9,7 +9,10 @@ function useCraneDetails(craneId) {
 
   const fetchCrane = useCallback(
     async (signal) => {
-      if (!craneId) {
+      const invalidCraneId =
+        !craneId || craneId === "undefined" || craneId === "null";
+
+      if (invalidCraneId) {
         setCrane(null);
         setLoading(false);
         setError("Crane id is missing.");
@@ -21,13 +24,25 @@ function useCraneDetails(craneId) {
         setError("");
 
         const craneData = await craneApi.getById(craneId, { signal });
+
+        if (signal?.aborted) return;
+
         setCrane(craneData);
       } catch (err) {
+        const isCanceled =
+          err?.code === "ERR_CANCELED" || err?.name === "CanceledError";
+
+        if (isCanceled) {
+          return;
+        }
+
         console.error("Failed to fetch crane:", err);
         setError("Failed to load crane details.");
         setCrane(null);
       } finally {
-        setLoading(false);
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
       }
     },
     [craneId]
@@ -47,7 +62,7 @@ function useCraneDetails(craneId) {
     crane,
     loading,
     error,
-    refetchCrane: () => fetchCrane,
+    refetchCrane: () => fetchCrane(),
   };
 }
 

@@ -1,4 +1,4 @@
-import FloatingInput from "../../ui/form/FloatingFields";
+import { FloatingInput } from "../../ui/form/FloatingFields";
 
 function InquiryAddressField({ address = "", updateField, required = false }) {
   return (

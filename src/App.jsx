@@ -175,7 +175,7 @@ function App() {
       <Modal
         isOpen={modalMode !== "none"}
         onClose={close}
-        widthClass="w-[92w] max-w-[34rem]"
+        widthClass="w-[92vw] max-w-[34rem]"
         panelClass="max-h-[92dvh] overflow-hidden hide-scrollbar"
         contentClass="p-0"
         style={{

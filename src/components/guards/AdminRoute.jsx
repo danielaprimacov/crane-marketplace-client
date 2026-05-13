@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useContext } from "react";
 
 import { AuthContext } from "../../context/auth.context";
-import ROLES from "../../constants/roles";
+import { ROLES } from "../../constants/roles";
 
 import RouteLoading from "./RouteLoading";
 
