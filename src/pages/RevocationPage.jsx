@@ -42,6 +42,32 @@ function ContactLink({ href, children }) {
   );
 }
 
+function CompanyAddress() {
+  return (
+    <div className="rounded-xl bg-gray-50 p-4">
+      <p className="font-semibold text-gray-900">{COMPANY.name}</p>
+
+      <address className="not-italic leading-7">
+        {COMPANY.street}
+        <br />
+        {COMPANY.city}
+        <br />
+        {COMPANY.country}
+      </address>
+
+      <p className="mt-2">
+        Email:{" "}
+        <ContactLink href={COMPANY.emailHref}>{COMPANY.email}</ContactLink>
+      </p>
+
+      <p>
+        Phone:{" "}
+        <ContactLink href={COMPANY.phoneHref}>{COMPANY.phone}</ContactLink>
+      </p>
+    </div>
+  );
+}
+
 function SampleWithdrawalForm() {
   return (
     <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6">
@@ -91,6 +117,8 @@ ________________________________________________________
 }
 
 function RevocationPage() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <article className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-lg">
@@ -111,10 +139,10 @@ function RevocationPage() {
 
         <div className="space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900">
-            <strong>Important:</strong> This page is a template. The exact
-            wording must be adapted to your real business model, especially if
-            you provide services, digital products, marketplace intermediation,
-            or B2B-only services.
+            <strong>Important:</strong> This page is a template. The final legal
+            wording must be adapted to the actual business model, especially for
+            crane rental, transport services, installation services, marketplace
+            intermediation, paid listings, digital tools, or B2B-only services.
           </div>
 
           <Section number="1" title="Your Right to Withdraw">
@@ -138,30 +166,7 @@ function RevocationPage() {
               statement, for example by letter or email.
             </p>
 
-            <div className="rounded-xl bg-gray-50 p-4">
-              <p className="font-semibold text-gray-900">{COMPANY.name}</p>
-              <address className="not-italic leading-7">
-                {COMPANY.street}
-                <br />
-                {COMPANY.city}
-                <br />
-                {COMPANY.country}
-              </address>
-
-              <p className="mt-2">
-                Email:{" "}
-                <ContactLink href={COMPANY.emailHref}>
-                  {COMPANY.email}
-                </ContactLink>
-              </p>
-
-              <p>
-                Phone:{" "}
-                <ContactLink href={COMPANY.phoneHref}>
-                  {COMPANY.phone}
-                </ContactLink>
-              </p>
-            </div>
+            <CompanyAddress />
 
             <p>
               You may use the sample withdrawal form below, but this is not
@@ -249,8 +254,7 @@ function RevocationPage() {
           </section>
 
           <footer className="border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} {COMPANY.name}. All rights
-            reserved.
+            &copy; {currentYear} {COMPANY.name}. All rights reserved.
           </footer>
         </div>
       </article>
