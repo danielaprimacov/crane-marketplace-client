@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 
 import Modal from "../components/ui/Modal";
@@ -8,7 +8,7 @@ import transportationImg from "../assets/images/crane-gettyimages.jpg";
 import saleCrane from "../assets/images/crane-sale.webp";
 import installCrane from "../assets/images/install-crane.png";
 
-const services = [
+const SERVICE_SECTIONS = [
   {
     id: "transportation",
     title: "Transportation",
@@ -64,6 +64,14 @@ const services = [
     ctaText: "Request Expert Advice",
   },
 ];
+
+function safeDecodeHash(hash) {
+  try {
+    return decodeURIComponent(hash.replace("#", ""));
+  } catch {
+    return hash.replace("#", "");
+  }
+}
 
 function ServiceSection({ service, onAdviceClick }) {
   const imageFirst = service.imagePosition === "left";
@@ -134,12 +142,20 @@ function OurServicesPage() {
   const { hash } = useLocation();
   const [isAdviceOpen, setAdviceOpen] = useState(false);
 
+  const openAdviceModal = useCallback(() => {
+    setAdviceOpen(true);
+  }, []);
+
+  const closeAdviceModal = useCallback(() => {
+    setAdviceOpen(false);
+  }, []);
+
   useEffect(() => {
     if (!hash) return;
 
-    const id = decodeURIComponent(hash.replace("#", ""));
+    const id = safeDecodeHash(hash);
 
-    requestAnimationFrame(() => {
+    const frameId = window.requestAnimationFrame(() => {
       const element = document.getElementById(id);
 
       if (element) {
@@ -149,15 +165,11 @@ function OurServicesPage() {
         });
       }
     });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, [hash]);
-
-  const openAdviceModal = () => {
-    setAdviceOpen(true);
-  };
-
-  const closeAdviceModal = () => {
-    setAdviceOpen(false);
-  };
 
   return (
     <>
@@ -178,7 +190,7 @@ function OurServicesPage() {
         </header>
 
         <div>
-          {services.map((service) => (
+          {SERVICE_SECTIONS.map((service) => (
             <ServiceSection
               key={service.id}
               service={service}
@@ -188,7 +200,14 @@ function OurServicesPage() {
         </div>
       </main>
 
-      <Modal isOpen={isAdviceOpen} onClose={closeAdviceModal}>
+      <Modal
+        isOpen={isAdviceOpen}
+        onClose={closeAdviceModal}
+        widthClass="w-[92vw] max-w-[38rem]"
+        panelClass="max-h-[92dvh] overflow-y-auto"
+        contentClass="p-0"
+        ariaLabel="Expert advice form"
+      >
         <ExpertForm onClose={closeAdviceModal} />
       </Modal>
     </>

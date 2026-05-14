@@ -271,7 +271,7 @@ function CranesPage() {
                 </h3>
 
                 <ul className="space-y-4">
-                  {FILTER_ITEM.map((item) => (
+                  {FILTER_ITEMS.map((item) => (
                     <li key={item.title} className="leading-7">
                       <span className="font-semibold text-gray-900">
                         {item.title} —
