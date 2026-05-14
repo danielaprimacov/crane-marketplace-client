@@ -1,8 +1,8 @@
 import apiClient from "./apiClient";
 
 export const inquiryApi = {
-  create: async (payload) => {
-    const response = await apiClient.post("/inquiries", payload);
+  create: async (payload, config = {}) => {
+    const response = await apiClient.post("/inquiries", payload, config);
     return response.data;
   },
 
@@ -11,8 +11,8 @@ export const inquiryApi = {
     return response.data;
   },
 
-  getByIdAdmin: async (inquiryId) => {
-    const response = await apiClient.get(`/inquiries/${inquiryId}`);
+  getByIdAdmin: async (inquiryId, config = {}) => {
+    const response = await apiClient.get(`/inquiries/${inquiryId}`, config);
     return response.data;
   },
 

@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import axios from "axios";
 import { DndProvider } from "react-dnd";
 
 import { getDndConfig } from "../utils/getDndConfig";
+import { inquiryApi } from "../services/inquiriApi";
 
 import KanbanProvider from "../components/kanban/KanbanProvider";
 import Columns from "../components/kanban/Columns";
@@ -10,7 +10,9 @@ import DragLayer from "../components/kanban/DragLayer";
 import LoadingState from "../components/ui/LoadingState";
 import ErrorState from "../components/ui/ErrorState";
 
-const API_URL = import.meta.env.VITE_API_URL;
+function getInquiryId(inquiry) {
+  return inquiry?.id || inquiry?._id || null;
+}
 
 function InquiriesListPage() {
   const [inquiries, setInquiries] = useState([]);
@@ -20,24 +22,13 @@ function InquiriesListPage() {
   const dndConfig = useMemo(() => getDndConfig(), []);
 
   const getAllInquiries = useCallback(async (signal) => {
-    const storedToken = localStorage.getItem("authToken");
-
-    if (!storedToken) {
-      setError("Missing auth token.");
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
       setError("");
 
-      const response = await axios.get(`${API_URL}/inquiries`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-        signal,
-      });
+      const data = await inquiryApi.getAllAdmin({ signal });
 
-      const safeInquiries = Array.isArray(response.data) ? response.data : [];
+      const safeInquiries = Array.isArray(data) ? data : [];
 
       setInquiries(safeInquiries);
     } catch (error) {
@@ -67,51 +58,46 @@ function InquiriesListPage() {
   }, [getAllInquiries]);
 
   const handleUpdate = async (id, updatedFields) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("Missing auth token.");
-    const { data: updated } = await axios.put(
-      `${API_URL}/inquiries/${id}`,
-      updatedFields,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const updatedInquiry = await inquiryApi.updateAdmin(id, updatedFields);
 
     setInquiries((prev) =>
-      prev.map((iq) => (iq._id === id ? { ...iq, ...updated } : iq))
+      prev.map((inquiry) => {
+        const inquiryId = getInquiryId(inquiry);
+
+        if (inquiryId !== id) {
+          return inquiry;
+        }
+
+        return {
+          ...inquiry,
+          ...updatedInquiry,
+        };
+      })
     );
 
-    return updated;
+    return updatedInquiry;
   };
-
   const handleDelete = async (id) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("Missing auth token.");
+    await inquiryApi.deleteAdmin(id);
 
-    await axios.delete(`${API_URL}/inquiries/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setInquiries((prev) => prev.filter((iq) => iq._id !== id));
+    setInquiries((prev) =>
+      prev.filter((inquiry) => getInquiryId(inquiry) !== id)
+    );
   };
 
   const handleRead = async (id) => {
-    // mark as read only if not already
-    const inquiry = inquiries.find((iq) => iq._id === id);
+    const inquiry = inquiries.find((item) => getInquiryId(item) === id);
+
     if (!inquiry || inquiry.isRead) return;
 
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("Missing auth token.");
-    await axios.put(
-      `${API_URL}/inquiries/${id}`,
-      { isRead: true },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    await inquiryApi.updateAdmin(id, {
+      isRead: true,
+    });
 
     setInquiries((prev) =>
-      prev.map((iq) => (iq._id === id ? { ...iq, isRead: true } : iq))
+      prev.map((item) =>
+        getInquiryId(item) === id ? { ...item, isRead: true } : item
+      )
     );
   };
 
