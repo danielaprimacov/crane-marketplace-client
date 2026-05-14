@@ -1,11 +1,9 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-hot-toast";
 
 import { AuthContext } from "../context/auth.context";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { userApi } from "../services/userApi";
+import { FloatingInput } from "../components/ui/form/FloatingFields";
 
 const INITIAL_FORM = {
   name: "",
@@ -14,9 +12,14 @@ const INITIAL_FORM = {
   newPassword: "",
 };
 
+function getErrorMessage(error) {
+  return error?.response?.data?.message || error?.message || "Update failed.";
+}
+
 function EditProfilePage() {
   const { user, authenticateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const redirectTimeoutRef = useRef(null);
 
   const [form, setForm] = useState(INITIAL_FORM);
@@ -89,40 +92,33 @@ function EditProfilePage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (submitting) return;
+
     setError("");
     setSuccess("");
 
     const validationError = validateForm();
+
     if (validationError) {
       setError(validationError);
       return;
     }
 
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      setError("You are not authorized. Please log in again.");
-      return;
-    }
-
     const requestBody = {
       name: form.name.trim(),
-      email: form.email.trim(),
-      ...(showPasswordFields
-        ? {
-            currentPassword: form.currentPassword,
-            newPassword: form.newPassword,
-          }
-        : {}),
+      email: form.email.trim().toLowerCase(),
     };
+
+    if (showPasswordFields) {
+      requestBody.currentPassword = form.currentPassword;
+      requestBody.newPassword = form.newPassword;
+    }
 
     try {
       setSubmitting(true);
 
-      await axios.patch(
-        `${API_URL}/users/profile`,
-        { requestBody },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await userApi.updateProfile(requestBody);
       await authenticateUser();
 
       setSuccess("✅ Your profile has been updated!");
@@ -131,15 +127,19 @@ function EditProfilePage() {
         resetPasswordFields();
       }
 
-      redirectTimeoutRef.current = setTimeout(() => {
-        navigate("/profile");
+      redirectTimeoutRef.current = window.setTimeout(() => {
+        navigate("/profile", { replace: true });
       }, 1800);
     } catch (err) {
       console.error("Failed to update profile:", err);
-      setError(err?.response?.data?.message || "Update failed");
+      setError(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleCancel = () => {
+    navigate("/profile");
   };
 
   return (
@@ -162,38 +162,27 @@ function EditProfilePage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-7">
-          {[
-            { id: "name", type: "text", label: "Full Name", required: true },
-            {
-              id: "email",
-              type: "email",
-              label: "Email Address",
-              required: true,
-            },
-          ].map(({ id, type, label, required }) => (
-            <div key={id} className="relative pt-4">
-              <input
-                id={id}
-                name={id}
-                type={type}
-                value={form[id]}
-                onChange={handleChange}
-                required={required}
-                placeholder=" "
-                className="peer block w-full h-12 bg-transparent border-b border-gray-300 focus:border-red-300 focus:outline-none transition"
-              />
-              <label
-                htmlFor={id}
-                className={`absolute left-0 transition-all duration-200 ${
-                  form[id]
-                    ? "-top-1 text-sm text-gray-500"
-                    : "top-6 text-base text-gray-500"
-                } peer-focus:-top-1 peer-focus:text-sm`}
-              >
-                {label}
-              </label>
-            </div>
-          ))}
+          <FloatingInput
+            id="name"
+            name="name"
+            type="text"
+            label="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            autoComplete="name"
+          />
+
+          <FloatingInput
+            id="email"
+            name="email"
+            type="email"
+            label="Email Address"
+            value={form.email}
+            onChange={handleChange}
+            required
+            autoComplete="email"
+          />
 
           {!showPasswordFields ? (
             <button
@@ -205,33 +194,28 @@ function EditProfilePage() {
             </button>
           ) : (
             <div className="space-y-7 rounded-xl border border-black/10 bg-gray-50 p-4 sm:p-5">
-              {[
-                { id: "currentPassword", label: "Current Password" },
-                { id: "newPassword", label: "New Password" },
-              ].map(({ id, label }) => (
-                <div key={id} className="relative pt-4">
-                  <input
-                    id={id}
-                    name={id}
-                    type="password"
-                    value={form[id]}
-                    onChange={handleChange}
-                    placeholder=" "
-                    required
-                    className="peer block w-full h-12 bg-transparent border-b border-gray-300 focus:border-red-300 focus:outline-none transition"
-                  />
-                  <label
-                    htmlFor={id}
-                    className={`absolute left-0 transition-all duration-200 ${
-                      form[id]
-                        ? "-top-1 text-sm text-gray-500"
-                        : "top-6 text-base text-gray-500"
-                    } peer-focus:-top-1 peer-focus:text-sm`}
-                  >
-                    {label}
-                  </label>
-                </div>
-              ))}
+              <FloatingInput
+                id="currentPassword"
+                name="currentPassword"
+                type="password"
+                label="Current Password"
+                value={form.currentPassword}
+                onChange={handleChange}
+                required
+                autoComplete="current-password"
+              />
+
+              <FloatingInput
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                label="New Password"
+                value={form.newPassword}
+                onChange={handleChange}
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
               <button
                 type="button"
                 onClick={resetPasswordFields}
@@ -245,13 +229,15 @@ function EditProfilePage() {
           <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
-              onClick={() => navigate("/profile")}
+              onClick={handleCancel}
+              disabled={submitting}
               className="px-4 py-2 border border-gray-400 rounded transition hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               type="submit"
+              disabled={submitting}
               className="px-6 py-2 bg-black text-white rounded transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Saving..." : "Save changes"}
