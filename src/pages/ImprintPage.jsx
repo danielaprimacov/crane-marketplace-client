@@ -6,7 +6,7 @@ import {
   CheckBadgeIcon,
 } from "@heroicons/react/24/outline";
 
-const companyDetails = {
+const COMPANY_DETAILS = {
   companyName: "KranHub GmbH",
   street: "Crane Way 123",
   city: "10115 Berlin",
@@ -42,6 +42,8 @@ function InfoRow({ icon: Icon, children, alignStart = false }) {
 }
 
 function ImprintPage() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-lg">
@@ -64,14 +66,14 @@ function ImprintPage() {
               <InfoRow icon={BuildingOfficeIcon} alignStart>
                 <div>
                   <p className="font-medium text-gray-900">
-                    {companyDetails.companyName}
+                    {COMPANY_DETAILS.companyName}
                   </p>
                   <address className="not-italic leading-7 text-gray-700">
-                    {companyDetails.street}
+                    {COMPANY_DETAILS.street}
                     <br />
-                    {companyDetails.city}
+                    {COMPANY_DETAILS.city}
                     <br />
-                    {companyDetails.country}
+                    {COMPANY_DETAILS.country}
                   </address>
                 </div>
               </InfoRow>
@@ -80,14 +82,14 @@ function ImprintPage() {
                 <div className="space-y-2 leading-7">
                   <p>
                     <strong>Managing Director:</strong>{" "}
-                    {companyDetails.managingDirector}
+                    {COMPANY_DETAILS.managingDirector}
                   </p>
                   <p>
                     <strong>Register Court:</strong>{" "}
-                    {companyDetails.registerCourt}
+                    {COMPANY_DETAILS.registerCourt}
                   </p>
                   <p>
-                    <strong>VAT ID:</strong> {companyDetails.vatId}
+                    <strong>VAT ID:</strong> {COMPANY_DETAILS.vatId}
                   </p>
                 </div>
               </InfoRow>
@@ -98,19 +100,19 @@ function ImprintPage() {
 
               <InfoRow icon={PhoneIcon}>
                 <a
-                  href={companyDetails.phoneHref}
+                  href={COMPANY_DETAILS.phoneHref}
                   className="break-words text-gray-800 transition hover:text-red-600"
                 >
-                  {companyDetails.phone}
+                  {COMPANY_DETAILS.phone}
                 </a>
               </InfoRow>
 
               <InfoRow icon={EnvelopeIcon}>
                 <a
-                  href={companyDetails.emailHref}
+                  href={COMPANY_DETAILS.emailHref}
                   className="break-all text-gray-800 transition hover:text-red-600"
                 >
-                  {companyDetails.email}
+                  {COMPANY_DETAILS.email}
                 </a>
               </InfoRow>
             </div>
@@ -131,34 +133,25 @@ function ImprintPage() {
           {/* Dispute Resolution */}
           <section className="space-y-4 rounded-2xl bg-gray-50 p-5 sm:p-6">
             <h2 className="border-l-4 border-red-600 pl-3 text-xl font-semibold uppercase sm:text-2xl">
-              Online Dispute Resolution
+              Consumer Dispute Resolution
             </h2>
-
-            <p className="leading-7 text-gray-700">
-              Under EU Regulation 524/2013, consumers may file complaints via
-              the EU’s Online Dispute Resolution platform{" "}
-              <a
-                href="https://ec.europa.eu/consumers/odr/"
-                target="_blank"
-                rel="noreferrer"
-                className="break-all text-red-600 transition hover:underline"
-              >
-                ec.europa.eu/consumers/odr
-              </a>
-              .
-            </p>
 
             <InfoRow icon={CheckBadgeIcon} alignStart>
               <p className="leading-7 text-gray-700">
                 KranHub GmbH is willing to participate in dispute resolution
-                proceedings before the Berlin Consumer Arbitration Board.
+                proceedings before a consumer arbitration board.
               </p>
             </InfoRow>
+
+            <p className="text-sm leading-6 text-gray-500">
+              Note: The former EU Online Dispute Resolution platform has been
+              discontinued. The legal text on this page should be checked before
+              production use.
+            </p>
           </section>
 
-          {/* Footer */}
           <footer className="border-t border-black/10 pt-6 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} KranHub GmbH. All rights reserved.
+            &copy; {currentYear} KranHub GmbH. All rights reserved.
           </footer>
         </div>
       </div>
