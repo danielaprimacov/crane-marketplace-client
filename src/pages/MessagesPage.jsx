@@ -1,13 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 import Modal from "../components/ui/Modal";
 import LoadingState from "../components/ui/LoadingState";
 import ErrorState from "../components/ui/ErrorState";
-
 import DeleteIcon from "../components/kanban/Icons/DeleteIcon";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { messageApi } from "../services/messageApi";
 
 const FILTERS = [
   { value: "all", label: "All" },
@@ -15,6 +13,10 @@ const FILTERS = [
   { value: "expert", label: "Expert" },
   { value: "newsletter", label: "Newsletter" },
 ];
+
+function getMessageId(message) {
+  return message?.id || message?._id || null;
+}
 
 function formatDate(value) {
   if (!value) return "Unknown date";
@@ -29,8 +31,93 @@ function formatDate(value) {
 }
 
 function sortNewestFirst(messages) {
-  return [...messages].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  return [...messages].sort((a, b) => {
+    const dateA = new Date(a?.createdAt || 0).getTime();
+    const dateB = new Date(b?.createdAt || 0).getTime();
+
+    return dateB - dateA;
+  });
+}
+
+function getContactName(message) {
+  return (
+    [message.salutation, message.firstName, message.lastName]
+      .filter(Boolean)
+      .join(" ") || "Unknown contact"
+  );
+}
+
+function MessageContent({ message }) {
+  if (message.formType === "contact") {
+    return (
+      <>
+        <p>
+          <span className="font-semibold text-gray-900">
+            {getContactName(message)}
+          </span>
+          {message.country ? ` from ${message.country}` : ""}
+        </p>
+
+        {message.phone && <p>{message.phone}</p>}
+
+        <p className="whitespace-pre-line break-words">
+          {message.message || "No message text provided."}
+        </p>
+      </>
+    );
+  }
+
+  if (message.formType === "expert") {
+    return (
+      <>
+        <p>
+          <span className="font-semibold text-gray-900">
+            {message.name || "Unknown person"}
+          </span>
+          {message.company ? ` at ${message.company}` : ""}
+        </p>
+
+        {message.phone && <p>{message.phone}</p>}
+
+        <p className="whitespace-pre-line break-words">
+          {message.projectDetails || "No project details provided."}
+        </p>
+      </>
+    );
+  }
+
+  if (message.formType === "newsletter") {
+    return (
+      <>
+        <p>
+          <span className="font-semibold text-gray-900">
+            {[message.firstName, message.lastName].filter(Boolean).join(" ") ||
+              "Unknown subscriber"}
+          </span>
+        </p>
+
+        {message.phone && <p>{message.phone}</p>}
+
+        {Array.isArray(message.topics) && message.topics.length > 0 && (
+          <p>
+            <span className="font-semibold text-gray-900">Topics:</span>{" "}
+            {message.topics.join(", ")}
+          </p>
+        )}
+
+        <p>
+          Communication consent: {message.agreeComm ? "Yes" : "No"}
+          <br />
+          Newsletter consent: {message.agreeNewsletter ? "Yes" : "No"}
+        </p>
+      </>
+    );
+  }
+
+  return (
+    <p className="whitespace-pre-line break-words">
+      {message.message || message.projectDetails || "No message content."}
+    </p>
   );
 }
 
@@ -46,44 +133,43 @@ function MessagesPage() {
   const [toDeleteId, setToDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const fetchMessages = useCallback(async (signal) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await messageApi.getAllAdmin({ signal });
+      const safeMessages = Array.isArray(data) ? data : [];
+
+      setMessages(sortNewestFirst(safeMessages));
+    } catch (error) {
+      if (error.code === "ERR_CANCELED") return;
+
+      console.error("Failed to load messages:", error);
+
+      setError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to load messages."
+      );
+
+      setMessages([]);
+    } finally {
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchMessages = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          setError("You are not authorized to view messages.");
-          return;
-        }
-
-        const { data } = await axios.get(`${API_URL}/messages`, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: controller.signal,
-        });
-        const safeMessages = Array.isArray(data) ? data : [];
-
-        setMessages(sortNewestFirst(safeMessages));
-      } catch (err) {
-        if (err.code === "ERR_CANCELED") return;
-
-        console.error("Failed to load messages:", err);
-        setError("Failed to load messages.");
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchMessages();
+    fetchMessages(controller.signal);
 
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [fetchMessages]);
 
   const filteredMessages = useMemo(() => {
     if (filter === "all") return messages;
@@ -110,28 +196,24 @@ function MessagesPage() {
   const confirmDelete = async () => {
     if (!toDeleteId || deleting) return;
 
-    setDeleting(true);
-    setDeleteError("");
-
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        setDeleteError("You are not authorized to delete messages.");
-        return;
-      }
+      setDeleting(true);
+      setDeleteError("");
 
-      await axios.delete(`${API_URL}/messages/${toDeleteId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessages((prev) => prev.filter((m) => m._id !== toDeleteId));
+      await messageApi.deleteAdmin(toDeleteId);
+
+      setMessages((prev) =>
+        prev.filter((message) => getMessageId(message) !== toDeleteId)
+      );
 
       setConfirmOpen(false);
       setToDeleteId(null);
-    } catch (err) {
-      console.error("Failed to delete:", err);
+    } catch (error) {
+      console.error("Failed to delete message:", error);
 
       setDeleteError(
-        err?.response?.data?.message ||
+        error?.response?.data?.message ||
+          error?.message ||
           "Could not delete message. Please try again."
       );
     } finally {
@@ -155,7 +237,7 @@ function MessagesPage() {
       <ErrorState
         title="Could not load messages"
         message={error}
-        onRetry={() => window.location.reload()}
+        onRetry={() => fetchMessages()}
         actionLabel="Reload page"
         fullPage
       />
@@ -173,7 +255,7 @@ function MessagesPage() {
             Messages
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Review contact and expert request messages.
+            Review contact, expert, and newsletter messages.
           </p>
         </div>
 
@@ -205,81 +287,49 @@ function MessagesPage() {
 
       <div className="space-y-4">
         {filteredMessages.length > 0 ? (
-          filteredMessages.map((message) => (
-            <article
-              key={message._id}
-              className="rounded-xl border border-red-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gray-700">
-                      {message.formType || "unknown"}
-                    </span>
+          filteredMessages.map((message) => {
+            const messageId = getMessageId(message);
 
-                    <time className="text-xs text-gray-500">
-                      {formatDate(message.createdAt)}
-                    </time>
+            if (!messageId) return null;
+
+            return (
+              <article
+                key={messageId}
+                className="rounded-xl border border-red-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gray-700">
+                        {message.formType || "unknown"}
+                      </span>
+
+                      <time className="text-xs text-gray-500">
+                        {formatDate(message.createdAt)}
+                      </time>
+                    </div>
+
+                    <p className="mt-2 break-words text-sm font-medium text-gray-900">
+                      {message.email || "No email provided"}
+                    </p>
                   </div>
 
-                  <p className="mt-2 break-words text-sm font-medium text-gray-900">
-                    {message.email || "No email provided"}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteClick(messageId)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center self-start rounded-lg text-red-500 transition hover:bg-red-50 hover:text-red-700"
+                    aria-label="Delete message"
+                  >
+                    <DeleteIcon className="h-5 w-5" />
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleDeleteClick(message._id)}
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center self-start rounded-lg text-red-500 transition hover:bg-red-50 hover:text-red-700"
-                  aria-label="Delete message"
-                >
-                  <DeleteIcon className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="mt-4 space-y-2 text-sm text-gray-700">
-                {message.formType === "contact" ? (
-                  <>
-                    <p>
-                      <span className="font-semibold text-gray-900">
-                        {[
-                          message.salutation,
-                          message.firstName,
-                          message.lastName,
-                        ]
-                          .filter(Boolean)
-                          .join(" ") || "Unknown contact"}
-                      </span>
-                      {message.country ? ` from ${message.country}` : ""}
-                    </p>
-
-                    {message.phone && <p>{message.phone}</p>}
-
-                    <p className="whitespace-pre-line break-words">
-                      {message.message || "No message text provided."}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      <span className="font-semibold text-gray-900">
-                        {message.name || "Unknown person"}
-                      </span>
-                      {message.company ? ` at ${message.company}` : ""}
-                    </p>
-
-                    {message.phone && <p>{message.phone}</p>}
-
-                    <p className="whitespace-pre-line break-words">
-                      {message.projectDetails ||
-                        message.message ||
-                        "No project details provided."}
-                    </p>
-                  </>
-                )}
-              </div>
-            </article>
-          ))
+                <div className="mt-4 space-y-2 text-sm text-gray-700">
+                  <MessageContent message={message} />
+                </div>
+              </article>
+            );
+          })
         ) : (
           <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
             No messages to display.
@@ -287,7 +337,11 @@ function MessagesPage() {
         )}
       </div>
 
-      <Modal isOpen={confirmOpen} onClose={closeDeleteModal}>
+      <Modal
+        isOpen={confirmOpen}
+        onClose={closeDeleteModal}
+        ariaLabel="Delete message confirmation"
+      >
         <div className="w-full max-w-md">
           <h3 className="mb-3 text-xl font-semibold text-gray-900">
             Delete message?

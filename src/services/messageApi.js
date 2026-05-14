@@ -1,8 +1,8 @@
 import apiClient from "./apiClient";
 
 export const messageApi = {
-  create: async (payload) => {
-    const response = await apiClient.post("/messages", payload);
+  create: async (payload, config = {}) => {
+    const response = await apiClient.post("/messages", payload, config);
     return response.data;
   },
 
