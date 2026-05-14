@@ -16,7 +16,12 @@ function SectionHeading({ children, className = "" }) {
 function ServiceCard({ image, alt, title, description }) {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-md">
-      <img src={image} alt={alt} className="h-48 w-full object-cover sm:h-52" />
+      <img
+        src={image}
+        alt={alt}
+        loading="lazy"
+        className="h-48 w-full object-cover sm:h-52"
+      />
       <div className="flex flex-1 flex-col p-6">
         <h3 className="mb-3 text-xl font-medium">{title}</h3>
         <p className="text-sm leading-6 text-gray-600 sm:text-base">
@@ -28,6 +33,10 @@ function ServiceCard({ image, alt, title, description }) {
 }
 
 function AboutPage({ openSignup }) {
+  const handleSignupClick = () => {
+    openSignup?.();
+  };
+
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -54,7 +63,8 @@ function AboutPage({ openSignup }) {
           <div className="overflow-hidden rounded-2xl shadow-lg">
             <img
               src={teamImage}
-              alt="Our Team"
+              alt="KranHub team"
+              loading="lazy"
               className="w-full h-full object-cover"
             />
           </div>
@@ -62,7 +72,7 @@ function AboutPage({ openSignup }) {
             <h2 className="text-2xl font-semibold uppercase tracking-wide sm:text-3xl">
               Our Mission
             </h2>
-            <p className="text-base leading07 text-gray-700 sm:text-lg">
+            <p className="text-base leading-7 text-gray-700 sm:text-lg">
               At KranHub, we believe access to heavy lifting equipment should be
               as easy as booking a ride. Whether you’re a crane owner looking to
               monetize your fleet or a contractor in need of specialized
@@ -103,13 +113,13 @@ function AboutPage({ openSignup }) {
         <SectionHeading>Why Choose Us</SectionHeading>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {benefits.map((item) => (
+          {benefits.map((benefit) => (
             <div
-              key={item}
+              key={benefit}
               className="rounded-2xl border border-black/10 bg-white px-5 py-4 shadow-sm"
             >
               <p className="text-sm leading-6 text-gray-700 sm:text-base">
-                {item}
+                {benefit}
               </p>
             </div>
           ))}
@@ -131,7 +141,7 @@ function AboutPage({ openSignup }) {
           <button
             type="button"
             className="mt-8 bg-white text-red-600 px-8 py-3 font-semibold rounded-lg transition hover:bg-gray-100"
-            onClick={() => openSignup?.()}
+            onClick={handleSignupClick}
           >
             Get Started Now
           </button>
