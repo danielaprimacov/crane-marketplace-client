@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { messageApi } from "../../../services/messageApi";
+import { FloatingInput } from "../../ui/form/FloatingFields";
+
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const INITIAL_FORM = {
@@ -45,43 +46,34 @@ const TOPIC_OPTIONS = [
   },
 ];
 
-function FloatingInput({
-  id,
-  name,
-  label,
-  type = "text",
-  value,
-  onChange,
-  required = false,
-  autoComplete,
-}) {
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        autoComplete={autoComplete}
-        className="peer block h-10 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
-
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-0 flex h-10 items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
+function getSelectedTopics(topics) {
+  return Object.entries(topics)
+    .filter(([, checked]) => checked)
+    .map(([topic]) => topic);
 }
 
-function NewsletterForm({ onClose }) {
+function getErrorMessage(error) {
+  const responseData = error?.response?.data;
+
+  if (responseData?.message) {
+    return responseData.message;
+  }
+
+  if (responseData?.details) {
+    const firstDetail = Object.values(responseData.details)[0];
+
+    if (firstDetail) {
+      return firstDetail;
+    }
+  }
+
+  return "There was an error submitting the form. Please try again.";
+}
+
+function NewsletterForm({ onClose, autoCloseOnSuccess = true }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [recaptchaToken, setRecaptchaToken] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -138,9 +130,7 @@ function NewsletterForm({ onClose }) {
   };
 
   const validateForm = () => {
-    const selectedTopics = Object.entries(form.topics)
-      .filter(([, checked]) => checked)
-      .map(([topic]) => topic);
+    const selectedTopics = getSelectedTopics(form.topics);
 
     if (!form.firstName.trim()) return "First name is required.";
     if (!form.lastName.trim()) return "Last name is required.";
@@ -181,15 +171,13 @@ function NewsletterForm({ onClose }) {
 
     setSubmitting(true);
 
-    const selectedTopics = Object.entries(form.topics)
-      .filter(([, checked]) => checked)
-      .map(([topic]) => topic);
+    const selectedTopics = getSelectedTopics(form.topics);
 
     const payload = {
       formType: "newsletter",
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
-      email: form.email.trim(),
+      email: form.email.trim().toLocaleLowerCase(),
       phone: form.phone.trim(),
       topics: selectedTopics,
       agreeComm: form.agreeComm,
@@ -199,7 +187,7 @@ function NewsletterForm({ onClose }) {
     };
 
     try {
-      await axios.post(`${API_URL}/messages`, payload);
+      await messageApi.create(payload);
 
       setSuccess("Your newsletter subscription request was sent.");
       setForm(INITIAL_FORM);
@@ -212,12 +200,7 @@ function NewsletterForm({ onClose }) {
       }
     } catch (error) {
       console.error("Failed to submit newsletter form:", error);
-
-      setError(
-        error?.response?.data?.message ||
-          "There was an error submitting the form. Please try again."
-      );
-
+      setError(getErrorMessage(error));
       resetCaptcha();
     } finally {
       setSubmitting(false);
@@ -279,6 +262,7 @@ function NewsletterForm({ onClose }) {
             value={form.firstName}
             onChange={handleChange}
             required
+            maxLength={100}
             autoComplete="given-name"
           />
 
@@ -289,6 +273,7 @@ function NewsletterForm({ onClose }) {
             value={form.lastName}
             onChange={handleChange}
             required
+            maxLength={100}
             autoComplete="family-name"
           />
         </div>
@@ -312,6 +297,7 @@ function NewsletterForm({ onClose }) {
             label="Mobile phone number"
             value={form.phone}
             onChange={handleChange}
+            maxLength={50}
             autoComplete="tel"
           />
         </div>

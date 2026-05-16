@@ -1,152 +1,98 @@
+import { FloatingInput } from "../../ui/form/FloatingFields";
+
 function CraneSpecsFields({ form, updateField }) {
   return (
     <>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
-        {/* Producer */}
-        <div className="relative flex-1">
-          <input
-            id="producer"
-            name="producer"
-            type="text"
-            value={form.producer}
-            onChange={(e) => updateField("producer", e.target.value)}
-            required
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="producer"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Producer
-          </label>
-        </div>
-
-        {/* Series Code */}
-        <div className="relative">
-          <input
-            id="seriesCode"
-            name="seriesCode"
-            type="text"
-            value={form.seriesCode}
-            onChange={(e) => updateField("seriesCode", e.target.value)}
-            required
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="seriesCode"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Series Code
-          </label>
-        </div>
+        <FloatingInput
+          id="producer"
+          name="producer"
+          type="text"
+          label="Producer"
+          value={form.producer ?? ""}
+          onChange={(e) => updateField("producer", e.target.value)}
+          required
+          maxLength={100}
+          inputClassName="h-10"
+        />
+        <FloatingInput
+          id="seriesCode"
+          name="seriesCode"
+          type="text"
+          label="Series Code"
+          value={form.seriesCode ?? ""}
+          onChange={(e) => updateField("seriesCode", e.target.value)}
+          required
+          maxLength={100}
+          inputClassName="h-10"
+        />
       </div>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
-        {/* class capacity */}
-        <div className="relative">
-          <input
-            id="capacityClassNumber"
-            name="capacityClassNumber"
-            type="number"
-            min={0}
-            value={form.capacityClassNumber}
-            onChange={(e) => updateField("capacityClassNumber", e.target.value)}
-            required
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="capacityClassNumber"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Class Capacity (t)
-          </label>
-        </div>
+        <FloatingInput
+          id="capacityClassNumber"
+          name="capacityClassNumber"
+          type="number"
+          label="Class Capacity (t)"
+          value={form.capacityClassNumber ?? ""}
+          onChange={(e) => updateField("capacityClassNumber", e.target.value)}
+          required
+          min={0}
+          inputClassName="h-10"
+        />
 
-        {/* max capacity */}
-        <div className="relative">
-          <input
-            id="capacity"
-            name="capacity"
-            type="number"
-            step="0.1"
-            value={form.capacity}
-            onChange={(e) => updateField("capacity", e.target.value)}
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="capacity"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Max Capacity (t)
-          </label>
-        </div>
+        <FloatingInput
+          id="capacity"
+          name="capacity"
+          type="number"
+          label="Max Capacity (t)"
+          value={form.capacity ?? ""}
+          onChange={(e) => updateField("capacity", e.target.value)}
+          min={0}
+          step="0.1"
+          inputClassName="h-10"
+        />
       </div>
 
-      {/* ── Next, height stays full width ── */}
       <div className="relative mb-8">
-        <input
+        <FloatingInput
           id="height"
           name="height"
           type="number"
-          step="0.1"
-          value={form.height}
+          label="Max Height (m)"
+          value={form.height ?? ""}
           onChange={(e) => updateField("height", e.target.value)}
           required
-          placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
+          min={0}
+          step="0.1"
+          inputClassName="h-10"
         />
-        <label
-          htmlFor="height"
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-        >
-          Max Height (m)
-        </label>
       </div>
 
-      {/* ── Now Variant + Max Radius side by side ── */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
-        {/* variant revision */}
-        <div className="relative">
-          <input
-            id="variantRevision"
-            name="variantRevision"
-            type="text"
-            value={form.variantRevision}
-            onChange={(e) => updateField("variantRevision", e.target.value)}
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="variantRevision"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Variant / Revision
-          </label>
-        </div>
+        <FloatingInput
+          id="variantRevision"
+          name="variantRevision"
+          type="text"
+          label="Variant / Revision"
+          value={form.variantRevision ?? ""}
+          onChange={(e) => updateField("variantRevision", e.target.value)}
+          maxLength={100}
+          inputClassName="h-10"
+        />
 
-        {/* max radius */}
-        <div className="relative">
-          <input
-            id="radius"
-            name="radius"
-            type="number"
-            step="0.1"
-            value={form.radius}
-            onChange={(e) => updateField("radius", e.target.value)}
-            required
-            placeholder=" "
-            className="peer block w-full h-10 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black transition"
-          />
-          <label
-            htmlFor="radius"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Max Radius (m)
-          </label>
-        </div>
+        <FloatingInput
+          id="radius"
+          name="radius"
+          type="number"
+          label="Max Radius (m)"
+          value={form.radius ?? ""}
+          onChange={(e) => updateField("radius", e.target.value)}
+          required
+          min={0}
+          step="0.1"
+          inputClassName="h-10"
+        />
       </div>
     </>
   );

@@ -1,40 +1,68 @@
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { craneApi } from "../services/craneApi";
 
 function useCraneDetails(craneId) {
   const [crane, setCrane] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchCrane = useCallback(async () => {
-    if (!craneId) return;
+  const fetchCrane = useCallback(
+    async (signal) => {
+      const invalidCraneId =
+        !craneId || craneId === "undefined" || craneId === "null";
 
-    try {
-      setLoading(true);
-      setError("");
+      if (invalidCraneId) {
+        setCrane(null);
+        setLoading(false);
+        setError("Crane id is missing.");
+        return;
+      }
 
-      const response = await axios.get(`${API_URL}/cranes/${craneId}`);
-      setCrane(response.data);
-    } catch (err) {
-      console.error("Failed to fetch crane:", err);
-      setError("Failed to load crane details.");
-      setCrane(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [craneId]);
+      try {
+        setLoading(true);
+        setError("");
+
+        const craneData = await craneApi.getById(craneId, { signal });
+
+        if (signal?.aborted) return;
+
+        setCrane(craneData);
+      } catch (err) {
+        const isCanceled =
+          err?.code === "ERR_CANCELED" || err?.name === "CanceledError";
+
+        if (isCanceled) {
+          return;
+        }
+
+        console.error("Failed to fetch crane:", err);
+        setError("Failed to load crane details.");
+        setCrane(null);
+      } finally {
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
+      }
+    },
+    [craneId]
+  );
 
   useEffect(() => {
-    fetchCrane();
+    const controller = new AbortController();
+
+    fetchCrane(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [fetchCrane]);
 
   return {
     crane,
     loading,
     error,
-    refetchCrane: fetchCrane,
+    refetchCrane: () => fetchCrane(),
   };
 }
 

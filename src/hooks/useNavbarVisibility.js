@@ -12,21 +12,19 @@ export default function useNavbarVisibility(isHome) {
       // on home: always show while over hero
       if (isHome && currentY <= heroBottom) {
         setShowNavbar(true);
-      } else {
-        // otherwise (either scrolled past hero on home, or any scroll on other pages)
-        if (currentY > lastScrollY.current) {
-          // scrolled down
-          setShowNavbar(false);
-        } else {
-          // scrolled up
-          setShowNavbar(true);
-        }
+        lastScrollY.current = currentY;
+        return;
       }
+
+      setShowNavbar(currentY <= lastScrollY.current);
 
       lastScrollY.current = currentY;
     };
 
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll, { passive: true });
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isHome]);
 

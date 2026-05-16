@@ -1,7 +1,12 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 
 import { useProducers } from "../../hooks/useProducers";
+import {
+  getCraneId,
+  getImageUrl,
+  getCraneModel,
+} from "../../utils/craneHelpers";
 
 import ArrowIcon from "../ui/ArrowIcon";
 
@@ -12,7 +17,7 @@ function ProducersNav({
   closeSubnav,
   menuOpen,
 }) {
-  const { producers } = useProducers();
+  const { producers = [] } = useProducers();
   const [needsScroll, setNeedsScroll] = useState(false);
 
   const scrollRef = useRef(null);
@@ -25,13 +30,13 @@ function ProducersNav({
 
   const featuredModels = activeProducer?.models?.slice(0, 4) ?? [];
 
-  const stopScroll = () => {
+  const stopScroll = useCallback(() => {
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
     if (scrollRef.current) scrollRef.current.scrollLeft = 0;
-  };
+  }, []);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -45,6 +50,12 @@ function ProducersNav({
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
   }, [producers]);
+
+  useEffect(() => {
+    return () => {
+      stopScroll();
+    };
+  }, [stopScroll]);
 
   const startScroll = () => {
     if (menuOpen || rafRef.current) return;
@@ -68,10 +79,6 @@ function ProducersNav({
 
     rafRef.current = requestAnimationFrame(step);
   };
-
-  useEffect(() => {
-    return () => stopScroll();
-  }, []);
 
   return (
     <div
@@ -148,27 +155,23 @@ function ProducersNav({
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-2">
                   {featuredModels.map((crane) => {
-                    const model = [
-                      crane.seriesCode,
-                      crane.capacityClassNumber,
-                      crane.variantRevision,
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
+                    const craneId = getCraneId(crane);
+                    const model = getCraneModel(crane);
+                    const firstImageUrl = getImageUrl(crane);
 
-                    const firstImage = crane.images?.[0];
+                    if (!craneId) return null;
 
                     return (
                       <Link
-                        to={`/cranes/${crane._id}`}
+                        to={`/cranes/${craneId}`}
                         onClick={closeSubnav}
-                        key={crane._id}
+                        key={craneId}
                         className="group flex gap-3 items-start"
                       >
                         <div className="w-32 h-24 shrink-0 rounded overflow-hidden">
-                          {firstImage ? (
+                          {firstImageUrl ? (
                             <img
-                              src={firstImage}
+                              src={firstImageUrl}
                               alt={model}
                               className="h-full w-full object-cover"
                             />
@@ -180,10 +183,10 @@ function ProducersNav({
                         </div>
                         <div className="min-w-0 text-sm">
                           <p className="truncate font-medium text-black group-hover:text-red-600">
-                            {model}
+                            {model || "Model not set"}
                           </p>
                           <span className="block truncate text-gray-500">
-                            {crane.title}
+                            {crane.title || "Untitled crane"}
                           </span>
                         </div>
                       </Link>

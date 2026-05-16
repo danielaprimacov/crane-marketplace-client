@@ -1,47 +1,22 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
+import { craneApi } from "../services/craneApi";
 
 import ArrowIcon from "../components/ui/ArrowIcon";
 import LoadingState from "../components/ui/LoadingState";
 import ErrorState from "../components/ui/ErrorState";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { getCraneId, getCraneModel, getImageUrl } from "../utils/craneHelpers";
 
-function getOwnerId(crane) {
-  if (!crane?.owner) return null;
+function formatStatus(status) {
+  if (!status) return "Unknown";
 
-  if (typeof crane.owner === "string") {
-    return crane.owner;
-  }
+  if (status === "for sale") return "For Sale";
+  if (status === "for rent") return "For Rent";
 
-  return crane.owner._id || null;
-}
-
-function getCraneModel(crane) {
-  return [
-    crane.seriesCode,
-    crane.capacityClassNumber ? `${crane.capacityClassNumber}t` : "",
-    crane.variantRevision?.trim(),
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function getImageUrl(crane) {
-  if (!Array.isArray(crane.images) || crane.images.length === 0) {
-    return null;
-  }
-
-  const firstImage = crane.images[0];
-
-  if (typeof firstImage === "string") {
-    return firstImage;
-  }
-
-  return firstImage?.url || firstImage?.secure_url || null;
+  return status;
 }
 
 function EmptyState() {
@@ -54,17 +29,27 @@ function EmptyState() {
       <p className="mt-2 text-sm text-gray-600">
         You have not added any cranes to your account yet.
       </p>
+
+      <Link
+        to="/cranes/new"
+        className="mt-5 inline-flex rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+      >
+        Add a new crane
+      </Link>
     </div>
   );
 }
 
 function CraneCard({ crane }) {
+  const craneId = getCraneId(crane);
   const model = getCraneModel(crane);
   const imageUrl = getImageUrl(crane);
 
+  if (!craneId) return null;
+
   return (
     <article className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <Link to={`/cranes/${crane._id}`} className="block">
+      <Link to={`/cranes/${craneId}`} className="block">
         <div className="h-52 w-full overflow-hidden bg-gray-100">
           {imageUrl ? (
             <img
@@ -83,7 +68,7 @@ function CraneCard({ crane }) {
 
       <div className="p-4">
         <Link
-          to={`/cranes/${crane._id}`}
+          to={`/cranes/${craneId}`}
           className="line-clamp-2 font-medium text-gray-900 transition hover:text-red-600"
         >
           {crane.title || "Untitled crane"}
@@ -95,11 +80,11 @@ function CraneCard({ crane }) {
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-gray-700">
-            {crane.status || "Unknown"}
+            {formatStatus(crane.status)}
           </span>
 
           <Link
-            to={`/cranes/${crane._id}`}
+            to={`/cranes/${craneId}`}
             className="group inline-flex items-center gap-2 text-sm font-medium text-gray-700 transition hover:text-red-600"
           >
             <span>View details</span>
@@ -112,68 +97,57 @@ function CraneCard({ crane }) {
 }
 
 function UserCranesPage() {
-  const { isLoggedIn, user, isLoading } = useContext(AuthContext);
+  const { isLoggedIn, isLoading } = useContext(AuthContext);
+
   const [cranes, setCranes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const userId = user?._id;
+  const fetchMyCranes = useCallback(async (signal) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await craneApi.getMine({ signal });
+      const safeCranes = Array.isArray(data) ? data : [];
+
+      setCranes(safeCranes);
+    } catch (error) {
+      if (error.code === "ERR_CANCELED") return;
+
+      console.error("Failed to fetch user cranes:", error);
+
+      setError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Could not load your cranes. Please try again."
+      );
+
+      setCranes([]);
+    } finally {
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (isLoading) return;
 
-    // don’t try to load until we know we’re logged in & have a user
-    if (!isLoggedIn || !userId) {
-      setLoading(false);
+    if (!isLoggedIn) {
       setCranes([]);
+      setLoading(false);
       return;
     }
 
     const controller = new AbortController();
 
-    const fetchMyCranes = async () => {
-      setLoading(true);
-      setError("");
-
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          setError("You are not authorized to view your cranes.");
-          return;
-        }
-
-        const { data: allCranes } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: controller.signal,
-        });
-
-        const safeCranes = Array.isArray(allCranes) ? allCranes : [];
-
-        setCranes(safeCranes);
-      } catch (err) {
-        if (err.code === "ERR_CANCELED") return;
-
-        console.error("Failed to fetch user’s cranes:", err);
-        setError("Could not load your cranes. Please try again.");
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchMyCranes();
+    fetchMyCranes(controller.signal);
 
     return () => {
       controller.abort();
     };
-  }, [isLoading, isLoggedIn, userId]);
-
-  const myCranes = useMemo(() => {
-    if (!userId) return [];
-
-    return cranes.filter((crane) => getOwnerId(crane) === userId);
-  }, [cranes, userId]);
+  }, [isLoading, isLoggedIn, fetchMyCranes]);
 
   if (isLoading || loading) {
     return (
@@ -187,7 +161,15 @@ function UserCranesPage() {
   }
 
   if (error) {
-    return <ErrorState message={error} fullPage />;
+    return (
+      <ErrorState
+        title="Could not load your cranes"
+        message={error}
+        onRetry={() => fetchMyCranes()}
+        actionLabel="Reload cranes"
+        fullPage
+      />
+    );
   }
 
   if (!isLoggedIn) {
@@ -212,19 +194,28 @@ function UserCranesPage() {
           <h1 className="text-2xl font-bold mb-6 tracking-widest">My Cranes</h1>
 
           <p className="mt-2 text-sm text-gray-500">
-            {myCranes.length} crane{myCranes.length !== 1 ? "s" : ""} connected
-            to your account.
+            {cranes.length} crane{cranes.length !== 1 ? "s" : ""} connected to
+            your account.
           </p>
         </div>
+
+        <Link
+          to="/cranes/new"
+          className="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 sm:w-auto"
+        >
+          Add a new crane
+        </Link>
       </header>
 
-      {myCranes.length === 0 ? (
+      {cranes.length === 0 ? (
         <EmptyState />
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {myCranes.map((c) => (
-            <CraneCard key={c._id} crane={c} />
-          ))}
+          {cranes.map((crane) => {
+            const craneId = getCraneId(crane);
+
+            return <CraneCard key={craneId} crane={crane} />;
+          })}
         </div>
       )}
     </div>

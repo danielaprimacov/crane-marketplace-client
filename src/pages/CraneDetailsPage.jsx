@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 
 import { AuthContext } from "../context/auth.context";
+import { craneApi } from "../services/craneApi";
 
 import Modal from "../components/ui/Modal";
 import LoadingState from "../components/ui/LoadingState";
@@ -15,8 +15,6 @@ import FullViewGalleryModal from "../components/cranes/FullViewGalleryModal";
 import CraneDetailsPanel from "../components/cranes/CraneDetailsPanel";
 
 import useCraneDetails from "../hooks/useCraneDetails";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function CraneDetailsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -36,15 +34,9 @@ function CraneDetailsPage() {
   const handleDelete = async () => {
     setConfirmOpen(false);
 
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      toast.error("You are not authorized to delete this crane.");
-      return;
-    }
     try {
-      await axios.delete(`${API_URL}/cranes/${craneId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await craneApi.delete(craneId);
+
       toast.success("Crane deleted successfully");
       navigate("/cranes/my-cranes");
     } catch (error) {
@@ -82,9 +74,15 @@ function CraneDetailsPage() {
   }
 
   const ownerId =
-    typeof crane.owner === "string" ? crane.owner : crane.owner?._id;
+    typeof crane.owner === "string"
+      ? crane.owner
+      : crane.owner?.id || crane.owner?._id;
 
-  const isOwner = Boolean(user && user._id === ownerId);
+  const currentUserId = user?.id || user?._id;
+
+  const isOwner = Boolean(
+    currentUserId && ownerId && currentUserId === ownerId
+  );
 
   return (
     <div className="mt-20 mb-8 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">

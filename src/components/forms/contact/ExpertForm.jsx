@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { messageApi } from "../../../services/messageApi";
+
+import { FloatingInput, FloatingTextarea } from "../../ui/form/FloatingFields";
 
 const INITIAL_FORM = {
   name: "",
@@ -11,69 +12,22 @@ const INITIAL_FORM = {
   projectDetails: "",
 };
 
-function FloatingInput({
-  id,
-  name,
-  label,
-  type = "text",
-  value,
-  onChange,
-  required = false,
-  autoComplete,
-}) {
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        autoComplete={autoComplete}
-        className="peer block h-10 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
+function getErrorMessage(error) {
+  const responseData = error?.response?.data;
 
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-0 flex h-10 items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
-}
+  if (responseData?.message) {
+    return responseData.message;
+  }
 
-function FloatingTextarea({
-  id,
-  name,
-  label,
-  value,
-  onChange,
-  required = false,
-}) {
-  return (
-    <div className="relative">
-      <textarea
-        id={id}
-        name={name}
-        rows={4}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        className="peer block min-h-28 w-full resize-none border-b border-b-black/20 bg-transparent pt-2 text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
+  if (responseData?.details) {
+    const firstDetail = Object.values(responseData.details)[0];
 
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-2 flex items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
+    if (firstDetail) {
+      return firstDetail;
+    }
+  }
+
+  return "There was an error. Please try again later.";
 }
 
 function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
@@ -93,7 +47,7 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
     };
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (event) => {
     const { name, value } = event.target;
 
     setForm((currentForm) => ({
@@ -123,7 +77,7 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
       formType: "expert",
       name: form.name.trim(),
       company: form.company.trim(),
-      email: form.email.trim(),
+      email: form.email.trim().toLocaleLowerCase(),
       phone: form.phone.trim(),
       projectDetails: form.projectDetails.trim(),
     };
@@ -147,7 +101,7 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
     }
 
     try {
-      await axios.post(`${API_URL}/messages`, payload);
+      await messageApi.create(payload);
 
       setSuccess("✅ Your request has been sent!");
       setForm(INITIAL_FORM);
@@ -159,10 +113,7 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
       }
     } catch (err) {
       console.error("Failed to send expert request:", err);
-      setError(
-        err.response?.data?.message ||
-          "There was an error. Please try again later."
-      );
+      setError(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -204,6 +155,8 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
           value={form.name}
           onChange={handleChange}
           required
+          minLength={1}
+          maxLength={150}
           autoComplete="name"
         />
 
@@ -213,6 +166,7 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
           label="Company"
           value={form.company}
           onChange={handleChange}
+          maxLength={150}
           autoComplete="organization"
         />
 
@@ -234,6 +188,7 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
           label="Phone"
           value={form.phone}
           onChange={handleChange}
+          maxLength={50}
           autoComplete="tel"
         />
 
@@ -244,6 +199,10 @@ function ExpertForm({ onClose, autoCloseOnSuccess = true }) {
           value={form.projectDetails}
           onChange={handleChange}
           required
+          minLength={1}
+          maxLength={5000}
+          rows={4}
+          extareaClassName="resize-none"
         />
       </div>
 

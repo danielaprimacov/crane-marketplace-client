@@ -6,7 +6,7 @@ const COMPANY = {
   emailHref: "mailto:legal@kranhub.com",
 };
 
-const termsSections = [
+const TERMS_SECTIONS = [
   {
     title: "Scope and Applicability",
     content: [
@@ -101,6 +101,9 @@ const termsSections = [
   },
 ];
 
+const defaultContactLinkClassName =
+  "break-all font-medium text-red-600 underline-offset-4 transition hover:underline";
+
 function Section({ number, title, content }) {
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
@@ -123,18 +126,60 @@ function Section({ number, title, content }) {
   );
 }
 
-function ContactLink({ href, children }) {
+function ContactLink({ href, children, className = "" }) {
   return (
-    <a
-      href={href}
-      className="break-all font-medium text-red-600 underline-offset-4 transition hover:underline"
-    >
+    <a href={href} className={className || defaultContactLinkClassName}>
       {children}
     </a>
   );
 }
 
+function LegalWarning() {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900">
+      <strong>Important:</strong> This page is a template. It must be adapted to
+      the real KranHub business model, especially if the platform offers paid
+      listings, crane rental, crane sales, transport, installation, brokerage,
+      B2B-only services, or consumer contracts.
+    </div>
+  );
+}
+
+function TermsContactBox() {
+  return (
+    <section className="rounded-2xl bg-gray-900 p-5 text-white sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-bold">Questions about these terms?</h2>
+
+          <p className="mt-1 text-sm text-gray-300">
+            Contact KranHub legal support.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 text-sm sm:items-end">
+          <ContactLink
+            href={COMPANY.emailHref}
+            className="break-all font-medium text-red-300 underline-offset-4 transition hover:underline"
+          >
+            {COMPANY.email}
+          </ContactLink>
+
+          <ContactLink
+            href={COMPANY.phoneHref}
+            className="break-all font-medium text-red-300 underline-offset-4 transition hover:underline"
+          >
+            {COMPANY.phone}
+          </ContactLink>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TermsPage() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <article className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-lg">
@@ -154,14 +199,9 @@ function TermsPage() {
         </header>
 
         <div className="space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900">
-            <strong>Important:</strong> This page is a template. It must be
-            adapted to the real KranHub business model, especially if the
-            platform offers paid listings, crane rental, crane sales, transport,
-            installation, brokerage, B2B-only services, or consumer contracts.
-          </div>
+          <LegalWarning />
 
-          {termsSections.map((section, index) => (
+          {TERMS_SECTIONS.map((section, index) => (
             <Section
               key={section.title}
               number={index + 1}
@@ -170,32 +210,10 @@ function TermsPage() {
             />
           ))}
 
-          <section className="rounded-2xl bg-gray-900 p-5 text-white sm:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-xl font-bold">
-                  Questions about these terms?
-                </h2>
-                <p className="mt-1 text-sm text-gray-300">
-                  Contact KranHub legal support.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2 text-sm sm:items-end">
-                <ContactLink href={COMPANY.emailHref}>
-                  {COMPANY.email}
-                </ContactLink>
-
-                <ContactLink href={COMPANY.phoneHref}>
-                  {COMPANY.phone}
-                </ContactLink>
-              </div>
-            </div>
-          </section>
+          <TermsContactBox />
 
           <footer className="border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} {COMPANY.name}. All rights
-            reserved.
+            &copy; {currentYear} {COMPANY.name}. All rights reserved.
           </footer>
         </div>
       </article>

@@ -9,33 +9,44 @@ import { slugify } from "../../utils/helpers";
 
 const MotionLink = motion.create(Link);
 
+const SERVICES = [
+  {
+    src: transportPhoto,
+    alt: "Crane Transportation",
+    label: "Transportation",
+  },
+  { src: salePhoto, alt: "Crane Sales", label: "Sale / Rent" },
+  {
+    src: installationPhoto,
+    alt: "Crane Installation",
+    label: "Installation / Disassembly",
+  },
+];
+
+const servicesContainer = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const servicesItem = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+    },
+  },
+};
+
 function Services() {
-  const servicesContainer = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: 0.2 },
-    },
-  };
-
-  const servicesItem = {
-    hidden: { opacity: 0, x: 0 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.7 } },
-  };
-
-  const services = [
-    {
-      src: transportPhoto,
-      alt: "Crane Transportation",
-      label: "Transportation",
-    },
-    { src: salePhoto, alt: "Crane Sales", label: "Sale / Rent" },
-    {
-      src: installationPhoto,
-      alt: "Crane Installation",
-      label: "Installation / Disassembly",
-    },
-  ];
-
   return (
     <div className="m-2 px-4 py-6 sm:p-5 lg:px-8">
       <h1 className="text-2xl sm:text-3xl lg:text-4xl uppercase font-medium tracking-widest text-center mb-8 sm:mb-10">
@@ -48,7 +59,7 @@ function Services() {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
       >
-        {services.map(({ src, alt, label }) => (
+        {SERVICES.map(({ src, alt, label }) => (
           <MotionLink
             to={`/services#${encodeURIComponent(slugify(label))}`}
             key={label}
@@ -59,6 +70,7 @@ function Services() {
               <img
                 src={src}
                 alt={alt}
+                loading="lazy"
                 className="h-56 w-full object-cover sm:h-64 lg:h-72"
               />
             </div>

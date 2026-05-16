@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { messageApi } from "../../../services/messageApi";
+
+import {
+  FloatingInput,
+  FloatingSelect,
+  FloatingTextarea,
+} from "../../ui/form/FloatingFields";
 
 const INITIAL_FORM = {
   salutation: "",
@@ -17,107 +22,22 @@ const SALUTATION_OPTIONS = ["Mr.", "Ms.", "Dr."];
 
 const COUNTRY_OPTIONS = ["USA", "Germany", "Poland"];
 
-function FloatingInput({
-  id,
-  name,
-  label,
-  type = "text",
-  value,
-  onChange,
-  required = false,
-  autoComplete,
-}) {
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        autoComplete={autoComplete}
-        className="peer block h-6 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
+function getErrorMessage(error) {
+  const responseData = error?.response?.data;
 
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-0 flex h-6 items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
-}
+  if (responseData?.message) {
+    return responseData.message;
+  }
 
-function FloatingSelect({
-  id,
-  name,
-  label,
-  value,
-  onChange,
-  options,
-  required = false,
-}) {
-  const hasValue = Boolean(value);
+  if (responseData?.details) {
+    const firstDetail = Object.values(responseData.details)[0];
 
-  return (
-    <div className="relative">
-      <label htmlFor={id} className="mb-1 block text-sm text-black/50">
-        {label}
-      </label>
-      <select
-        id={id}
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className="block h-6 w-full border-b border-b-black/20 bg-transparent text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      >
-        <option value="" disabled>
-          Select...
-        </option>
+    if (firstDetail) {
+      return firstDetail;
+    }
+  }
 
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function FloatingTextarea({
-  id,
-  name,
-  label,
-  value,
-  onChange,
-  required = false,
-}) {
-  return (
-    <div className="relative">
-      <textarea
-        id={id}
-        name={name}
-        rows={3}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder=" "
-        className="peer block min-h-5 w-full resize-none border-b border-b-black/20 bg-transparent pt-2 text-sm text-gray-900 transition focus:border-black focus:outline-none"
-      />
-
-      <label
-        htmlFor={id}
-        className="absolute left-0 top-2 flex items-center text-base text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-sm peer-focus:text-black/50 peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-black/50"
-      >
-        {label}
-      </label>
-    </div>
-  );
+  return "There was an error submitting the form. Please try again.";
 }
 
 function ContactForm({ onClose }) {
@@ -138,7 +58,7 @@ function ContactForm({ onClose }) {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = event.target;
+    const { name, value } = e.target;
 
     setForm((currentForm) => ({
       ...currentForm,
@@ -212,22 +132,19 @@ function ContactForm({ onClose }) {
 
     try {
       // send to backend
-      await axios.post(`${API_URL}/messages`, payload);
+      await messageApi.create(payload);
 
       // on success, close the modal
       setSuccess("✅ Your message was sent successfully!");
       setForm(INITIAL_FORM);
-      if (autoCloseOnSuccess && onClose) {
+      if (onClose) {
         closeTimerRef.current = setTimeout(() => {
           onClose();
         }, 2000);
       }
     } catch (error) {
       console.error("Failed to send message:", error);
-      setError(
-        err.response?.data?.message ||
-          "There was an error submitting the form. Please try again."
-      );
+      setError(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -239,7 +156,7 @@ function ContactForm({ onClose }) {
       className="flex flex-col w-full max-w-xl mx-auto px-5 py-7 sm:px-8"
     >
       <div className="mb-8 text-center">
-        <h2 className="text-2xl semifont-bold tracking-tight text-gray-900 sm:text-3xl">
+        <h2 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
           Contact Us
         </h2>
         <p className="mt-2 text-sm leading-6 text-gray-500">
@@ -258,6 +175,17 @@ function ContactForm({ onClose }) {
           {error}
         </div>
       )}
+
+      <input
+        type="text"
+        name="website"
+        value={form.website}
+        onChange={handleChange}
+        tabIndex="-1"
+        autoComplete="off"
+        className="hidden"
+        aria-hidden="true"
+      />
 
       <div className="space-y-8">
         <FloatingSelect
@@ -330,6 +258,8 @@ function ContactForm({ onClose }) {
           value={form.message}
           onChange={handleChange}
           required
+          rows={3}
+          maxLength={3000}
         />
       </div>
 

@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import AvailabilityRange from "../cranes/AvailabilityRange";
 import Modal from "../ui/Modal";
 
+import { getCraneId } from "../../utils/craneHelpers";
+
 function formatDate(dateValue) {
   if (!dateValue) return "Not specified";
 
@@ -36,8 +38,13 @@ function getStatusBadgeClass(status) {
   );
 }
 
+function getStatusLabel(status) {
+  return (status || "new").replace(/_/g, " ");
+}
+
 function InquiryCard({
-  _id: inquiryId,
+  _id,
+  id,
   customerName,
   email,
   message,
@@ -52,8 +59,12 @@ function InquiryCard({
   onCloseModal,
   showDetailsOnly = false,
 }) {
+  const inquiryId = id || _id;
+  const craneId = getCraneId(crane);
+
   const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState(initialStatus || "new");
+
   const [editPeriod, setEditPeriod] = useState({
     periodStart: getDateInputValue(initialPeriod?.from),
     periodEnd: getDateInputValue(initialPeriod?.to),
@@ -62,6 +73,7 @@ function InquiryCard({
   // confirmation delete state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setEditPeriod({
@@ -71,23 +83,27 @@ function InquiryCard({
   }, [initialPeriod]);
 
   const statusLabel = useMemo(
-    () => (initialStatus || "new").replace(/_/g, " "),
+    () => getStatusLabel(initialStatus),
     [initialStatus]
   );
 
   const saveHandler = async () => {
+    if (!inquiryId || saving) return;
+
     const requestBody = {
       status,
     };
 
     if (editPeriod.periodStart && editPeriod.periodEnd) {
       requestBody.period = {
-        from: new Date(editPeriod.periodStart),
-        to: new Date(editPeriod.periodEnd),
+        from: editPeriod.periodStart,
+        to: editPeriod.periodEnd,
       };
     }
 
     try {
+      setSaving(true);
+
       await onUpdate?.(inquiryId, requestBody);
       setIsEditing(false);
     } catch (error) {
@@ -111,6 +127,8 @@ function InquiryCard({
 
   // actual delete + close both modals
   const confirmDelete = async () => {
+    if (!inquiryId || deleting) return;
+
     try {
       setDeleting(true);
       await onDelete?.(inquiryId);
@@ -146,9 +164,9 @@ function InquiryCard({
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start">
               <p>
                 <strong>Crane:</strong>{" "}
-                {crane?._id ? (
+                {craneId ? (
                   <Link
-                    to={`/cranes/${crane._id}`}
+                    to={`/cranes/${craneId}`}
                     className="text-red-600 hover:underline"
                   >
                     {crane?.title || "View crane"}
@@ -237,6 +255,7 @@ function InquiryCard({
             <button
               type="button"
               onClick={cancelHandler}
+              disabled={saving}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded transition hover:bg-gray-300"
             >
               Cancel
@@ -244,9 +263,10 @@ function InquiryCard({
             <button
               type="button"
               onClick={saveHandler}
+              disabled={saving}
               className="px-4 py-2 bg-orange-600 text-white rounded transition hover:bg-orange-700"
             >
-              Save
+              {saving ? "Saving..." : "Save"}
             </button>
           </div>
         </>

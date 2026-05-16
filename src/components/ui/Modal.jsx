@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function Modal({
   children,
@@ -7,46 +7,70 @@ function Modal({
   widthClass = "w-full max-w-3xl",
   panelClass = "",
   contentClass = "p-4 sm:p-6 lg:p-8",
+  closeOnOverlayClick = true,
+  ariaLabel = "Dialog",
 }) {
+  const panelRef = useRef(null);
+  const previouslyFocusedElementRef = useRef(null);
+
   // lock scroll when open
   useEffect(() => {
     if (!isOpen) return;
 
+    previouslyFocusedElementRef.current = document.activeElement;
+
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    window.setTimeout(() => {
+      panelRef.current?.focus();
+    }, 0);
 
     return () => {
       document.body.style.overflow = previousOverflow;
     };
+
+    if (
+      previouslyFocusedElementRef.current instanceof HTMLElement &&
+      document.body.contains(previouslyFocusedElementRef.current)
+    ) {
+      previouslyFocusedElementRef.current.focus();
+    }
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const onKey = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         onClose();
-        // blur whichever element was focused (so you don’t end up with that little outline)
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur();
-        }
       }
     };
 
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const handleOverlayClick = () => {
+    if (!closeOnOverlayClick) return;
+
+    onClose?.();
+  };
 
   return (
     <div
       className="fixed inset-0 z-[90] bg-black/50 flex items-center justify-center p-4 sm:p-6"
-      onClick={onClose}
+      onClick={handleOverlayClick}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-label={ariaLabel}
+        tabIndex={-1}
         className={`max-h-[90vh] w-full bg-white rounded-2xl relative ${widthClass} ${panelClass}`}
         onClick={(e) => e.stopPropagation()}
       >

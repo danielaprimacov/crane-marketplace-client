@@ -7,6 +7,23 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
+function normalizeRange(value, min, max) {
+  if (!Array.isArray(value) || value.length !== 2) {
+    return [min, max];
+  }
+
+  const rawMin = Number(value[0]);
+  const rawMax = Number(value[1]);
+
+  const safeMin = Number.isFinite(rawMin) ? rawMin : min;
+  const safeMax = Number.isFinite(rawMax) ? rawMax : max;
+
+  const clampedMin = clamp(safeMin, min, max);
+  const clampedMax = clamp(safeMax, clampedMin, max);
+
+  return [clampedMin, clampedMax];
+}
+
 function RangeDropDown({
   label,
   min,
@@ -16,12 +33,20 @@ function RangeDropDown({
   onChange,
   onApply,
 }) {
-  const [local, setLocal] = useState(value);
+  const controlledValue = normalizeRange(value, min, max);
+  const [local, setLocal] = useState(controlledValue);
 
   // if parent value changes (e.g. reset filters), sync
   useEffect(() => {
-    setLocal(value);
-  }, [value]);
+    setLocal(controlledValue);
+  }, [controlledValue[0], controlledValue[1]]);
+
+  const updateLocal = (nextValue) => {
+    const normalized = normalizeRange(nextValue, min, max);
+
+    setLocal(normalized);
+    onChange?.(normalized);
+  };
 
   const handleMinInputChange = (rawValue) => {
     if (rawValue === "") {
@@ -29,8 +54,15 @@ function RangeDropDown({
       return;
     }
 
-    const nextMin = clamp(Number(rawValue), min, local[1]);
-    setLocal([nextMin, local[1]]);
+    const parsedValue = Number(rawValue);
+
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    const nextMin = clamp(parsedValue, min, local[1]);
+
+    updateLocal([nextMin, local[1]]);
   };
 
   const handleMaxInputChange = (rawValue) => {
@@ -39,21 +71,31 @@ function RangeDropDown({
       return;
     }
 
-    const nextMax = clamp(Number(rawValue), local[0], max);
-    setLocal([local[0], nextMax]);
+    const parsedValue = Number(rawValue);
+
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    const nextMax = clamp(parsedValue, local[0], max);
+
+    updateLocal([local[0], nextMax]);
   };
 
   return (
     <Popover className="relative w-full sm:w-auto sm:min-w-[12rem]">
       {({ open }) => (
         <>
-          {" "}
-          <Popover.Button className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-gray-300 bg-white px-4 text-left transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-600/15">
+          <Popover.Button
+            aria-label={`Open ${label} range filter`}
+            className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-gray-300 bg-white px-4 text-left transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-600/15"
+          >
             <span className="truncate text-sm text-gray-800">{label}</span>
             <ChevronDown
               className={`h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200 ${
                 open ? "rotate-180" : ""
               }`}
+              aria-hidden="true"
             />
           </Popover.Button>
           <Transition
@@ -75,39 +117,56 @@ function RangeDropDown({
                         step={step}
                         min={min}
                         max={max}
-                        onChange={(vals) => {
-                          setLocal(vals);
-                          onChange?.(vals);
+                        onChange={updateLocal}
+                        renderTrack={({ props, children }) => {
+                          const { key, ...trackProps } = props;
+
+                          return (
+                            <div
+                              key={key}
+                              {...trackProps}
+                              className="flex h-2 w-full rounded-lg"
+                              style={{
+                                ...trackProps.style,
+                                background: getTrackBackground({
+                                  values: local,
+                                  colors: ["#E5E7EB", "#ef4444", "#E5E7EB"],
+                                  min,
+                                  max,
+                                }),
+                                touchAction: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
+                            >
+                              {children}
+                            </div>
+                          );
                         }}
-                        renderTrack={({ props, children }) => (
-                          <div
-                            {...props}
-                            className="flex h-2 w-full rounded-lg"
-                            style={{
-                              ...props.style,
-                              background: getTrackBackground({
-                                values: local,
-                                colors: ["#E5E7EB", "#ef4444", "#E5E7EB"],
-                                min,
-                                max,
-                              }),
-                            }}
-                          >
-                            {children}
-                          </div>
-                        )}
-                        renderThumb={({ props }) => (
-                          <div
-                            {...props}
-                            className="h-4 w-4 rounded-full border border-gray-400 bg-white shadow"
-                          />
-                        )}
+                        renderThumb={({ props }) => {
+                          const { key, style, ...thumbProps } = props;
+
+                          return (
+                            <div
+                              key={key}
+                              {...thumbProps}
+                              className="h-4 w-4 rounded-full border border-gray-400 bg-white shadow"
+                              style={{
+                                ...style,
+                                touchAction: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
+                            />
+                          );
+                        }}
                       />
                     </div>
 
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
+                        aria-label={`${label} minimum value`}
                         className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none transition focus:border-red-500"
                         value={local[0]}
                         min={min}
@@ -117,6 +176,7 @@ function RangeDropDown({
                       <span className="shrink-0 text-sm text-gray-500">–</span>
                       <input
                         type="number"
+                        aria-label={`${label} maximum value`}
                         className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none transition focus:border-red-500"
                         value={local[1]}
                         min={local[0]}

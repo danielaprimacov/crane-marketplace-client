@@ -1,46 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import { AuthContext } from "../context/auth.context";
+import { craneApi } from "../services/craneApi";
+
 import LoadingState from "../components/ui/LoadingState";
 import ErrorState from "../components/ui/ErrorState";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-function getOwnerId(crane) {
-  if (!crane?.owner) return null;
-
-  if (typeof crane.owner === "string") {
-    return crane.owner;
-  }
-
-  return crane.owner._id || null;
-}
-
-function getImageUrl(crane) {
-  if (!Array.isArray(crane.images) || crane.images.length === 0) {
-    return null;
-  }
-
-  const firstImage = crane.images[0];
-
-  if (typeof firstImage === "string") {
-    return firstImage;
-  }
-
-  return firstImage?.url || firstImage?.secure_url || null;
-}
-
-function getCraneModel(crane) {
-  return [
-    crane.seriesCode,
-    crane.capacityClassNumber ? `${crane.capacityClassNumber}t` : "",
-    crane.variantRevision?.trim(),
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
+import { getCraneId, getCraneModel, getImageUrl } from "../utils/craneHelpers";
 
 function InitialsBadge({ name = "" }) {
   const initials =
@@ -60,12 +27,13 @@ function InitialsBadge({ name = "" }) {
 }
 
 function CraneCard({ crane }) {
+  const craneId = getCraneId(crane);
   const imageUrl = getImageUrl(crane);
   const model = getCraneModel(crane);
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <Link to={`/cranes/${crane._id}`} className="block">
+      <Link to={`/cranes/${craneId}`} className="block">
         <div className="h-40 w-full overflow-hidden bg-gray-100 sm:h-44">
           {imageUrl ? (
             <img
@@ -94,14 +62,14 @@ function CraneCard({ crane }) {
 
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            to={`/cranes/${crane._id}`}
+            to={`/cranes/${craneId}`}
             className="inline-flex justify-center rounded-lg border border-red-600 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
           >
             View
           </Link>
 
           <Link
-            to={`/cranes/edit/${crane._id}`}
+            to={`/cranes/edit/${craneId}`}
             className="inline-flex justify-center rounded-lg border border-green-600 px-3 py-2 text-sm font-medium text-green-700 transition hover:bg-green-50"
           >
             Edit
@@ -124,7 +92,7 @@ function ProfilePage() {
   useEffect(() => {
     if (isLoading) return;
 
-    if (!user?._id) {
+    if (!user) {
       setLoadingCranes(false);
       setMyCranes([]);
       return;
@@ -137,25 +105,11 @@ function ProfilePage() {
       setError("");
 
       try {
-        const storedToken = localStorage.getItem("authToken");
-
-        if (!storedToken) {
-          setError("You are not authorized to view your cranes.");
-          return;
-        }
-
-        const { data } = await axios.get(`${API_URL}/cranes`, {
-          headers: { Authorization: `Bearer ${storedToken}` },
+        const cranes = await craneApi.getMine({
           signal: controller.signal,
         });
 
-        const safeCranes = Array.isArray(data) ? data : [];
-
-        const owned = safeCranes.filter(
-          (crane) => getOwnerId(crane) === user._id
-        );
-
-        setMyCranes(owned);
+        setMyCranes(Array.isArray(cranes) ? cranes : []);
       } catch (err) {
         if (err.code === "ERR_CANCELED") return;
 
@@ -172,7 +126,7 @@ function ProfilePage() {
     return () => {
       controller.abort();
     };
-  }, [isLoading, user?._id]);
+  }, [isLoading, user]);
 
   if (isLoading) {
     return (
@@ -275,7 +229,7 @@ function ProfilePage() {
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {myCranes.map((crane) => (
-              <CraneCard key={crane._id} crane={crane} />
+              <CraneCard key={getCraneId(crane)} crane={crane} />
             ))}
           </div>
         )}

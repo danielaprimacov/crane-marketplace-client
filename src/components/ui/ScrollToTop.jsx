@@ -6,13 +6,19 @@ function isProducerRoute(pathname) {
 }
 
 export default function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const previousPathnameRef = useRef(pathname);
 
   useEffect(() => {
-    if ("scrollRestoration" in window.history) {
-      window.history.scrollRestoration = "manual";
-    }
+    if (!("scrollRestoration" in window.history)) return;
+
+    const previousScrollRestoration = window.history.scrollRestoration;
+
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
   }, []);
 
   useEffect(() => {
@@ -21,12 +27,17 @@ export default function ScrollToTop() {
     const isProducerToProducer =
       isProducerRoute(previousPathname) && isProducerRoute(pathname);
 
+    if (hash) {
+      previousPathnameRef.current = pathname;
+      return;
+    }
+
     if (!isProducerToProducer) {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
 
     previousPathnameRef.current = pathname;
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }

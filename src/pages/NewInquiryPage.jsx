@@ -1,11 +1,11 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useParams } from "react-router-dom";
 
 import AddInquiryForm from "../components/forms/inquiry/AddInquiryForm";
 import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { craneApi } from "../services/craneApi";
 
 function NewInquiryPage() {
   const { craneId } = useParams();
@@ -27,14 +27,19 @@ function NewInquiryPage() {
       setLoading(true);
       setError("");
       try {
-        const { data } = await axios.get(`${API_URL}/cranes/${craneId}`, {
+        const data = await craneApi.getById(craneId, {
           signal: controller.signal,
         });
         setCrane(data);
       } catch (err) {
         if (err.code === "ERR_CANCELED") return;
+
         console.error("Could not load crane details:", err);
-        setError("Could not load crane details.");
+
+        setError(
+          err?.response?.data?.message || "Could not load crane details."
+        );
+        setCrane(null);
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
@@ -52,39 +57,37 @@ function NewInquiryPage() {
   if (loading) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
-        <LoadingState />
+        <LoadingState
+          type="cranes"
+          title="Loading crane details..."
+          message="We are loading the crane information for your inquiry."
+          fullPage
+        />
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 shadow-sm">
-          <h1 className="text-lg font-semibold text-red-700">
-            Inquiry unavailable
-          </h1>
-
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-
-          <Link
-            to="/cranes"
-            className="mt-5 inline-flex rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
-          >
-            Back to cranes
-          </Link>
-        </div>
-      </main>
+      <ErrorState
+        title="Inquiry unavailable"
+        message={error}
+        actionTo="/cranes"
+        actionLabel="Back to cranes"
+        fullPage
+      />
     );
   }
 
   if (!crane) {
     return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
-          Crane not found.
-        </div>
-      </main>
+      <ErrorState
+        title="Crane not found"
+        message="The crane could not be found or is no longer available."
+        actionTo="/cranes"
+        actionLabel="Back to cranes"
+        fullPage
+      />
     );
   }
 

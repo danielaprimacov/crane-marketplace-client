@@ -1,7 +1,9 @@
 import { useState } from "react";
 
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import {
+  CheckCircleIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/24/outline";
 
 import VideoComponent from "../components/home/VideoComponent";
 import ArrowDownIcon from "../components/ui/ArrowDownIcon";
@@ -20,7 +22,7 @@ import towerCrane from "../assets/images/tower-crane.webp";
 import mobileCrane from "../assets/images/mobile-crane.jpg";
 import crawlerCrane from "../assets/images/crawler-crane.png";
 
-const jobNeeds = [
+const JOB_NEEDS = [
   {
     question: "What are you lifting?",
     answer: (
@@ -49,7 +51,7 @@ const jobNeeds = [
   },
 ];
 
-const craneTypes = [
+const CRANE_TYPES = [
   {
     title: "Tower",
     text: "Tall-building projects, compact footprint on tight city sites.",
@@ -67,7 +69,7 @@ const craneTypes = [
   },
 ];
 
-const filterItems = [
+const FILTER_ITEMS = [
   {
     title: "Capacity",
     text: "enter the minimum tonnage you require.",
@@ -86,7 +88,7 @@ const filterItems = [
   },
 ];
 
-const cardIncludes = [
+const CARD_INCLUDES = [
   "High-resolution photos",
   "Key specs: capacity, lift height, crane type",
   "Transparent pricing: purchase price or rental rate",
@@ -125,6 +127,14 @@ function CranesPage() {
   const [videoMuted, setVideoMuted] = useState(true);
   const [isAdviceOpen, setAdviceOpen] = useState(false);
 
+  const openAdviceModal = () => {
+    setAdviceOpen(true);
+  };
+
+  const closeAdviceModal = () => {
+    setAdviceOpen(false);
+  };
+
   return (
     <>
       <section className="relative w-full h-screen overflow-hidden">
@@ -134,7 +144,7 @@ function CranesPage() {
           poster={videoPoster}
           muted={videoMuted}
           onMuteChange={setVideoMuted}
-          interactive={true}
+          interactive
           blurred={false}
         />
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
@@ -144,7 +154,7 @@ function CranesPage() {
             }`}
           >
             <p className="max-w-5xl text-4xl font-semibold uppercase tracking-wide text-red-600 [text-shadow:2px_2px_4px_rgba(0,0,0,0.65)] sm:text-5xl md:text-6xl lg:text-7xl">
-              Get crane choosing advice
+              Crane Selection Guide
             </p>
 
             <p className="mt-4 text-lg uppercase tracking-tight text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.65)] sm:text-xl md:text-2xl lg:text-3xl">
@@ -167,7 +177,7 @@ function CranesPage() {
         <Section title="Define Your Job Needs">
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] lg:gap-16">
             <ul className="space-y-8">
-              {jobNeeds.map((item) => (
+              {JOB_NEEDS.map((item) => (
                 <li
                   key={item.question}
                   className="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm sm:p-6"
@@ -179,6 +189,7 @@ function CranesPage() {
                   <img
                     src={downArrow}
                     alt=""
+                    loading="lazy"
                     className="mx-auto my-3 h-6 w-6"
                     aria-hidden="true"
                   />
@@ -212,7 +223,7 @@ function CranesPage() {
           subtitle="On KranHub you will see three main categories. Use the crane type as the first practical filter before comparing exact models."
         >
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {craneTypes.map(({ title, text, image }) => (
+            {CRANE_TYPES.map(({ title, text, image }) => (
               <article
                 key={title}
                 className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
@@ -221,6 +232,7 @@ function CranesPage() {
                   <img
                     src={image}
                     alt={`${title} crane`}
+                    loading="lazy"
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
 
@@ -259,7 +271,7 @@ function CranesPage() {
                 </h3>
 
                 <ul className="space-y-4">
-                  {filterItems.map((item) => (
+                  {FILTER_ITEMS.map((item) => (
                     <li key={item.title} className="leading-7">
                       <span className="font-semibold text-gray-900">
                         {item.title} —
@@ -276,7 +288,7 @@ function CranesPage() {
                 </h3>
 
                 <ul className="space-y-4">
-                  {cardIncludes.map((item) => (
+                  {CARD_INCLUDES.map((item) => (
                     <li key={item} className="flex items-start">
                       <CheckCircleIcon className="mt-1 h-5 w-5 shrink-0 text-green-500" />
                       <span className="ml-3 leading-7 text-gray-700">
@@ -319,7 +331,7 @@ function CranesPage() {
 
             <button
               type="button"
-              onClick={() => setAdviceOpen(true)}
+              onClick={openAdviceModal}
               className="mt-6 inline-flex items-center justify-center rounded-full bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             >
               Get Expert Advice
@@ -330,12 +342,13 @@ function CranesPage() {
 
       <Modal
         isOpen={isAdviceOpen}
-        onClose={() => setAdviceOpen(false)}
+        onClose={closeAdviceModal}
         widthClass="w-[92vw] max-w-[38rem]"
         panelClass="max-h-[92dvh] overflow-y-auto"
         contentClass="p-0"
+        ariaLabel="Expert advice form"
       >
-        <ExpertForm onClose={() => setAdviceOpen(false)} />
+        <ExpertForm onClose={closeAdviceModal} />
       </Modal>
     </>
   );

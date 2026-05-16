@@ -2,7 +2,9 @@ import { motion } from "framer-motion";
 
 import CranePromoCard from "../cranes/cards/CranePromoCard";
 
-function LastAddedCranes({ recentCranes }) {
+import { getCraneId } from "../../utils/craneHelpers.js";
+
+function LastAddedCranes({ recentCranes = [] }) {
   const lastCranesContainer = {
     hidden: {},
     show: { transition: { staggerChildren: 0.15 } },
@@ -12,6 +14,10 @@ function LastAddedCranes({ recentCranes }) {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.7 } },
   };
+
+  const displayedCranes = Array.isArray(recentCranes)
+    ? recentCranes.slice(0, 4)
+    : [];
 
   return (
     <motion.div
@@ -28,8 +34,8 @@ function LastAddedCranes({ recentCranes }) {
         Last Added Cranes
       </motion.h1>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {recentCranes.slice(0, 4).map((crane) => (
-          <motion.div key={crane._id} variants={lastCranesItem}>
+        {displayedCranes.map((crane) => (
+          <motion.div key={getCraneId(crane)} variants={lastCranesItem}>
             <CranePromoCard crane={crane} />
           </motion.div>
         ))}

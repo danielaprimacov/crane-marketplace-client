@@ -1,6 +1,5 @@
-import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { useParams, Link } from "react-router-dom";
 
 import ProducersSidebar from "../components/cranes/ProducersSidebar";
 import FilterDropDown from "../components/ui/FilterDropDown";
@@ -8,9 +7,15 @@ import RangeDropDown from "../components/ui/RangeDropDown";
 import LoadingState from "../components/ui/LoadingState";
 import ErrorState from "../components/ui/ErrorState";
 
+import { craneApi } from "../services/craneApi";
+
 import { slugify, formatPrice, getMinMax } from "../utils/helpers";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import {
+  getCraneId,
+  getImageUrl,
+  getCraneModel,
+} from "../utils/craneHelpers";
 
 const INITIAL_FILTERS = {
   capacityMin: "",
@@ -26,39 +31,15 @@ const INITIAL_FILTERS = {
 };
 
 function getCranePrice(crane) {
-  if (crane.status === "for sale") {
+  if (crane?.status === "for sale") {
     return Number(crane.salePrice) || 0;
   }
 
-  if (crane.status === "for rent") {
+  if (crane?.status === "for rent") {
     return Number(crane.rentPrice?.amount) || 0;
   }
 
   return 0;
-}
-
-function getCraneModel(crane) {
-  return [
-    crane.seriesCode,
-    crane.capacityClassNumber ? `${crane.capacityClassNumber}t` : "",
-    crane.variantRevision?.trim(),
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function getImageUrl(crane) {
-  if (!Array.isArray(crane.images) || crane.images.length === 0) {
-    return null;
-  }
-
-  const firstImage = crane.images[0];
-
-  if (typeof firstImage === "string") {
-    return firstImage;
-  }
-
-  return firstImage?.url || firstImage?.secure_url || null;
 }
 
 function formatStatus(status) {
@@ -95,12 +76,15 @@ function StaticFilterValue({ label, value, suffix = "" }) {
 }
 
 function CraneCard({ crane }) {
+  const craneId = getCraneId(crane);
   const model = getCraneModel(crane);
   const imageUrl = getImageUrl(crane);
 
+  if (!craneId) return null;
+
   return (
     <Link
-      to={`/cranes/${crane._id}`}
+      to={`/cranes/${craneId}`}
       className="group overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="h-52 w-full overflow-hidden bg-gray-100">
@@ -111,9 +95,6 @@ function CraneCard({ crane }) {
             alt={crane.title || model || "Crane"}
             loading="lazy"
             referrerPolicy="no-referrer"
-            onError={(event) => {
-              console.log("Image failed:", event.currentTarget.src);
-            }}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100 text-sm text-gray-400">
@@ -157,6 +138,11 @@ function ProducerPage() {
   // Filters state
   const [filters, setFilters] = useState(INITIAL_FILTERS);
 
+  const [capRange, setCapRange] = useState([0, 0]);
+  const [hRange, setHRange] = useState([0, 0]);
+  const [rRange, setRRange] = useState([0, 0]);
+  const [pRange, setPRange] = useState([0, 0]);
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -165,7 +151,7 @@ function ProducerPage() {
       setError("");
 
       try {
-        const { data } = await axios.get(`${API_URL}/cranes`, {
+        const data = await craneApi.getAll({
           signal: controller.signal,
         });
 
@@ -180,8 +166,8 @@ function ProducerPage() {
       } catch (err) {
         if (err.code === "ERR_CANCELED") return;
 
-        console.error("Unable to load cranes:", err);
-        setError("Unable to load cranes.");
+        setError(error?.response?.data?.message || "Unable to load cranes.");
+        setCranes([]);
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
@@ -199,25 +185,28 @@ function ProducerPage() {
   // group all cranes by producer for the sidebar
   const groupedProducers = useMemo(() => {
     const byProducer = cranes.reduce((acc, crane) => {
-      if (!crane.producer) return acc;
+      const producerName =
+        typeof crane?.producer === "string" ? crane.producer.trim() : "";
 
-      acc[crane.producer] = acc[crane.producer] || [];
-      acc[crane.producer].push(crane);
+      if (!producerName) return acc;
+
+      acc[producerName] = acc[producerName] || [];
+      acc[producerName].push(crane);
 
       return acc;
     }, {});
 
     return Object.entries(byProducer)
-      .map(([name, list]) => {
-        const models = list.map((crane, index) => {
-          const label =
-            getCraneModel(crane) || crane.title || `Model ${index + 1}`;
-
-          return { id: crane._id, label };
-        });
-        return { name, slug: slugify(name), models };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .map(([name, list]) => ({
+        name,
+        slug: slugify(name),
+        models: list,
+      }))
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          sensitivity: "base",
+        })
+      );
   }, [cranes]);
 
   const activeGroup = useMemo(() => {
@@ -227,7 +216,12 @@ function ProducerPage() {
   const producerCranes = useMemo(() => {
     if (!activeGroup) return [];
 
-    return cranes.filter((crane) => crane.producer === activeGroup.name);
+    return cranes.filter((crane) => {
+      const producerName =
+        typeof crane?.producer === "string" ? crane.producer.trim() : "";
+
+      return producerName === activeGroup.name;
+    });
   }, [cranes, activeGroup]);
 
   const [minCap, maxCap] = useMemo(
@@ -249,11 +243,6 @@ function ProducerPage() {
     () => getMinMax(producerCranes, (c) => c.price ?? 0),
     [producerCranes]
   );
-
-  const [capRange, setCapRange] = useState([minCap, maxCap]);
-  const [hRange, setHRange] = useState([minH, maxH]);
-  const [rRange, setRRange] = useState([minR, maxR]);
-  const [pRange, setPRange] = useState([minP, maxP]);
 
   useEffect(() => {
     setCapRange([minCap, maxCap]);
@@ -361,7 +350,7 @@ function ProducerPage() {
   };
 
   if (loading) {
-    return <LoadingState type="cranes" title="Loading cranes..." />;
+    return <LoadingState type="cranes" title="Loading cranes..." fullPage />;
   }
 
   if (error) {
@@ -540,9 +529,10 @@ function ProducerPage() {
                 </p>
               ) : (
                 <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {filteredCranes.map((crane) => (
-                    <CraneCard key={crane._id} crane={crane} />
-                  ))}
+                  {filteredCranes.map((crane) => {
+                    const craneId = getCraneId(crane);
+                    return <CraneCard key={craneId} crane={crane} />;
+                  })}
                 </div>
               )}
             </div>

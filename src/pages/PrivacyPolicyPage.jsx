@@ -14,9 +14,21 @@ const COMPANY = {
   country: "Germany",
   phone: "+49 30 123 4567",
   email: "privacy@kranhub.com",
+  emailHref: "mailto:privacy@kranhub.com",
 };
 
-const lastUpdated = "June 2025";
+const LAST_UPDATED = "June 2025";
+
+function ContactLink({ href, children }) {
+  return (
+    <a
+      href={href}
+      className="font-medium text-red-600 underline-offset-4 transition hover:underline"
+    >
+      {children}
+    </a>
+  );
+}
 
 function Section({ icon: Icon, title, children }) {
   return (
@@ -51,7 +63,39 @@ function BulletList({ items }) {
   );
 }
 
+function LegalWarning() {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900">
+      <strong>Important:</strong> This page is a template. It must be adapted to
+      the real KranHub business model, actual tools, hosting setup, processors,
+      cookie categories, third-party services, retention periods, and whether
+      the platform is B2B-only or also available to consumers.
+    </div>
+  );
+}
+
+function DataControllerSection() {
+  return (
+    <Section icon={ShieldCheckIcon} title="Data Controller">
+      <address className="not-italic">
+        <p className="font-semibold text-gray-900">{COMPANY.name}</p>
+        <p>{COMPANY.street}</p>
+        <p>
+          {COMPANY.city}, {COMPANY.country}
+        </p>
+        <p>Phone: {COMPANY.phone}</p>
+        <p>
+          Email:{" "}
+          <ContactLink href={COMPANY.emailHref}>{COMPANY.email}</ContactLink>
+        </p>
+      </address>
+    </Section>
+  );
+}
+
 function PrivacyPolicyPage() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
       <article className="mx-auto w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-lg">
@@ -69,36 +113,14 @@ function PrivacyPolicyPage() {
           </p>
 
           <p className="mt-4 text-xs text-red-100">
-            Last updated: {lastUpdated}
+            Last updated: {LAST_UPDATED}
           </p>
         </header>
 
         <div className="space-y-10 px-5 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:px-10">
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900">
-            <strong>Important:</strong> This page is a template. It must be
-            adapted to the real KranHub business model, especially if the
-            platform offers paid listings, crane rental, crane sales, transport,
-            installation, brokerage, B2B-only services, or consumer contracts.
-          </div>
-          <Section icon={ShieldCheckIcon} title="Data Controller">
-            <address className="not-italic">
-              <p className="font-semibold text-gray-900">{COMPANY.name}</p>
-              <p>{COMPANY.street}</p>
-              <p>
-                {COMPANY.city}, {COMPANY.country}
-              </p>
-              <p>Phone: {COMPANY.phone}</p>
-              <p>
-                Email:{" "}
-                <a
-                  href={`mailto:${COMPANY.email}`}
-                  className="font-medium text-red-600 underline-offset-4 hover:underline"
-                >
-                  {COMPANY.email}
-                </a>
-              </p>
-            </address>
-          </Section>
+          <LegalWarning />
+
+          <DataControllerSection />
 
           <Section icon={DocumentTextIcon} title="Personal Data We Collect">
             <p>
@@ -188,6 +210,20 @@ function PrivacyPolicyPage() {
             />
           </Section>
 
+          <Section icon={ServerIcon} title="International Data Transfers">
+            <p>
+              Some service providers may process personal data outside the
+              European Economic Area. Where this happens, appropriate safeguards
+              should be used where required by law.
+            </p>
+
+            <p>
+              This section must be adapted to the real providers used by the
+              platform, for example hosting, email, image storage, analytics,
+              maps, reCAPTCHA, or newsletter tools.
+            </p>
+          </Section>
+
           <Section icon={LockClosedIcon} title="Data Retention">
             <p>
               We retain personal data only for as long as necessary for the
@@ -224,12 +260,9 @@ function PrivacyPolicyPage() {
 
             <p>
               To exercise your rights, contact us at{" "}
-              <a
-                href={`mailto:${COMPANY.email}`}
-                className="font-medium text-red-600 underline-offset-4 hover:underline"
-              >
+              <ContactLink href={COMPANY.emailHref}>
                 {COMPANY.email}
-              </a>
+              </ContactLink>
               .
             </p>
           </Section>
@@ -260,8 +293,7 @@ function PrivacyPolicyPage() {
           </Section>
 
           <footer className="border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} {COMPANY.name}. All rights
-            reserved.
+            &copy; {currentYear} {COMPANY.name}. All rights reserved.
           </footer>
         </div>
       </article>

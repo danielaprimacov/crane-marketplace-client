@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -8,6 +8,8 @@ import {
 } from "../../utils/imageHelpers";
 
 function Crane({
+  id,
+  _id,
   title,
   images,
   description,
@@ -15,8 +17,9 @@ function Crane({
   rentPrice,
   location,
   status,
-  _id,
 }) {
+  const craneId = id || _id;
+
   const validImages = getValidImages(images);
 
   const firstImageUrl = getImageUrl(validImages[0]);
@@ -29,10 +32,28 @@ function Crane({
 
   const [backgroundImage, setBackgroundImage] = useState(imageUrl);
 
+  useEffect(() => {
+    setBackgroundImage(imageUrl);
+  }, [imageUrl]);
+
+  const priceLabel =
+    status === "for sale" && salePrice != null
+      ? `${salePrice} €`
+      : status === "for rent" && rentPrice?.amount != null
+      ? `${rentPrice.amount} €/${rentPrice.interval}`
+      : "Contact for price";
+
+  const statusLabel =
+    status === "for sale"
+      ? "For Sale"
+      : status === "for rent"
+      ? "For Rent"
+      : status || "Status not set";
+
   return (
     <div className="group w-80 h-[35rem] p-2 flex flex-col gap-2 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow duration-300 ease-in">
       <h3 className="h-12 font-semibold text-lg flex items-center justify-center text-center">
-        {title}
+        {title || "Untitled crane"}
       </h3>
       <div
         className={`top-2 right-2 uppercase text-[10px] px-4 py-1 rounded-full font-semibold
@@ -44,10 +65,7 @@ function Crane({
             : "bg-gray-100 text-gray-800"
         }`}
       >
-        <div className="flex items-center gap-2">
-          {/* <img src={arrow} alt="Arrow Icon" className="h-4" /> */}
-          {status}
-        </div>
+        <div className="flex items-center gap-2">{statusLabel}</div>
       </div>
       <div
         className="w-full h-64 bg-cover bg-center transition-[background-image] duration-500"
@@ -65,17 +83,11 @@ function Crane({
         {description || ""}
       </p>
       <div className="ml-auto flex items-center justify-between text-gray-700">
-        <span className="font-medium mr-2">
-          {status === "for sale" && salePrice != null
-            ? `${salePrice} €`
-            : status === "for rent" && rentPrice?.amount != null
-            ? `${rentPrice.amount} €/${rentPrice.interval}`
-            : "Contact for price"}
-        </span>
+        <span className="font-medium mr-2">{priceLabel}</span>
       </div>
-      <div className="mb-2 pl-3 text-sm">{location}</div>
+      <div className="mb-2 pl-3 text-sm">{location || "Location not set"}</div>
       <Link
-        to={`/cranes/${_id}`}
+        to={`/cranes/${craneId}`}
         className="px-5 py-2 bg-black rounded-md text-white text-center hover:bg-orange-400 hover:text-black/70 transition duration-400 ease-in"
       >
         More Information

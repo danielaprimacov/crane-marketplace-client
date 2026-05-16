@@ -4,7 +4,7 @@ import craneTruckDeliveryAnimation from "../../assets/animations/craneTruckDeliv
 import doubleCircularLoading from "../../assets/animations/doubleCircularLoading.json";
 import profileAnimation from "../../assets/animations/profileAnimation.json";
 
-const animationMap = {
+const ANIMATION_MAP = {
   cranes: craneTruckDeliveryAnimation,
   profile: profileAnimation,
   default: doubleCircularLoading,
@@ -16,18 +16,16 @@ function LoadingState({
   message = "Please wait while we prepare the content.",
   fullPage = false,
 }) {
-  const animationData = animationMap[type] || animationMap.default;
+  const animationData = ANIMATION_MAP[type] || ANIMATION_MAP.default;
+
+  const wrapperClassName = fullPage
+    ? "flex min-h-[calc(100vh-6rem)] w-full items-center justify-center px-4 py-16"
+    : "flex w-full items-center justify-center px-4 py-12";
 
   return (
-    <div
-      className={
-        fullPage
-          ? "flex min-h-[calc(100vh-6rem)] w-full items-center justify-center px-4 py-16"
-          : "flex w-full items-center justify-center px-4 py-12"
-      }
-    >
+    <div className={wrapperClassName} role="status" aria-live="polite">
       <div className="flex max-w-md flex-col items-center text-center">
-        <div className="h-44 w-44 sm:h-56 sm:w-56">
+        <div className="h-44 w-44 sm:h-56 sm:w-56" aria-hidden="true">
           <Lottie
             key={type}
             animationData={animationData}

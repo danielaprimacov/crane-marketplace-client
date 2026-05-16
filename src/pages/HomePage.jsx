@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import HeroSection from "../components/home/HeroSection";
 import AllProducers from "../components/home/AllProducers";
 import Services from "../components/home/Services";
@@ -5,12 +7,20 @@ import LastAddedCranes from "../components/cranes/LastAddedCranes";
 import InformationSection from "../components/home/InformationSection";
 import OurClients from "../components/home/OurClients";
 
-import { useProducers } from "../hooks/useProducers";
 import useHomeCranes from "../hooks/useHomeCranes";
+import { slugify } from "../utils/helpers";
 
 function HomePage() {
-  const { producers } = useProducers();
   const { recentCranes, allProducers } = useHomeCranes();
+
+  const producers = useMemo(() => {
+    const safeProducers = Array.isArray(allProducers) ? allProducers : [];
+
+    return safeProducers.map((producer) => ({
+      name: producer,
+      slug: slugify(producer),
+    }));
+  }, [allProducers]);
 
   return (
     <>

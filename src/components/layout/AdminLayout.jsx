@@ -1,13 +1,16 @@
 import { useState, useEffect, useContext, useMemo } from "react";
 import { Outlet, Link, NavLink, useLocation } from "react-router-dom";
-import axios from "axios";
+
 import { AuthContext } from "../../context/auth.context";
-
 import { useProducers } from "../../hooks/useProducers";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { messageApi } from "../../services/messageApi";
+import { ROLES } from "../../constants/roles";
 
 import goBackIcon from "../../assets/icons/angle-double-small-left.png";
+
+function getArrayCount(value) {
+  return Array.isArray(value) ? value.length : 0;
+}
 
 function AdminLayout() {
   const { isLoggedIn, user } = useContext(AuthContext);
@@ -15,39 +18,45 @@ function AdminLayout() {
 
   const [messagesCount, setMessagesCount] = useState(0);
 
-  const { producers, loading: producersLoading } = useProducers();
+  const { producers = [], loading: producersLoading } = useProducers();
   const firstProducer = producers[0];
 
   const backTo = useMemo(() => {
-    if (producersLoading || !firstProducer) return "/cranes";
+    if (producersLoading || !firstProducer.slug) return "/cranes";
+
     return `/cranes/producers/${firstProducer.slug}`;
   }, [producersLoading, firstProducer]);
 
   useEffect(() => {
     // only for admins
-    if (!isLoggedIn || user?.role !== "admin") {
+    if (!isLoggedIn || user?.role !== ROLES.ADMIN) {
       setMessagesCount(0);
       return;
     }
+
+    let ignore = false;
+
     const fetchMessagesCount = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          setMessagesCount(0);
-          return;
-        }
+        const messages = await messageApi.getAllAdmin();
 
-        const { data } = await axios.get(`${API_URL}/messages`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setMessagesCount(data.length);
+        if (!ignore) {
+          setMessagesCount(getArrayCount(messages));
+        }
       } catch (err) {
         console.error("Failed to fetch message count", err);
+        if (!ignore) {
+          setMessagesCount(0);
+        }
       }
     };
 
     fetchMessagesCount();
-  }, [isLoggedIn, user?.role, pathname]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [isLoggedIn, user?.id, user?._id, user?.role, pathname]);
 
   const adminLinkClass = ({ isActive }) =>
     `relative inline-flex items-center border-b pb-1 text-sm sm:text-base transition ${
@@ -67,7 +76,12 @@ function AdminLayout() {
               to={backTo} // while producers are loading, fall back to /cranes
               className="w-fit inline-flex items-center text-gray-600 text-sm sm:text-base hover:text-gray-900 cursor-pointer"
             >
-              <img src={goBackIcon} alt="back" className="w-5 mr-2" />
+              <img
+                src={goBackIcon}
+                alt=""
+                aria-hidden="true"
+                className="w-5 mr-2"
+              />
               Back to cranes
             </Link>
             <nav className="flex flex-wrap items-center gap-5 sm:gap-6">
@@ -78,7 +92,7 @@ function AdminLayout() {
                 <span>All Messages</span>
                 {messagesCount > 0 && (
                   <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs text-white">
-                    {messagesCount}
+                    {messagesCount > 99 ? "99+" : messagesCount}
                   </span>
                 )}
               </NavLink>

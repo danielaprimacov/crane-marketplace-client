@@ -1,33 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { Link } from "react-router-dom";
 import { services, serviceLinkClass } from "../../../constants/navbar";
 
+const SERVICES_CLOSE_DELAY = 120;
+
 function ServicesAccordion({ servicesOpen, setServicesOpen, onLinkClick }) {
-  const servicesCloseTimer = useRef(null);
+  const servicesCloseTimerRef = useRef(null);
 
-  const openServicesMenu = () => {
-    if (servicesCloseTimer.current) {
-      clearTimeout(servicesCloseTimer.current);
-      servicesCloseTimer.current = null;
+  const clearCloseTimer = useCallback(() => {
+    if (servicesCloseTimerRef.current) {
+      clearTimeout(servicesCloseTimerRef.current);
+      servicesCloseTimerRef.current = null;
     }
-    setServicesOpen(true);
-  };
+  }, []);
 
-  const closeServicesMenu = () => {
-    servicesCloseTimer.current = setTimeout(() => {
+  const openServicesMenu = useCallback(() => {
+    clearCloseTimer();
+    setServicesOpen(true);
+  }, [clearCloseTimer, setServicesOpen]);
+
+  const closeServicesMenu = useCallback(() => {
+    clearCloseTimer();
+
+    servicesCloseTimerRef.current = window.setTimeout(() => {
       setServicesOpen(false);
-      servicesCloseTimer.current = null;
-    }, 120);
+      servicesCloseTimerRef.current = null;
+    }, SERVICES_CLOSE_DELAY);
+  }, [clearCloseTimer, setServicesOpen]);
+
+  const toggleServicesMenu = useCallback(() => {
+    clearCloseTimer();
+    setServicesOpen((prev) => !prev);
+  }, [clearCloseTimer, setServicesOpen]);
+
+  const handleServiceClick = () => {
+    clearCloseTimer();
+    setServicesOpen(false);
+    onLinkClick?.();
   };
 
   useEffect(() => {
     return () => {
-      if (servicesCloseTimer.current) {
-        clearTimeout(servicesCloseTimer.current);
-      }
+      clearCloseTimer();
     };
-  }, []);
+  }, [clearCloseTimer]);
 
   return (
     <div
@@ -37,7 +54,7 @@ function ServicesAccordion({ servicesOpen, setServicesOpen, onLinkClick }) {
     >
       <button
         type="button"
-        onClick={() => setServicesOpen((prev) => !prev)}
+        onClick={toggleServicesMenu}
         aria-expanded={servicesOpen}
         aria-controls="services-submenu"
         className="flex w-full items-center justify-between text-left text-xl sm:text-2xl font-medium cursor-pointer hover:text-red-600 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40 rounded-sm"
@@ -60,7 +77,7 @@ function ServicesAccordion({ servicesOpen, setServicesOpen, onLinkClick }) {
                 <Link
                   to={service.to}
                   className={serviceLinkClass}
-                  onClick={onLinkClick}
+                  onClick={handleServiceClick}
                 >
                   {service.label}
                 </Link>

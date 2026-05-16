@@ -3,8 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { ChevronDown } from "lucide-react";
 
-function ProducersSidebar({ producers, activeSlug }) {
+import { getCraneId, getCraneModel } from "../../utils/craneHelpers";
+
+function ProducersSidebar({ producers = [], activeSlug }) {
   const navigate = useNavigate();
+
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const sorted = useMemo(
     () =>
@@ -14,9 +18,8 @@ function ProducersSidebar({ producers, activeSlug }) {
     [producers]
   );
 
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-
   const currentSlug = activeSlug || sorted[0]?.slug || "";
+
   const activeProducer = sorted.find(
     (producer) => producer.slug === currentSlug
   );
@@ -107,9 +110,12 @@ function ProducersSidebar({ producers, activeSlug }) {
                   <div className="overflow-hidden">
                     <div className="px-4 pb-4 lg:px-6">
                       <ul className="space-y-3 border-l border-black/10 pl-4">
-                        {(models || []).filter(Boolean).map((model, index) => {
-                          const craneId = model?.id || model?._id;
-                          const label = model?.label || `Model ${index + 1}`;
+                        {models.filter(Boolean).map((model, index) => {
+                          const craneId = getCraneId(model);
+                          const label =
+                            getCraneModel(model) ||
+                            model?.title ||
+                            `Model ${index + 1}`;
 
                           return (
                             <li key={craneId || `${slug}-${index}`}>

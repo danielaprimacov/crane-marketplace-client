@@ -1,26 +1,28 @@
 import { ChevronDown } from "lucide-react";
 
+import { FloatingInput, FloatingSelect } from "../../ui/form/FloatingFields";
+
+const RENT_INTERVAL_OPTIONS = [
+  { value: "hour", label: "Hour" },
+  { value: "day", label: "Day" },
+  { value: "week", label: "Week" },
+  { value: "month", label: "Month" },
+];
+
 function CranePricingFields({ form, updateField }) {
   if (form.status === "for sale") {
     return (
       <div className="relative mb-8">
-        <input
+        <FloatingInput
           id="salePrice"
           name="salePrice"
           type="number"
-          min={0}
-          value={form.salePrice}
+          label="Sale Price (€)"
+          value={form.salePrice || ""}
           onChange={(e) => updateField("salePrice", e.target.value)}
           required
-          placeholder=" "
-          className="peer block w-full h-11 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black"
+          inputClassName="h-11"
         />
-        <label
-          htmlFor="salePrice"
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-        >
-          Sale Price (€)
-        </label>
       </div>
     );
   }
@@ -29,48 +31,30 @@ function CranePricingFields({ form, updateField }) {
     return (
       <>
         <div className="relative mb-8">
-          <input
+          <FloatingInput
             id="rentAmount"
             name="rentAmount"
             type="number"
-            min={0}
-            value={form.rentAmount}
+            label="Rent Amount (€)"
+            value={form.rentAmount || ""}
             onChange={(e) => updateField("rentAmount", e.target.value)}
             required
-            placeholder=" "
-            className="peer block w-full h-11 bg-transparent border-b border-b-black/20 focus:outline-none focus:border-black"
+            inputClassName="h-11"
           />
-          <label
-            htmlFor="rentAmount"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-          >
-            Rent Amount (€)
-          </label>
         </div>
 
         <div className="relative mb-8">
-          <select
+          <FloatingSelect
             id="rentInterval"
             name="rentInterval"
-            value={form.rentInterval}
+            label="Interval"
+            value={form.rentInterval || "day"}
             onChange={(e) => updateField("rentInterval", e.target.value)}
+            options={RENT_INTERVAL_OPTIONS}
+            placeholder="-- Interval --"
             required
-            className="peer block w-full h-11 appearance-none bg-transparent border-b border-b-black/20 pr-10 focus:outline-none focus:border-black"
-          >
-            <option value="" disabled>
-              -- Interval --
-            </option>
-            <option value="hour">Hour</option>
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-          </select>
-          <label
-            htmlFor="rentInterval"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-focus:-top-6 peer-focus:text-base"
-          >
-            Interval
-          </label>
+            selectClassName="h-11"
+          />
           <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-gray-500">
             <ChevronDown className="h-4 w-4" />
           </span>

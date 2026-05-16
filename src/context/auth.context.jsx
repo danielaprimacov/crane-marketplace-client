@@ -1,7 +1,5 @@
 import { useState, useEffect, createContext } from "react";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { authApi } from "../services/authApi";
 
 const AuthContext = createContext();
 
@@ -12,6 +10,10 @@ function AuthProviderWrapper(props) {
 
   const storeToken = (token) => {
     localStorage.setItem("authToken", token);
+  };
+
+  const removeToken = () => {
+    localStorage.removeItem("authToken");
   };
 
   const authenticateUser = async () => {
@@ -28,30 +30,27 @@ function AuthProviderWrapper(props) {
 
     try {
       // Attempt verification
-      const response = await axios.get(`${API_URL}/users/profile`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
+      const profile = await authApi.verify();
 
       // On success, update state
       setIsLoggedIn(true);
-      setIsLoading(false);
-      setUser(response.data);
+      setUser(profile);
     } catch (error) {
       // On any error, treat as unauthenticated
       console.error("Token verification failed:", error);
-      setIsLoggedIn(false);
-      setIsLoading(false);
-      setUser(null);
-    }
-  };
 
-  const removeToken = () => {
-    localStorage.removeItem("authToken");
+      removeToken();
+      setIsLoggedIn(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logOutUser = () => {
     removeToken();
-    authenticateUser();
+    setIsLoggedIn(false);
+    setUser(null);
   };
 
   useEffect(() => {

@@ -1,3 +1,5 @@
+import { FloatingDateInput } from "../ui/form/FloatingFields";
+
 function AvailabilityRange({ field, values, setValues, label }) {
   const startKey = `${field}Start`;
   const endKey = `${field}End`;
@@ -20,42 +22,26 @@ function AvailabilityRange({ field, values, setValues, label }) {
 
   return (
     <div className="flex gap-6 my-8 flex-col sm:flex-row">
-      <div className="relative flex-1">
-        <input
-          type="date"
+      <div className="flex-1">
+        <FloatingDateInput
           id={startKey}
           name={startKey}
+          label={`${label} From`}
           value={values[startKey] || ""}
           onChange={handleChange}
-          placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-0 focus:outline-none focus:border-black transition"
         />
-        <label
-          htmlFor={startKey}
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-        >
-          {label} From
-        </label>
       </div>
 
-      <div className="relative flex-1">
-        <input
-          type="date"
+      <div className="flex-1">
+        <FloatingDateInput
           id={endKey}
           name={endKey}
+          label={`${label} To`}
           value={values[endKey] || ""}
           min={values[startKey] || undefined}
           disabled={!values[startKey]}
           onChange={handleChange}
-          placeholder=" "
-          className="peer block w-full h-10 bg-transparent border-b border-b-black/20 mb-0 focus:outline-none focus:border-black transition disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        <label
-          htmlFor={endKey}
-          className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-        >
-          {label} To
-        </label>
       </div>
     </div>
   );
