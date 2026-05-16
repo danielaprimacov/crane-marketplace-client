@@ -1,9 +1,6 @@
 import AvailabilityRange from "../../cranes/AvailabilityRange";
 
 function InquiryOptionsSection({ form, setForm }) {
-  const needsTransport = Boolean(form.needsTransport);
-  const needsInstallation = Boolean(form.needsInstallation);
-
   const updateCheckbox = (field, checked) => {
     setForm((prev) => ({
       ...prev,
@@ -50,7 +47,7 @@ function InquiryOptionsSection({ form, setForm }) {
             type="checkbox"
             checked={form.needsInstallation}
             onChange={(event) =>
-              updateCheckbox("needsTransport", event.target.checked)
+              updateCheckbox("needsInstallation", event.target.checked)
             }
             className="mt-0.5 h-5 w-5 shrink-0 text-blue-600"
           />

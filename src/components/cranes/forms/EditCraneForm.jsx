@@ -85,7 +85,7 @@ function EditCraneForm() {
 
       setForm((prev) => ({
         ...prev,
-        images: [...prev.images, imageUrl],
+        images: [imageUrl, ...prev.images],
       }));
 
       toast.success("Image uploaded!");
