@@ -16,6 +16,8 @@ import { craneApi } from "../../../services/craneApi";
 
 import useCloudinaryUpload from "../../../hooks/useCloudinaryUpload";
 
+import { CRANES_UPDATED_EVENT } from "../../../constants/events";
+
 import {
   initialCraneState,
   buildCraneRequestBody,
@@ -111,6 +113,7 @@ function EditCraneForm() {
       setSaving(true);
 
       await craneApi.update(craneId, requestBody);
+      window.dispatchEvent(new Event(CRANES_UPDATED_EVENT));
 
       toast.success("Crane updated successfully!");
 

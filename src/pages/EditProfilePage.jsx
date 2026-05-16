@@ -1,9 +1,14 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 import { AuthContext } from "../context/auth.context";
 import { userApi } from "../services/userApi";
-import { FloatingInput } from "../components/ui/form/FloatingFields";
+
+import {
+  FloatingInput,
+  FloatingPasswordInput,
+} from "../components/ui/form/FloatingFields";
 
 const INITIAL_FORM = {
   name: "",
@@ -26,7 +31,6 @@ function EditProfilePage() {
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -96,7 +100,6 @@ function EditProfilePage() {
     if (submitting) return;
 
     setError("");
-    setSuccess("");
 
     const validationError = validateForm();
 
@@ -121,7 +124,7 @@ function EditProfilePage() {
       await userApi.updateProfile(requestBody);
       await authenticateUser();
 
-      setSuccess("✅ Your profile has been updated!");
+      toast.success("Profile updated successfully.");
 
       if (showPasswordFields) {
         resetPasswordFields();
@@ -129,9 +132,9 @@ function EditProfilePage() {
 
       redirectTimeoutRef.current = window.setTimeout(() => {
         navigate("/profile", { replace: true });
-      }, 1800);
-    } catch (err) {
-      console.error("Failed to update profile:", err);
+      }, 1200);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
       setError(getErrorMessage(error));
     } finally {
       setSubmitting(false);
@@ -149,38 +152,38 @@ function EditProfilePage() {
           Edit Profile
         </h1>
 
-        {success && (
-          <p className="mb-4 rounded-lg bg-green-50 px-4 py-3 text-center text-green-700">
-            {success}
-          </p>
-        )}
-
         {error && (
-          <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-center text-red-700">
-            {error}
-          </p>
+          <div
+            role="alert"
+            className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+          >
+            <p className="font-medium text-red-800">Could not update profile</p>
+            <p className="mt-1">{error}</p>
+          </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-7">
+        <form onSubmit={handleSubmit} className="space-y-7 pt-4">
           <FloatingInput
-            id="name"
+            id="profile-name"
             name="name"
             type="text"
             label="Full Name"
             value={form.name}
             onChange={handleChange}
             required
+            disabled={submitting}
             autoComplete="name"
           />
 
           <FloatingInput
-            id="email"
+            id="profile-email"
             name="email"
             type="email"
             label="Email Address"
             value={form.email}
             onChange={handleChange}
             required
+            disabled={submitting}
             autoComplete="email"
           />
 
@@ -188,38 +191,43 @@ function EditProfilePage() {
             <button
               type="button"
               onClick={() => setShowPasswordFields(true)}
-              className="text-orange-500 text-sm transition hover:underline"
+              disabled={submitting}
+              className="text-sm text-orange-500 transition hover:underline disabled:cursor-not-allowed disabled:opacity-60"
             >
               Change Password
             </button>
           ) : (
-            <div className="space-y-7 rounded-xl border border-black/10 bg-gray-50 p-4 sm:p-5">
-              <FloatingInput
-                id="currentPassword"
+            <div className="space-y-7 rounded-xl border border-black/10 bg-gray-50 p-6 sm:p-7">
+              <FloatingPasswordInput
+                id="profile-current-password"
                 name="currentPassword"
-                type="password"
                 label="Current Password"
                 value={form.currentPassword}
                 onChange={handleChange}
                 required
+                disabled={submitting}
                 autoComplete="current-password"
+                inputClassName="mt-2"
               />
 
-              <FloatingInput
-                id="newPassword"
+              <FloatingPasswordInput
+                id="profile-new-password"
                 name="newPassword"
-                type="password"
                 label="New Password"
                 value={form.newPassword}
                 onChange={handleChange}
                 required
+                disabled={submitting}
                 minLength={8}
                 autoComplete="new-password"
+                inputClassName="mt-2"
               />
+
               <button
                 type="button"
                 onClick={resetPasswordFields}
-                className="text-red-600 text-sm transition hover:underline"
+                disabled={submitting}
+                className="text-sm text-red-600 transition hover:underline disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel Password Change
               </button>

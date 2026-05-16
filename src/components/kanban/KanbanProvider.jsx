@@ -34,8 +34,8 @@ const KanbanProvider = ({
     const grouped = tasks.reduce((acc, task) => {
       const status = task.status || "new";
 
-      acc[task.status] = acc[task.status] || [];
-      acc[task.status].push(task);
+      acc[status] = acc[status] || [];
+      acc[status].push(task);
       return acc;
     }, {});
 

@@ -77,9 +77,9 @@ function RangeDropDown({
       return;
     }
 
-    const nextMin = clamp(parsedValue, min, local[1]);
+    const nextMax = clamp(parsedValue, local[0], max);
 
-    updateLocal([nextMin, local[1]]);
+    updateLocal([local[0], nextMax]);
   };
 
   return (
@@ -134,6 +134,9 @@ function RangeDropDown({
                                   min,
                                   max,
                                 }),
+                                touchAction: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
                               }}
                             >
                               {children}
@@ -141,13 +144,19 @@ function RangeDropDown({
                           );
                         }}
                         renderThumb={({ props }) => {
-                          const { key, ...thumbProps } = props;
+                          const { key, style, ...thumbProps } = props;
 
                           return (
                             <div
                               key={key}
                               {...thumbProps}
                               className="h-4 w-4 rounded-full border border-gray-400 bg-white shadow"
+                              style={{
+                                ...style,
+                                touchAction: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
                             />
                           );
                         }}

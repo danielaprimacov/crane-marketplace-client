@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 
 import { authApi } from "../../../services/authApi";
-import { FloatingInput } from "../../ui/form/FloatingFields";
+import {
+  FloatingInput,
+  FloatingPasswordInput,
+} from "../../ui/form/FloatingFields";
 
 function getErrorMessage(error) {
   const responseData = error?.response?.data;
@@ -29,9 +31,6 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,7 +41,7 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
     setErrorMessage("");
 
     const trimmedName = name.trim();
-    const trimmedEmail = email.trim().toLocaleLowerCase();
+    const trimmedEmail = email.trim().toLowerCase();
 
     if (!trimmedName) {
       setErrorMessage("Name is required.");
@@ -86,8 +85,8 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col px-5 py-7 sm:px-8">
-      <h1 className="mb-8 text-2xl uppercase font-semibold text-gray-900 tracking-tight">
+    <div className="mx-auto flex w-full max-w-xl flex-col px-4 pb-5 sm:px-6">
+      <h1 className="my-8 text-2xl uppercase font-semibold text-gray-900 sm:my-10">
         Create account
       </h1>
       <form
@@ -95,95 +94,57 @@ function SignupForm({ onSuccess, onSwitchToLogin, formRef }) {
         onSubmit={handleSignupSubmit}
         className="flex flex-col"
       >
-        <div className="relativ mb-7">
-          <FloatingInput
-            id="name"
-            name="name"
-            type="text"
-            label="Your name*"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            autoComplete="name"
-            required
-          />
-        </div>
+        <FloatingInput
+          id="signup-name"
+          name="name"
+          type="text"
+          label="Your name*"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          autoComplete="name"
+          required
+          disabled={isSubmitting}
+          inputClassName="mb-10"
+        />
 
-        <div className="mb-7">
-          <FloatingInput
-            id="signup-email"
-            name="email"
-            type="email"
-            label="Your email address*"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            required
-          />
-        </div>
+        <FloatingInput
+          id="signup-email"
+          name="email"
+          type="email"
+          label="Your email address*"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
+          required
+          disabled={isSubmitting}
+          inputClassName="mb-10"
+        />
 
-        <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            id="signup-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder=" "
-            autoComplete="new-password"
-            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent pr-16 focus:border-black focus:outline-none"
-          />
+        <FloatingPasswordInput
+          id="signup-password"
+          name="password"
+          label="Your password*"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          disabled={isSubmitting}
+          inputClassName="mb-10"
+        />
 
-          <label
-            htmlFor="signup-password"
-            className="absolute left-0 top-0 flex h-10 items-center text-sm text-black/50 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:-top-6"
-          >
-            Your password*
-          </label>
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute right-0 top-0 h-10 w-10 text-sm text-gray-500 transition hover:text-black"
-          >
-            {showPassword ? (
-              <EyeOff className="h-5 w-5" />
-            ) : (
-              <Eye className="h-5 w-5" />
-            )}
-          </button>
-        </div>
-
-        <div className="relative">
-          <input
-            type={showRepeatPassword ? "text" : "password"}
-            name="repeat-password"
-            id="repeat-password"
-            value={repeatPassword}
-            onChange={(event) => setRepeatPassword(event.target.value)}
-            placeholder=" "
-            autoComplete="new-password"
-            className="peer mb-7 block h-10 w-full border-b border-b-black/20 bg-transparent pr-16 focus:border-black focus:outline-none"
-          />
-
-          <label
-            htmlFor="repeat-password"
-            className="absolute left-0 top-0 flex h-10 items-center text-sm text-black/50 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:-top-6"
-          >
-            Repeat your password*
-          </label>
-          <button
-            type="button"
-            aria-label={showRepeatPassword ? "Hide password" : "Show password"}
-            onClick={() => setShowRepeatPassword((prev) => !prev)}
-            className="absolute right-0 top-0 h-10 w-10 text-sm text-gray-500 transition hover:text-black"
-          >
-            {showRepeatPassword ? (
-              <EyeOff className="h-5 w-5" />
-            ) : (
-              <Eye className="h-5 w-5" />
-            )}
-          </button>
-        </div>
+        <FloatingPasswordInput
+          id="signup-repeat-password"
+          name="repeatPassword"
+          label="Repeat your password*"
+          value={repeatPassword}
+          onChange={(event) => setRepeatPassword(event.target.value)}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          disabled={isSubmitting}
+          inputClassName="mb-10"
+        />
         <button
           type="submit"
           className="mt-1 bg-black text-white py-3 text-sm rounded uppercase hover:bg-orange-400 transition duration-300 ease-in disabled:cursor-not-allowed disabled:opacity-60"

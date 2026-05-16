@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
 
 import { AuthContext } from "../../../context/auth.context";
 import { authApi } from "../../../services/authApi";
@@ -8,7 +7,10 @@ import { craneApi } from "../../../services/craneApi";
 
 import { slugify } from "../../../utils/helpers";
 
-import { FloatingInput } from "../../ui/form/FloatingFields";
+import {
+  FloatingInput,
+  FloatingPasswordInput,
+} from "../../ui/form/FloatingFields";
 
 function getCranesTargetPath(cranes) {
   const safeCranes = Array.isArray(cranes) ? cranes : [];
@@ -50,7 +52,6 @@ function LoginForm({ onSuccess, onSwitchToSignup, formRef }) {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const { storeToken, authenticateUser } = useContext(AuthContext);
 
@@ -65,13 +66,12 @@ function LoginForm({ onSuccess, onSwitchToSignup, formRef }) {
 
     try {
       const requestBody = {
-        email: email.trim().toLocaleLowerCase(),
+        email: email.trim().toLowerCase(),
         password,
       };
 
       const loginData = await authApi.login(requestBody);
 
-      // send credentials
       const token = loginData.token || loginData.authToken;
 
       if (!token) {
@@ -79,12 +79,18 @@ function LoginForm({ onSuccess, onSwitchToSignup, formRef }) {
       }
 
       // save & verify
-      storeToken(authToken);
+      storeToken(token);
       await authenticateUser();
 
       // redirect all cranes
-      const cranes = await craneApi.getAll();
-      const targetPath = getCranesTargetPath(cranes);
+      let targetPath = "/cranes";
+
+      try {
+        const cranes = await craneApi.getAll();
+        targetPath = getCranesTargetPath(cranes);
+      } catch (redirectError) {
+        console.error("Could not load cranes for redirect:", redirectError);
+      }
 
       onSuccess?.();
 
@@ -99,7 +105,7 @@ function LoginForm({ onSuccess, onSwitchToSignup, formRef }) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-[40rem] flex-col px-4 pb-5 sm:px-6">
+    <div className="mx-auto flex w-full max-w-xl flex-col px-4 pb-5 sm:px-6">
       <h1 className="my-8 text-2xl uppercase font-semibold text-gray-900 sm:my-10">
         Login
       </h1>
@@ -108,50 +114,30 @@ function LoginForm({ onSuccess, onSwitchToSignup, formRef }) {
         onSubmit={handleLoginSubmit}
         className="flex flex-col"
       >
-        <div className="relative">
-          <FloatingInput
-            id="email"
-            name="email"
-            type="email"
-            label="Your email address"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            required
-          />
-        </div>
+        <FloatingInput
+          id="login-email"
+          name="email"
+          type="email"
+          label="Your email address"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
+          required
+          disabled={isSubmitting}
+          inputClassName="mb-10"
+        />
 
-        <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            id="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder=" "
-            autoComplete="current-password"
-            className="peer mb-10 block h-10 w-full border-b border-b-black/20 bg-transparent focus:border-black focus:outline-none"
-          />
-
-          <label
-            htmlFor="password"
-            className="absolute left-0 -top-8 flex h-10 items-center text-sm text-black/50 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:-top-6"
-          >
-            Your password
-          </label>
-          <button
-            type="button"
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-0 top-0 h-10 w-10 text-sm text-gray-500 transition hover:text-black"
-          >
-            {showPassword ? (
-              <EyeOff className="h-5 w-5" />
-            ) : (
-              <Eye className="h-5 w-5" />
-            )}
-          </button>
-        </div>
+        <FloatingPasswordInput
+          id="login-password"
+          name="password"
+          label="Your password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
+          required
+          disabled={isSubmitting}
+          inputClassName="mb-10"
+        />
 
         <button
           type="submit"

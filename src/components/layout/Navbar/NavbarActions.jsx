@@ -1,6 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { ROLES } from "../../../constants/roles.js";
+
+import UserCranesMenu from "./UserCranesMenu";
 
 import Badge from "../../ui/Badge";
 import IconButton from "../../ui/IconButton";
@@ -14,15 +16,15 @@ function AddCraneLink({ isVisible }) {
   if (!isVisible) return null;
 
   return (
-    <IconLink
+    <Link
       to="/cranes/new"
       label="Add a new crane"
-      className="h-7 min-w-7 bg-red-600 px-1 text-xs font-semibold text-white hover:bg-red-700 hover:shadow-md hover:text-white sm:h-10 sm:px-3 md:px-4"
+      className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-red-600 px-3 text-xs font-semibold text-white transition hover:bg-red-700 hover:text-white hover:shadow-md sm:h-10 sm:px-4"
     >
       <span className="sm:hidden">+</span>
-      <span className="hidden sm:inline md:hidden">Add</span>
-      <span className="hidden md:inline">Add a new crane</span>
-    </IconLink>
+      <span className="hidden sm:inline lg:hidden">Add</span>
+      <span className="hidden lg:inline">Add a new crane</span>
+    </Link>
   );
 }
 
